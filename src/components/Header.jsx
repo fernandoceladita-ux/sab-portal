@@ -82,13 +82,14 @@ export default function Header() {
                         <ul className="flex flex-col gap-1">
                           {group.items.map((item) => (
                             <li key={item.id}>
-                              <Link
+                              <MenuLink
+                                item={item}
                                 to={`${mod.path}?item=${item.id}`}
                                 className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-latam-estrellada"
                               >
                                 <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
                                 {item.label}
-                              </Link>
+                              </MenuLink>
                             </li>
                           ))}
                         </ul>
@@ -145,13 +146,14 @@ export default function Header() {
                           <ul className="flex flex-col">
                             {group.items.map((item) => (
                               <li key={item.id}>
-                                <Link
+                                <MenuLink
+                                  item={item}
                                   to={`${mod.path}?item=${item.id}`}
                                   className="flex items-center gap-3 rounded-lg py-2.5 text-[14px] font-semibold text-slate-600 active:bg-slate-50"
                                 >
                                   <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
                                   {item.label}
-                                </Link>
+                                </MenuLink>
                               </li>
                             ))}
                           </ul>
@@ -185,6 +187,23 @@ function NavItem({ to, label }) {
         </>
       )}
     </NavLink>
+  )
+}
+
+// Opciones del mega-menú/drawer: si el ítem trae externalUrl (ej. AppSheet),
+// abre en pestaña nueva en vez de navegar dentro del portal.
+function MenuLink({ item, to, className, children }) {
+  if (item.externalUrl) {
+    return (
+      <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    )
+  }
+  return (
+    <Link to={to} className={className}>
+      {children}
+    </Link>
   )
 }
 

@@ -25,6 +25,10 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: 'Token inválido' })
     }
 
+    if (!String(data.bp || '').trim() || !String(data.nombre || '').trim()) {
+      return jsonResponse({ status: 'error', message: 'BP y nombre son obligatorios' })
+    }
+
     const ss = SpreadsheetApp.openById(SHEET_ID)
     const sheet = ss.getSheets().find((s) => s.getSheetId() === TARGET_GID)
     if (!sheet) {
@@ -38,28 +42,28 @@ function doPost(e) {
     // "licencia" no está acá: su única columna relevante es de archivo.
     const valuesByHeader = {
       'Marca temporal': new Date(),
-      'Ingresa tu BP': data.bp || '',
-      'Ingresa tus nombres y apellidos completos': data.nombre || '',
-      'Selecciona que actualización deseas realizar': data.tramite || '',
-      'Nombre del Contacto de Emergencia': data.contactoNombre || '',
-      'Teléfono': data.contactoTelefono || '',
-      'Indícanos tu nueva dirección': data.direccion || '',
-      'Indícanos el distrito': data.distrito || '',
-      'Agregar sus coordenadas': data.coordenadas || '',
-      'Fecha vencimiento DNI': data.dniVencimiento || '',
-      'Ingresa el número de tu nuevo pasaporte': data.pasaporteNumero || '',
-      'Fecha de Vencimiento del pasaporte': data.pasaporteVencimiento || '',
-      'País emisor de pasaporte': data.pasaportePais || '',
-      'Indícanos qué número de celular deseas que consideremos ahora': data.celular || '',
-      'Indícanos qué número de teléfono fijo deseas que consideremos ahora': data.telefonoFijo || '',
-      'Fecha de vacunación': data.fiebreFecha || '',
-      'Cuentas con tu pasaporte para ejercer funciones': data.rechazoPasaporte || '',
-      'Ingresa el código alfanumérico de tu visa (código en rojo) Tripulante': data.visaTripulanteCodigo || '',
-      'Fecha Emisión de VISA Tripulante': data.visaTripulanteEmision || '',
-      'Fecha de Vencimiento de VISA Tripulante': data.visaTripulanteVencimiento || '',
-      'Ingresa el código alfanumérico de tu visa (código en rojo) Turista': data.visaTuristaCodigo || '',
-      'Fecha Emisión de VISA Turista': data.visaTuristaEmision || '',
-      'Fecha de Vencimiento de VISA Turista': data.visaTuristaVencimiento || '',
+      'Ingresa tu BP': sanitizeValue(data.bp),
+      'Ingresa tus nombres y apellidos completos': sanitizeValue(data.nombre),
+      'Selecciona que actualización deseas realizar': sanitizeValue(data.tramite),
+      'Nombre del Contacto de Emergencia': sanitizeValue(data.contactoNombre),
+      'Teléfono': sanitizeValue(data.contactoTelefono),
+      'Indícanos tu nueva dirección': sanitizeValue(data.direccion),
+      'Indícanos el distrito': sanitizeValue(data.distrito),
+      'Agregar sus coordenadas': sanitizeValue(data.coordenadas),
+      'Fecha vencimiento DNI': sanitizeValue(data.dniVencimiento),
+      'Ingresa el número de tu nuevo pasaporte': sanitizeValue(data.pasaporteNumero),
+      'Fecha de Vencimiento del pasaporte': sanitizeValue(data.pasaporteVencimiento),
+      'País emisor de pasaporte': sanitizeValue(data.pasaportePais),
+      'Indícanos qué número de celular deseas que consideremos ahora': sanitizeValue(data.celular),
+      'Indícanos qué número de teléfono fijo deseas que consideremos ahora': sanitizeValue(data.telefonoFijo),
+      'Fecha de vacunación': sanitizeValue(data.fiebreFecha),
+      'Cuentas con tu pasaporte para ejercer funciones': sanitizeValue(data.rechazoPasaporte),
+      'Ingresa el código alfanumérico de tu visa (código en rojo) Tripulante': sanitizeValue(data.visaTripulanteCodigo),
+      'Fecha Emisión de VISA Tripulante': sanitizeValue(data.visaTripulanteEmision),
+      'Fecha de Vencimiento de VISA Tripulante': sanitizeValue(data.visaTripulanteVencimiento),
+      'Ingresa el código alfanumérico de tu visa (código en rojo) Turista': sanitizeValue(data.visaTuristaCodigo),
+      'Fecha Emisión de VISA Turista': sanitizeValue(data.visaTuristaEmision),
+      'Fecha de Vencimiento de VISA Turista': sanitizeValue(data.visaTuristaVencimiento),
     }
 
     const row = headers.map((header) => (header in valuesByHeader ? valuesByHeader[header] : ''))
@@ -69,6 +73,15 @@ function doPost(e) {
   } catch (err) {
     return jsonResponse({ status: 'error', message: err.message })
   }
+}
+
+// Evita inyección de fórmulas: si el valor empieza con = + - @, Sheets lo
+// interpretaría como fórmula al abrir la celda. Anteponer ' lo fuerza a texto
+// plano. También recorta a 500 caracteres para frenar payloads gigantes.
+function sanitizeValue(value) {
+  if (value === undefined || value === null) return ''
+  const str = String(value).slice(0, 500)
+  return /^[=+\-@]/.test(str) ? "'" + str : str
 }
 
 function jsonResponse(obj) {

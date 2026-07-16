@@ -18,7 +18,13 @@ export const MODULES = [
         title: 'Expediente Personal',
         items: [
           { id: 'actualizacion-datos', label: 'Actualización de Datos', icon: IconEdit },
-          { id: 'renovacion-fotocheck', label: 'Renovación de Fotocheck', icon: IconIdCard },
+          {
+            id: 'renovacion-fotocheck',
+            label: 'Renovación de Fotocheck',
+            icon: IconIdCard,
+            externalUrl:
+              'https://www.appsheet.com/Account/Login?appName=Solicitud%20De%20Credenciales%20PE&FullScope=False&provider=google&returnUrl=https%3A%2F%2Fwww.appsheet.com%2Fstart%2Ffc09f2b3-fd11-46ae-882b-d8ce2cb7a8d1%3Fplatform%3Ddesktop#appName=SolicitudDeCredencialesPE-501453028&vss=H4sIAAAAAAAAA6WOOw7CMBAF7_Jqn8AliAIhaEA0mMLEG8kisaPYCUSW786aj1ID5b7VjCZhtHTbR11dIU9pvjY0QSIpHKaOFKTC0rvY-0ZBKOx0-xoXltxIzhqtkJHP4mOIFCDTtwL5b4GANeSirS31xVZYtrxJfheOh5lCFmiHqC8NPbOZypm32ldDIHPknJ8ywtqt7p12ZusNS2vdBMoPSSDo2G8BAAA=&view=Bienvenida',
+          },
           { id: 'cesion-vacaciones', label: 'Intercambio o Cesión de Vacaciones', icon: IconCalendar },
         ],
       },

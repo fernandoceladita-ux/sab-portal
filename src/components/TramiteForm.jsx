@@ -47,6 +47,17 @@ export default function TramiteForm() {
     e.preventDefault()
     setError('')
 
+    // RadioGroup/CheckboxGroup son botones, no inputs nativos, así que el
+    // navegador no los valida solo — se revisan a mano.
+    if (tramite === 'rechazo' && !passStatus) {
+      setError('Completa los campos obligatorios: selecciona si cuentas con tu pasaporte.')
+      return
+    }
+    if (tramite === 'visa' && visaTypes.length === 0) {
+      setError('Completa los campos obligatorios: selecciona al menos un tipo de VISA.')
+      return
+    }
+
     if (!SHEET_CONNECTED_TRAMITES.includes(tramite)) {
       // Los demás trámites aún no están conectados a Google Sheets.
       setSent(true)

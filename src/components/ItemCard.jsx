@@ -1,11 +1,10 @@
 export default function ItemCard({ item, content, active, onSelect }) {
-  return (
-    <button
-      onClick={onSelect}
-      className={`group flex w-[250px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition sm:w-[270px] ${
-        active ? 'border-latam-coral ring-2 ring-latam-coral/30' : 'border-slate-200 hover:border-latam-estrellada/40'
-      }`}
-    >
+  const cardClassName = `group flex w-[250px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition sm:w-[270px] ${
+    active ? 'border-latam-coral ring-2 ring-latam-coral/30' : 'border-slate-200 hover:border-latam-estrellada/40'
+  }`
+
+  const cardContent = (
+    <>
       <div className="h-32 w-full overflow-hidden bg-slate-100">
         <img src={content?.image} alt="" className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
       </div>
@@ -28,6 +27,22 @@ export default function ItemCard({ item, content, active, onSelect }) {
           Ingresar
         </span>
       </div>
+    </>
+  )
+
+  // Ítems con externalUrl (ej. AppSheet) abren en pestaña nueva en vez de
+  // seleccionar el detalle dentro del portal.
+  if (item.externalUrl) {
+    return (
+      <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className={cardClassName}>
+        {cardContent}
+      </a>
+    )
+  }
+
+  return (
+    <button onClick={onSelect} className={cardClassName}>
+      {cardContent}
     </button>
   )
 }

@@ -22,7 +22,7 @@ export function FieldWrap({ label, hint, required, children }) {
 export function TextField({ label, hint, required, ...props }) {
   return (
     <FieldWrap label={label} hint={hint} required={required}>
-      <input type="text" className={inputCls} {...props} />
+      <input type="text" required={required} className={inputCls} {...props} />
     </FieldWrap>
   )
 }
@@ -30,7 +30,7 @@ export function TextField({ label, hint, required, ...props }) {
 export function DateField({ label, required, ...props }) {
   return (
     <FieldWrap label={label} required={required}>
-      <input type="date" className={inputCls} {...props} />
+      <input type="date" required={required} className={inputCls} {...props} />
     </FieldWrap>
   )
 }
@@ -38,7 +38,7 @@ export function DateField({ label, required, ...props }) {
 export function SelectField({ label, required, options = [], ...props }) {
   return (
     <FieldWrap label={label} required={required}>
-      <select className={inputCls} defaultValue="" {...props}>
+      <select required={required} className={inputCls} defaultValue="" {...props}>
         <option value="" disabled>
           Elegir una opción...
         </option>
@@ -72,7 +72,11 @@ export function FileUploadField({ label, required, hint = 'PDF o imagen · Máx 
       <input
         ref={inputRef}
         type="file"
-        className="hidden"
+        required={required}
+        // sr-only (not `hidden`/display:none): inputs that aren't rendered are
+        // excluded from HTML5 required-field validation, so the browser would
+        // silently allow submitting without a file.
+        className="sr-only"
         onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
       />
     </FieldWrap>
