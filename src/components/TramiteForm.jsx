@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import StepAccordion from './StepAccordion.jsx'
 import {
   TextField, DateField, SelectField, FileUploadField, InfoNote,
@@ -36,7 +37,11 @@ const TRAMITES = [
 const ROUTE_STEPS = ['PORTAL', 'PEOPLE MANAGER', 'MY PROFILE', 'PERSONAL DATA', 'CONTACT INFORMATION']
 
 export default function TramiteForm() {
-  const [tramite, setTramite] = useState(null)
+  const [searchParams] = useSearchParams()
+  const [tramite, setTramite] = useState(() => {
+    const fromUrl = searchParams.get('tramite')
+    return TRAMITES.some((t) => t.id === fromUrl) ? fromUrl : null
+  })
   const [visaTypes, setVisaTypes] = useState([])
   const [passStatus, setPassStatus] = useState('')
   const [sent, setSent] = useState(false)
@@ -109,14 +114,14 @@ export default function TramiteForm() {
 
       <div className="mt-6">
         <StepAccordion number={1} title="Identificación del Tripulante">
-          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" defaultValue="6014982" />
+          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" defaultValue="" />
           <TextField
             name="nombre"
             label="Ingresa tus nombres y apellidos completos"
             hint="(No colocar tildes)"
             required
             placeholder="Ej. Mario Fernandez"
-            defaultValue="Mario Fernandez"
+            defaultValue=""
           />
         </StepAccordion>
 

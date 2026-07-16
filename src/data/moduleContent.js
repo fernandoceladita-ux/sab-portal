@@ -6,7 +6,7 @@ export const ITEM_CONTENT = {
     description: 'Actualización general de la ficha informativa interna.',
     tags: ['Expediente Personal', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
-    hasForm: true,
+    form: 'actualizacion-datos',
   },
   'renovacion-fotocheck': {
     description: 'Solicitud digital de renovación de credenciales aeroportuarias.',
@@ -14,24 +14,28 @@ export const ITEM_CONTENT = {
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70',
   },
   'cesion-vacaciones': {
-    description: 'Solicita el intercambio o la cesión de tus días de vacaciones con otro tripulante.',
+    description: 'Solicita el intercambio, la cesión o un pedido adicional de tus días de vacaciones.',
     tags: ['Expediente Personal', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=700&q=70',
+    form: 'cesion-vacaciones',
   },
   'domicilio-dgac': {
     description: 'Actualiza tu domicilio declarado ante la Dirección General de Aeronáutica Civil.',
     tags: ['Entidades y Legal', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=70',
+    form: 'domicilio-dgac',
   },
   'vacuna-fiebre-amarilla': {
     description: 'Registra tu constancia de vacunación contra la fiebre amarilla.',
     tags: ['Entidades y Legal', 'Documento'],
     image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=70',
+    form: 'vacuna-fiebre-amarilla',
   },
   'registro-sunat': {
     description: 'Declaración obligatoria de dispositivos tecnológicos personales ante aduanas.',
     tags: ['Entidades y Legal', 'Registro de Formulario'],
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
+    form: 'registro-sunat',
   },
   'solicitud-mes-subsiguiente': {
     description: 'Envía tu solicitud de preferencias de rol para el mes subsiguiente.',

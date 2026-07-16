@@ -161,8 +161,46 @@ export const IconSend = ({ className }) =>
 export const IconUpload = ({ className }) =>
   wrap(<><path d="M12 15V4M8 8l4-4 4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" strokeLinecap="round" strokeLinejoin="round" /></>, className)
 
+export const IconDownload = ({ className }) =>
+  wrap(<><path d="M12 4v11M8 11l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" strokeLinecap="round" strokeLinejoin="round" /></>, className)
+
 export const IconCheck = ({ className }) =>
   wrap(<path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />, className)
 
 export const IconSparkle = ({ className }) =>
   wrap(<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" strokeLinecap="round" />, className)
+
+export const IconAlertTriangle = ({ className }) =>
+  wrap(
+    <>
+      <path d="M12 3.5 2.5 20h19L12 3.5Z" strokeLinejoin="round" strokeLinecap="round" />
+      <path d="M12 10v4.3" strokeLinecap="round" />
+      <circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none" />
+    </>,
+    className,
+  )
+
+export const IconMail = ({ className }) =>
+  wrap(
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m4 7 8 6 8-6" strokeLinecap="round" strokeLinejoin="round" />
+    </>,
+    className,
+  )
+
+export const IconHome = ({ className }) =>
+  wrap(
+    <>
+      <path d="M4 11 12 4l8 7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 10v9h12v-9" strokeLinejoin="round" />
+      <path d="M10 19v-5h4v5" strokeLinejoin="round" />
+    </>,
+    className,
+  )
+
+export const IconWhatsApp = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className || 'w-5 h-5'} fill="currentColor">
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.41-1.42a9.9 9.9 0 0 0 4.63 1.18h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.05c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.11.11-1.79-.11a16.4 16.4 0 0 1-1.58-.58c-2.79-1.2-4.6-4.03-4.74-4.22-.14-.18-1.13-1.5-1.13-2.87 0-1.36.71-2.03.97-2.3.24-.28.53-.35.71-.35h.51c.16 0 .38-.06.6.45s.72 1.77.78 1.9c.06.12.1.27.02.44-.08.16-.12.27-.24.42-.12.14-.25.32-.36.43-.12.12-.24.25-.1.5.14.24.6 1 1.3 1.62.9.79 1.65 1.04 1.9 1.16.24.12.38.1.53-.06.14-.16.6-.7.76-.94.16-.24.32-.2.53-.12.22.08 1.38.65 1.62.77.24.12.4.18.46.28.06.1.06.6-.18 1.28Z" />
+  </svg>
+)

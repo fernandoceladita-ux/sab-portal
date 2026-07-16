@@ -1,9 +1,12 @@
 import { useRef, useState } from 'react'
-import { IconUpload, IconCheck, IconArrowRight, IconClock } from '../icons.jsx'
+import { IconUpload, IconCheck, IconArrowRight, IconClock, IconClose } from '../icons.jsx'
 
 const labelCls = 'block text-sm font-bold text-latam-estrellada mb-2'
-const inputCls =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10'
+const inputBaseCls = 'w-full rounded-xl border px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all'
+const inputNormalCls = 'border-slate-200 bg-slate-50 focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10'
+const inputInvalidCls = 'border-latam-coral bg-latam-coral/5 ring-4 ring-latam-coral/15 animate-shake'
+// `invalid` es opt-in: los campos que no lo pasan se comportan exactamente igual que antes.
+const inputCls = (invalid) => `${inputBaseCls} ${invalid ? inputInvalidCls : inputNormalCls}`
 
 export function FieldWrap({ label, hint, required, children }) {
   return (
@@ -19,26 +22,42 @@ export function FieldWrap({ label, hint, required, children }) {
   )
 }
 
-export function TextField({ label, hint, required, ...props }) {
+export function TextField({ label, hint, required, invalid, ...props }) {
   return (
     <FieldWrap label={label} hint={hint} required={required}>
-      <input type="text" required={required} className={inputCls} {...props} />
+      <input type="text" required={required} className={inputCls(invalid)} {...props} />
     </FieldWrap>
   )
 }
 
-export function DateField({ label, required, ...props }) {
+export function DateField({ label, required, invalid, ...props }) {
   return (
     <FieldWrap label={label} required={required}>
-      <input type="date" required={required} className={inputCls} {...props} />
+      <input type="date" required={required} className={inputCls(invalid)} {...props} />
     </FieldWrap>
   )
 }
 
-export function SelectField({ label, required, options = [], ...props }) {
+export function MonthField({ label, required, invalid, ...props }) {
   return (
     <FieldWrap label={label} required={required}>
-      <select required={required} className={inputCls} defaultValue="" {...props}>
+      <input type="month" required={required} className={inputCls(invalid)} {...props} />
+    </FieldWrap>
+  )
+}
+
+export function TextareaField({ label, hint, required, invalid, ...props }) {
+  return (
+    <FieldWrap label={label} hint={hint} required={required}>
+      <textarea rows={4} required={required} className={`${inputCls(invalid)} resize-none`} {...props} />
+    </FieldWrap>
+  )
+}
+
+export function SelectField({ label, required, invalid, options = [], ...props }) {
+  return (
+    <FieldWrap label={label} required={required}>
+      <select required={required} className={inputCls(invalid)} defaultValue="" {...props}>
         <option value="" disabled>
           Elegir una opción...
         </option>
@@ -52,32 +71,126 @@ export function SelectField({ label, required, options = [], ...props }) {
   )
 }
 
-export function FileUploadField({ label, required, hint = 'PDF o imagen · Máx 10 MB' }) {
+const formatFileSize = (bytes) =>
+  bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+
+// Drag & drop + validación de formato/peso + preview con botón de quitar.
+// `name`/`accept`/`maxSizeMB`/`onFileChange` son opcionales — los usos
+// existentes sin esos props siguen funcionando exactamente igual que antes.
+export function FileUploadField({
+  label,
+  required,
+  hint = 'PDF o imagen · Máx 10 MB',
+  name,
+  accept = '.pdf,.png,.jpg,.jpeg',
+  maxSizeMB = 10,
+  invalid,
+  onFileChange,
+}) {
   const inputRef = useRef(null)
-  const [fileName, setFileName] = useState('')
+  const [file, setFile] = useState(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [fileError, setFileError] = useState('')
+
+  const acceptExts = accept.split(',').map((s) => s.trim().toLowerCase())
+
+  const validate = (f) => {
+    const ext = `.${f.name.split('.').pop().toLowerCase()}`
+    if (!acceptExts.includes(ext)) return `Formato no permitido. Usa: ${accept.replaceAll('.', ' ').toUpperCase().trim()}`
+    if (f.size > maxSizeMB * 1024 * 1024) return `El archivo supera los ${maxSizeMB}MB permitidos.`
+    return ''
+  }
+
+  const handleFile = (f) => {
+    if (!f) return
+    const err = validate(f)
+    setFileError(err)
+    setFile(err ? null : f)
+    onFileChange?.(err ? null : f)
+  }
+
+  const removeFile = () => {
+    setFile(null)
+    setFileError('')
+    if (inputRef.current) inputRef.current.value = ''
+    onFileChange?.(null)
+  }
+
+  const showError = fileError || invalid
 
   return (
-    <FieldWrap label={label} required={required}>
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition hover:border-latam-estrellada hover:bg-latam-estrellada/5"
-      >
-        <IconUpload className="h-7 w-7 text-latam-estrellada" />
-        <span className="text-sm font-semibold text-slate-600">
-          {fileName || 'Toca para subir un archivo'}
-        </span>
-        <span className="text-xs text-slate-400">{hint}</span>
-      </button>
+    <FieldWrap label={label} hint={hint} required={required}>
+      {file ? (
+        <div className="flex animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100">
+              <IconCheck className="h-4 w-4 text-green-600" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-slate-700">{file.name}</p>
+              <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={removeFile}
+            aria-label="Quitar archivo"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral"
+          >
+            <IconClose className="h-4 w-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragOver(true)
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDragOver(false)
+            const f = e.dataTransfer.files?.[0]
+            if (f && inputRef.current) {
+              const dt = new DataTransfer()
+              dt.items.add(f)
+              inputRef.current.files = dt.files
+            }
+            handleFile(f)
+          }}
+          className={`flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-7 text-center transition-all ${
+            showError
+              ? 'animate-shake border-latam-coral bg-latam-coral/5'
+              : dragOver
+                ? 'scale-[1.01] border-latam-estrellada bg-latam-estrellada/10'
+                : 'border-slate-300 bg-slate-50 hover:border-latam-estrellada hover:bg-latam-estrellada/5'
+          }`}
+        >
+          <IconUpload className={`h-7 w-7 ${showError ? 'text-latam-coral' : 'text-latam-estrellada'}`} />
+          <span className="text-sm font-semibold text-slate-600">
+            {dragOver ? 'Suelta el archivo aquí' : 'Haz clic aquí para subir el archivo o arrastra la imagen'}
+          </span>
+          <span className="text-xs text-slate-400">
+            Formatos permitidos: {accept.replaceAll('.', ' ').toUpperCase().trim()} (Máx. {maxSizeMB}MB)
+          </span>
+        </button>
+      )}
+
+      {fileError && <p className="mt-2 text-xs font-bold text-latam-coral">{fileError}</p>}
+
       <input
         ref={inputRef}
+        name={name}
         type="file"
+        accept={accept}
         required={required}
         // sr-only (not `hidden`/display:none): inputs that aren't rendered are
         // excluded from HTML5 required-field validation, so the browser would
         // silently allow submitting without a file.
         className="sr-only"
-        onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
+        onChange={(e) => handleFile(e.target.files?.[0])}
       />
     </FieldWrap>
   )
