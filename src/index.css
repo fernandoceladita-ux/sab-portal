@@ -1,0 +1,64 @@
+/* LATAM Sans — pesos locales. Coloca los .otf en public/fonts/ */
+@font-face {
+  font-family: 'LATAM Sans';
+  src: url('/fonts/LatamSans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LATAM Sans';
+  src: url('/fonts/LatamSans-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LATAM Sans';
+  src: url('/fonts/LatamSans-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'LATAM Sans', 'Lato', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Hide scrollbar for the mobile-friendly horizontal carousels but keep it scrollable */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Fits the hero + option cards in one screen without the mobile
+   address bar causing a jump; falls back to vh where dvh isn't supported. */
+.hero-vh {
+  min-height: calc(100vh - 68px);
+}
+@supports (height: 100dvh) {
+  .hero-vh {
+    min-height: calc(100dvh - 68px);
+  }
+}
