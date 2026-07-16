@@ -3,6 +3,8 @@ export default function NoveltyBanner({
   description,
   href = '#',
   buttonLabel = 'Ver detalle',
+  hasDetail = false,
+  onOpenDetail,
   className = '',
 }) {
   return (
@@ -11,12 +13,23 @@ export default function NoveltyBanner({
     >
       <h3 className="text-3xl font-bold text-white">{noticia}</h3>
       <p className="text-xl leading-snug text-white">{description}</p>
-      
-        <a href={href}
-        className="mt-2 inline-block rounded-lg bg-latam-coral px-5 py-2 text-sm font-bold uppercase tracking-wide text-white"
-      >
-        {buttonLabel}
-      </a>
+
+      {hasDetail ? (
+        <button
+          type="button"
+          onClick={onOpenDetail}
+          className="mt-2 inline-block rounded-lg bg-latam-coral px-5 py-2 text-sm font-bold uppercase tracking-wide text-white"
+        >
+          {buttonLabel}
+        </button>
+      ) : (
+        <a
+          href={href}
+          className="mt-2 inline-block rounded-lg bg-latam-coral px-5 py-2 text-sm font-bold uppercase tracking-wide text-white"
+        >
+          {buttonLabel}
+        </a>
+      )}
     </div>
   )
 }

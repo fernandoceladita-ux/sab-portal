@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MODULES } from '../data/menuData.js'
 import { NEWS } from '../data/news.js'
 import OptionCard from '../components/OptionCard.jsx'
 import NoveltyCarousel from '../components/NoveltyCarousel.jsx'
+import NewsDetailModal from '../components/NewsDetailModal.jsx'
 import Reveal from '../components/Reveal.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import FaqAccordion from '../components/FaqAccordion.jsx'
@@ -35,6 +36,8 @@ const FAQ_ITEMS = [
 ]
 
 export default function Home() {
+  const [activeNews, setActiveNews] = useState(null)
+
   useEffect(() => {
     document.title = 'SAB Perú · Inicio'
   }, [])
@@ -59,7 +62,7 @@ export default function Home() {
             />
           </div>
 
-          <NoveltyCarousel items={NEWS} />
+          <NoveltyCarousel items={NEWS} onOpenDetail={setActiveNews} />
         </section>
 
         <section className="flex flex-[1] flex-col justify-center px-5 pb-3 pt-6 sm:pt-8">
@@ -101,6 +104,10 @@ export default function Home() {
           </div>
         </Reveal>
       </div>
+
+      {(activeNews?.detail || activeNews?.image) && (
+        <NewsDetailModal news={activeNews} onClose={() => setActiveNews(null)} />
+      )}
     </>
   )
 }

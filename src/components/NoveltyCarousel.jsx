@@ -6,7 +6,7 @@ const FADE_MS = 480   // duración del fundido
 
 // Rota entre varias <NoveltyBanner>, con fundido + leve desplazamiento,
 // auto-avance, y puntos para navegar manualmente.
-export default function NoveltyCarousel({ items, className = '' }) {
+export default function NoveltyCarousel({ items, onOpenDetail, className = '' }) {
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
   const timerRef = useRef(null)
@@ -51,6 +51,8 @@ export default function NoveltyCarousel({ items, className = '' }) {
           description={current.description}
           href={current.href}
           buttonLabel={current.buttonLabel}
+          hasDetail={Boolean(current.detail || current.image)}
+          onOpenDetail={() => onOpenDetail?.(current)}
         />
       </div>
 

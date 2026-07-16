@@ -16,7 +16,7 @@ export default function OptionCard({ to, title, image, icon: Icon, style }) {
       <span className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg border border-white/25 bg-white/15 backdrop-blur sm:mb-3 sm:h-11 sm:w-11 sm:rounded-xl">
         <Icon className="h-3.5 w-3.5 text-white sm:h-5 sm:w-5" />
       </span>
-      <h3 className="text-[11px] font-extrabold leading-tight text-white sm:text-lg">{title}</h3>
+      <h3 className="text-lg font-bold leading-tight text-white sm:text-lg">{title}</h3>
     </Link>
   )
 }
