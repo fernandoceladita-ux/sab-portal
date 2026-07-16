@@ -8,6 +8,10 @@ import {
   IconIdCard, IconCalendar, IconPlane, IconSyringe, IconWrench, IconEdit,
   IconSend, IconCheck,
 } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
+
+// Por ahora solo "Actualización Contacto Emergencia" está conectado a Google Sheets.
+const SHEET_CONNECTED_TRAMITES = ['emergencia']
 
 const TRAMITES = [
   { id: 'emergencia', label: 'Actualización Contacto Emergencia' },
@@ -28,11 +32,37 @@ export default function TramiteForm() {
   const [visaTypes, setVisaTypes] = useState([])
   const [passStatus, setPassStatus] = useState('')
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    setSent(true)
-    setTimeout(() => setSent(false), 3500)
+    setError('')
+
+    if (!SHEET_CONNECTED_TRAMITES.includes(tramite)) {
+      // Los demás trámites aún no están conectados a Google Sheets.
+      setSent(true)
+      setTimeout(() => setSent(false), 3500)
+      return
+    }
+
+    const formData = new FormData(e.currentTarget)
+    setSending(true)
+    try {
+      await submitTramite({
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        tramite: TRAMITES.find((t) => t.id === tramite)?.label,
+        contactoNombre: formData.get('contactoNombre'),
+        contactoTelefono: formData.get('contactoTelefono'),
+      })
+      setSent(true)
+      setTimeout(() => setSent(false), 3500)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -43,8 +73,9 @@ export default function TramiteForm() {
 
       <div className="mt-6">
         <StepAccordion number={1} title="Identificación del Tripulante">
-          <TextField label="Ingresa tu BP" required placeholder="Ej. 6014982" defaultValue="6014982" />
+          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" defaultValue="6014982" />
           <TextField
+            name="nombre"
             label="Ingresa tus nombres y apellidos completos"
             hint="(No colocar tildes)"
             required
@@ -89,8 +120,8 @@ export default function TramiteForm() {
           <div className="bg-[#fafbfc] px-5 py-6">
             {tramite === 'emergencia' && (
               <>
-                <TextField label="Nombre del Contacto de Emergencia" required placeholder="Tu respuesta" />
-                <TextField label="Teléfono" required placeholder="Tu respuesta" />
+                <TextField name="contactoNombre" label="Nombre del Contacto de Emergencia" required placeholder="Tu respuesta" />
+                <TextField name="contactoTelefono" label="Teléfono" required placeholder="Tu respuesta" />
               </>
             )}
 
@@ -196,16 +227,25 @@ export default function TramiteForm() {
       <div className="mt-7 flex justify-end">
         <button
           type="submit"
-          disabled={!tramite}
+          disabled={!tramite || sending}
           className="flex items-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3.5 text-sm font-extrabold text-white shadow-soft transition enabled:hover:bg-latam-coral disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Enviar Solicitud <IconSend className="h-4 w-4" />
+          {sending ? 'Enviando...' : 'Enviar Solicitud'} <IconSend className="h-4 w-4" />
         </button>
       </div>
 
+      {error && (
+        <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp">
+          No se pudo guardar: {error}
+        </div>
+      )}
+
       {sent && (
         <div className="mt-4 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
-          <IconCheck className="h-5 w-5" /> Solicitud enviada correctamente a los sistemas de soporte.
+          <IconCheck className="h-5 w-5" />{' '}
+          {SHEET_CONNECTED_TRAMITES.includes(tramite)
+            ? 'Solicitud guardada correctamente en Google Sheets.'
+            : 'Solicitud enviada correctamente a los sistemas de soporte.'}
         </div>
       )}
     </form>
