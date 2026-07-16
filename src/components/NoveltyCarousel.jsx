@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import NoveltyBanner from './NoveltyBanner.jsx'
 
-const AUTO_MS = 6000  // tiempo entre cambios automáticos
-const FADE_MS = 380   // duración del fundido
+const AUTO_MS = 15000  // tiempo entre cambios automáticos
+const FADE_MS = 480   // duración del fundido
 
 // Rota entre varias <NoveltyBanner>, con fundido + leve desplazamiento,
 // auto-avance, y puntos para navegar manualmente.
