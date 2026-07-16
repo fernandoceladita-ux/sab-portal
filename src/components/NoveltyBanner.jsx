@@ -12,7 +12,7 @@ export default function NoveltyBanner({
       className={`relative z-20 mx-auto flex w-full max-w-lg flex-col items-start gap-1.5 text-left animate-fadeUp [animation-delay:250ms] ${className}`}
     >
       <h3 className="text-3xl font-bold text-white">{noticia}</h3>
-      <p className="text-xl leading-snug text-white">{description}</p>
+      <p className="text-lg leading-snug text-white sm:text-xl">{description}</p>
 
       {hasDetail ? (
         <button
