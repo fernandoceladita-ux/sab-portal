@@ -10,8 +10,16 @@ import {
 } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
 
-// Por ahora solo "Actualización Contacto Emergencia" está conectado a Google Sheets.
-const SHEET_CONNECTED_TRAMITES = ['emergencia']
+// Trámites conectados a Google Sheets. "licencia" queda afuera: su única
+// columna relevante en el Sheet es de archivo (ver Code.gs).
+const SHEET_CONNECTED_TRAMITES = ['emergencia', 'direccion', 'dni', 'pasaporte', 'telefono', 'fiebre', 'rechazo', 'visa']
+
+// Cada tipo de VISA marcado en el checkbox tiene su propio bloque de campos
+// (código/fechas), porque el Sheet tiene columnas separadas para cada uno.
+const VISA_TYPE_FIELDS = {
+  'Actualización VISA Tripulante (Crew)': { prefix: 'visaTripulante', label: 'VISA Tripulante' },
+  'Actualización VISA Turista': { prefix: 'visaTurista', label: 'VISA Turista' },
+}
 
 const TRAMITES = [
   { id: 'emergencia', label: 'Actualización Contacto Emergencia' },
@@ -55,6 +63,23 @@ export default function TramiteForm() {
         tramite: TRAMITES.find((t) => t.id === tramite)?.label,
         contactoNombre: formData.get('contactoNombre'),
         contactoTelefono: formData.get('contactoTelefono'),
+        direccion: formData.get('direccion'),
+        distrito: formData.get('distrito'),
+        coordenadas: formData.get('coordenadas'),
+        dniVencimiento: formData.get('dniVencimiento'),
+        pasaporteNumero: formData.get('pasaporteNumero'),
+        pasaporteVencimiento: formData.get('pasaporteVencimiento'),
+        pasaportePais: formData.get('pasaportePais'),
+        celular: formData.get('celular'),
+        telefonoFijo: formData.get('telefonoFijo'),
+        fiebreFecha: formData.get('fiebreFecha'),
+        rechazoPasaporte: tramite === 'rechazo' ? passStatus : undefined,
+        visaTripulanteCodigo: formData.get('visaTripulanteCodigo'),
+        visaTripulanteEmision: formData.get('visaTripulanteEmision'),
+        visaTripulanteVencimiento: formData.get('visaTripulanteVencimiento'),
+        visaTuristaCodigo: formData.get('visaTuristaCodigo'),
+        visaTuristaEmision: formData.get('visaTuristaEmision'),
+        visaTuristaVencimiento: formData.get('visaTuristaVencimiento'),
       })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
@@ -130,9 +155,9 @@ export default function TramiteForm() {
                 <InfoNote>
                   <strong>IMPORTANTE:</strong> ingresar dirección sin tildes, puntos ni caracteres especiales (#, $, &amp;, -, etc).
                 </InfoNote>
-                <TextField label="Indícanos tu nueva dirección" required placeholder="Tu respuesta" />
-                <SelectField label="Indícanos el distrito" required options={['Miraflores', 'Santiago de Surco', 'Callao']} />
-                <TextField label="Agregar sus coordenadas" hint="(Formato Google Maps Ej. -12.0459, -77.0308)" required placeholder="Tu respuesta" />
+                <TextField name="direccion" label="Indícanos tu nueva dirección" required placeholder="Tu respuesta" />
+                <SelectField name="distrito" label="Indícanos el distrito" required options={['Miraflores', 'Santiago de Surco', 'Callao']} />
+                <TextField name="coordenadas" label="Agregar sus coordenadas" hint="(Formato Google Maps Ej. -12.0459, -77.0308)" required placeholder="Tu respuesta" />
                 <RouteInstruction
                   text="Recuerda replicar la actualización de tu domicilio en los sistemas maestros siguiendo la ruta interna:"
                   steps={ROUTE_STEPS}
@@ -144,7 +169,7 @@ export default function TramiteForm() {
               <>
                 <InfoNote>Es obligatorio adjuntar ambas caras del DNI de forma nítida.</InfoNote>
                 <ImageReference src={`${import.meta.env.BASE_URL}img/actualizacionDatos/referencia-dni.png`} alt="Referencia DNI" />
-                <DateField label="Fecha de vencimiento DNI" required />
+                <DateField name="dniVencimiento" label="Fecha de vencimiento DNI" required />
                 <FileUploadField label="Ingresa una foto de tu DNI" required />
               </>
             )}
@@ -152,9 +177,9 @@ export default function TramiteForm() {
             {tramite === 'pasaporte' && (
               <>
                 <InfoNote>Verificar que la información registrada sea idéntica al documento físico.</InfoNote>
-                <TextField label="Ingresa el número de tu nuevo pasaporte" required placeholder="Tu respuesta" />
-                <DateField label="Fecha de Vencimiento del pasaporte" required />
-                <SelectField label="País emisor del pasaporte" required options={['PE (Perú)', 'Otros países']} />
+                <TextField name="pasaporteNumero" label="Ingresa el número de tu nuevo pasaporte" required placeholder="Tu respuesta" />
+                <DateField name="pasaporteVencimiento" label="Fecha de Vencimiento del pasaporte" required />
+                <SelectField name="pasaportePais" label="País emisor del pasaporte" required options={['PE (Perú)', 'Otros países']} />
                 <FileUploadField label="Adjunta una foto de tu pasaporte" required />
               </>
             )}
@@ -162,8 +187,8 @@ export default function TramiteForm() {
             {tramite === 'telefono' && (
               <>
                 <InfoNote>Puedes actualizar uno o ambos números telefónicos de forma simultánea.</InfoNote>
-                <TextField label="Indícanos qué número de celular deseas que consideremos ahora" required placeholder="Ej. 999888777" />
-                <TextField label="Indícanos qué número de teléfono fijo deseas que consideremos" placeholder="Ej. 014445555 (Opcional)" />
+                <TextField name="celular" label="Indícanos qué número de celular deseas que consideremos ahora" required placeholder="Ej. 999888777" />
+                <TextField name="telefonoFijo" label="Indícanos qué número de teléfono fijo deseas que consideremos" placeholder="Ej. 014445555 (Opcional)" />
                 <RouteInstruction
                   text="Recuerda replicar la actualización de tus números telefónicos en los sistemas maestros siguiendo la ruta interna:"
                   steps={ROUTE_STEPS}
@@ -173,7 +198,7 @@ export default function TramiteForm() {
 
             {tramite === 'fiebre' && (
               <>
-                <DateField label="Fecha de colocación de la vacuna" required />
+                <DateField name="fiebreFecha" label="Fecha de colocación de la vacuna" required />
                 <FileUploadField label="Adjunta constancia de Vacuna Fiebre Amarilla" required />
               </>
             )}
@@ -187,14 +212,25 @@ export default function TramiteForm() {
                   value={visaTypes}
                   onChange={setVisaTypes}
                 />
-                {visaTypes.length > 0 && (
-                  <div className="animate-fadeUp">
-                    <TextField label="Ingresa el código alfanumérico de tu visa" hint="(Código en rojo)" required placeholder="Ej. E00000000" />
-                    <DateField label="Fecha Emisión de VISA" required />
-                    <DateField label="Fecha de Vencimiento de VISA" required />
-                    <FileUploadField label="Ingresa una foto de tu VISA" required hint="Archivo nítido de la VISA seleccionada" />
-                  </div>
-                )}
+                {visaTypes.map((type) => {
+                  const cfg = VISA_TYPE_FIELDS[type]
+                  if (!cfg) return null
+                  return (
+                    <div key={type} className="animate-fadeUp mb-5 rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="mb-3 text-sm font-extrabold uppercase tracking-wide text-latam-estrellada">{cfg.label}</p>
+                      <TextField
+                        name={`${cfg.prefix}Codigo`}
+                        label="Ingresa el código alfanumérico de tu visa"
+                        hint="(Código en rojo)"
+                        required
+                        placeholder="Ej. E00000000"
+                      />
+                      <DateField name={`${cfg.prefix}Emision`} label="Fecha Emisión de VISA" required />
+                      <DateField name={`${cfg.prefix}Vencimiento`} label="Fecha de Vencimiento de VISA" required />
+                      <FileUploadField label="Ingresa una foto de tu VISA" required hint="Archivo nítido de la VISA seleccionada" />
+                    </div>
+                  )
+                })}
               </>
             )}
 

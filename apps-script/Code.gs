@@ -35,6 +35,7 @@ function doPost(e) {
       .map((h) => h.toString().trim())
 
     // Mapea encabezado exacto -> valor recibido del formulario.
+    // "licencia" no está acá: su única columna relevante es de archivo.
     const valuesByHeader = {
       'Marca temporal': new Date(),
       'Ingresa tu BP': data.bp || '',
@@ -42,6 +43,23 @@ function doPost(e) {
       'Selecciona que actualización deseas realizar': data.tramite || '',
       'Nombre del Contacto de Emergencia': data.contactoNombre || '',
       'Teléfono': data.contactoTelefono || '',
+      'Indícanos tu nueva dirección': data.direccion || '',
+      'Indícanos el distrito': data.distrito || '',
+      'Agregar sus coordenadas': data.coordenadas || '',
+      'Fecha vencimiento DNI': data.dniVencimiento || '',
+      'Ingresa el número de tu nuevo pasaporte': data.pasaporteNumero || '',
+      'Fecha de Vencimiento del pasaporte': data.pasaporteVencimiento || '',
+      'País emisor de pasaporte': data.pasaportePais || '',
+      'Indícanos qué número de celular deseas que consideremos ahora': data.celular || '',
+      'Indícanos qué número de teléfono fijo deseas que consideremos ahora': data.telefonoFijo || '',
+      'Fecha de vacunación': data.fiebreFecha || '',
+      'Cuentas con tu pasaporte para ejercer funciones': data.rechazoPasaporte || '',
+      'Ingresa el código alfanumérico de tu visa (código en rojo) Tripulante': data.visaTripulanteCodigo || '',
+      'Fecha Emisión de VISA Tripulante': data.visaTripulanteEmision || '',
+      'Fecha de Vencimiento de VISA Tripulante': data.visaTripulanteVencimiento || '',
+      'Ingresa el código alfanumérico de tu visa (código en rojo) Turista': data.visaTuristaCodigo || '',
+      'Fecha Emisión de VISA Turista': data.visaTuristaEmision || '',
+      'Fecha de Vencimiento de VISA Turista': data.visaTuristaVencimiento || '',
     }
 
     const row = headers.map((header) => (header in valuesByHeader ? valuesByHeader[header] : ''))
