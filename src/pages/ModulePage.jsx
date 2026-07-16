@@ -12,6 +12,11 @@ import DomicilioDgacView from '../components/DomicilioDgacView.jsx'
 import UniformesView from '../components/UniformesView.jsx'
 import ConsultasViaticosView from '../components/ConsultasViaticosView.jsx'
 import InstructivoValesView from '../components/InstructivoValesView.jsx'
+import CambiosVoluntariosView from '../components/CambiosVoluntariosView.jsx'
+import SeguroMedicoView from '../components/SeguroMedicoView.jsx'
+import VisaPasaporteView from '../components/VisaPasaporteView.jsx'
+import GruposPbsView from '../components/GruposPbsView.jsx'
+import CambiosWebSabView from '../components/CambiosWebSabView.jsx'
 import DetailPlaceholder from '../components/DetailPlaceholder.jsx'
 import Reveal from '../components/Reveal.jsx'
 
@@ -27,6 +32,11 @@ const FORM_COMPONENTS = {
   'cambio-uniforme': UniformesView,
   'consultas-viaticos': ConsultasViaticosView,
   'instructivo-vales': InstructivoValesView,
+  'cambios-voluntarios': CambiosVoluntariosView,
+  'seguro-medico': SeguroMedicoView,
+  'visa-pasaporte': VisaPasaporteView,
+  'grupos-pbs': GruposPbsView,
+  'cambios-web-sab': CambiosWebSabView,
 }
 
 export default function ModulePage() {

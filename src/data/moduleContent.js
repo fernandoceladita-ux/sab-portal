@@ -46,6 +46,7 @@ export const ITEM_CONTENT = {
     description: 'Publica u ofrece cambios voluntarios de tramos con otros tripulantes.',
     tags: ['Gestión de Tiempos', 'AppSheet'],
     image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=70',
+    form: 'cambios-voluntarios',
   },
   'registro-medico': {
     description: 'Registra descansos médicos y adjunta tu documentación de sustento.',
@@ -56,21 +57,25 @@ export const ITEM_CONTENT = {
     description: 'Activa o consulta el estado de tu seguro médico como tripulante.',
     tags: ['Gestión de Tiempos', 'Beneficio'],
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
+    form: 'seguro-medico',
   },
   'visa-pasaporte': {
     description: 'Procedimiento a seguir para renovación o incidencias de visa y pasaporte.',
     tags: ['PBS, Visas y Habilitación', 'Procedimiento'],
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70',
+    form: 'visa-pasaporte',
   },
   'grupos-pbs': {
     description: 'Consulta los grupos PBS asignados para el periodo 2026.',
     tags: ['PBS, Visas y Habilitación', 'PDF'],
     image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=700&q=70',
+    form: 'grupos-pbs',
   },
   'cambios-web-sab': {
     description: 'Historial y detalle de cambios publicados en la web SAB LP.',
     tags: ['PBS, Visas y Habilitación', 'Novedades'],
     image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=70',
+    form: 'cambios-web-sab',
   },
   'instructivo-vales': {
     description: 'Guía paso a paso para el uso correcto de tus vales de alimentación.',

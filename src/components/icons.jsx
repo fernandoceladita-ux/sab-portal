@@ -133,6 +133,9 @@ export const IconArrowRight = ({ className }) =>
 export const IconHelp = ({ className }) =>
   wrap(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.7" strokeLinecap="round" /><circle cx="12" cy="16.5" r=".9" fill="currentColor" stroke="none" /></>, className)
 
+export const IconInfo = ({ className }) =>
+  wrap(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5" strokeLinecap="round" /><circle cx="12" cy="7.7" r=".9" fill="currentColor" stroke="none" /></>, className)
+
 export const IconLifeBuoy = ({ className }) =>
   wrap(<path d="M12 21s-7-4.5-9-9c-1.3-2.7.1-6 3.2-6.6C8 4.9 10 6 11 7.6 12 6 14 4.9 15.8 5.4c3.1.6 4.5 3.9 3.2 6.6-2 4.5-9 9-9 9Z" strokeLinejoin="round" />, className)
 
@@ -154,6 +157,8 @@ export const IconUtensils = ({ className }) =>
 
 export const IconClock = ({ className }) =>
   wrap(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" strokeLinecap="round" strokeLinejoin="round" /></>, className)
+
+export const IconPlay = ({ className }) => wrap(<path d="M7 4.5v15l13-7.5Z" strokeLinejoin="round" strokeLinecap="round" fill="currentColor" />, className)
 
 export const IconSend = ({ className }) =>
   wrap(<path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" strokeLinejoin="round" strokeLinecap="round" />, className)

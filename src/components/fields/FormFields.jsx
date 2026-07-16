@@ -264,7 +264,7 @@ export function RadioGroup({ label, required, options = [], value, onChange }) {
 export function RouteInstruction({ text, steps = [] }) {
   return (
     <div className="mt-2 border-t border-slate-200 pt-5">
-      <p className="mb-3 text-sm text-slate-500">{text}</p>
+      {text && <p className="mb-3 text-sm text-slate-500">{text}</p>}
       <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[#f1f0f7] p-3.5 font-mono text-[13px] font-bold text-latam-estrellada">
         {steps.map((s, i) => (
           <span key={s} className="flex items-center gap-2">
