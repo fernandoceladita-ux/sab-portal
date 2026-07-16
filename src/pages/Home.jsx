@@ -9,15 +9,19 @@ import SectionHeading from '../components/SectionHeading.jsx'
 import FaqAccordion from '../components/FaqAccordion.jsx'
 import HelpCard from '../components/HelpCard.jsx'
 import {
-  IconIdCard, IconCalendarCheck, IconWrench, IconChevronDown, IconHelp,
+  IconChevronDown, IconHelp,
   IconLifeBuoy, IconClipboard, IconGraduation, IconCalendarX, IconUtensils,
 } from '../components/icons.jsx'
 
-const MODULE_ICONS = { 'datos-personales': IconIdCard, 'mi-rol': IconCalendarCheck, 'gestion-operativa': IconWrench }
-const MODULE_IMAGES = {
-  'datos-personales': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70',
-  'mi-rol': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=700&q=70',
-  'gestion-operativa': 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
+const MODULE_ICONS = {
+  'datos-personales': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales.png`,
+  'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol.png`,
+  'gestion-operativa': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa.png`,
+}
+const MODULE_COLORS = {
+  'datos-personales': 'bg-latam-diavivo',
+  'mi-rol': 'bg-latam-estrellada',
+  'gestion-operativa': 'bg-latam-profunda',
 }
 
 const FAQ_ITEMS = [
@@ -68,8 +72,8 @@ export default function Home() {
         <section className="flex flex-[1] flex-col justify-center px-5 pb-3 pt-6 sm:pt-8">
           <div className="mx-auto grid w-full max-w-6xl grid-cols-3 gap-2 sm:gap-4">
             {MODULES.map((mod, i) => (
-              <div key={mod.key} className="animate-fadeUp" style={{ animationDelay: `${350 + i * 120}ms` }}>
-                <OptionCard to={mod.path} title={mod.label} image={MODULE_IMAGES[mod.key]} icon={MODULE_ICONS[mod.key]} />
+              <div key={mod.key} className="h-full animate-fadeUp" style={{ animationDelay: `${350 + i * 120}ms` }}>
+                <OptionCard to={mod.path} title={mod.label} icon={MODULE_ICONS[mod.key]} color={MODULE_COLORS[mod.key]} />
               </div>
             ))}
           </div>

@@ -1,22 +1,17 @@
 import { Link } from 'react-router-dom'
-import { IconArrowUpRight } from './icons.jsx'
 
-export default function OptionCard({ to, title, image, icon: Icon, style }) {
+export default function OptionCard({ to, title, icon, color, style }) {
   return (
     <Link
       to={to}
       style={style}
-      className="group relative isolate flex min-h-[100px] flex-col justify-end overflow-hidden rounded-xl bg-cover bg-center p-2.5 shadow-soft transition sm:min-h-[190px] sm:rounded-2xl sm:p-5"
+      className={`group relative isolate flex h-full min-h-[100px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl p-3 text-center shadow-soft transition hover:brightness-110 sm:min-h-[110px] sm:flex-row sm:justify-start sm:gap-4 sm:rounded-2xl sm:px-6 sm:text-left ${color}`}
     >
-      <img src={image} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" loading="lazy" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-latam-profunda/55 via-latam-profunda/80 to-latam-profunda/95 transition group-hover:from-latam-diavivo/55 group-hover:to-latam-profunda" />
-      <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/15 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:bg-latam-coral sm:right-4 sm:top-4 sm:h-8 sm:w-8">
-        <IconArrowUpRight className="h-2.5 w-2.5 text-white sm:h-3.5 sm:w-3.5" />
-      </span>
-      <span className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg border border-white/25 bg-white/15 backdrop-blur sm:mb-3 sm:h-11 sm:w-11 sm:rounded-xl">
-        <Icon className="h-3.5 w-3.5 text-white sm:h-5 sm:w-5" />
-      </span>
-      <h3 className="text-lg font-bold leading-tight text-white sm:text-lg">{title}</h3>
+      <span className="pointer-events-none absolute left-1/2 top-3 -z-0 h-14 w-14 -translate-x-1/2 rounded-full bg-white/25 blur-2xl sm:left-14 sm:top-1/2 sm:h-24 sm:w-24 sm:-translate-x-1/2 sm:-translate-y-1/2" />
+      <img src={icon} alt="" className="relative z-10 h-20 w-20 flex-shrink-0 object-contain sm:h-20 sm:w-20" />
+      <h3 className="relative z-10 text-sm font-extrabold uppercase leading-tight tracking-wide text-white sm:text-2xl sm:tracking-wider">
+        {title}
+      </h3>
     </Link>
   )
 }
