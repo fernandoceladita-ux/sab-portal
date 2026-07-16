@@ -50,7 +50,7 @@ export default function Header() {
         {/* Desktop nav */}
         <nav ref={wrapRef} className="hidden items-center gap-7 lg:flex">
           <NavItem to="/" label="Inicio" />
-          {MODULES.map((mod) => (
+          {MODULES.map((mod, i) => (
             <div key={mod.key} className="relative">
               <button
                 onClick={() => setOpenMenu((o) => (o === mod.key ? null : mod.key))}
@@ -68,7 +68,11 @@ export default function Header() {
               )}
 
               {openMenu === mod.key && (
-                <div className="absolute left-1/2 top-[calc(100%+14px)] z-50 w-[560px] -translate-x-1/2 rounded-2xl border-t-4 border-latam-coral bg-white p-6 shadow-card animate-fadeUp">
+                <div
+                  className={`absolute top-[calc(100%+14px)] z-50 w-[560px] max-w-[90vw] rounded-2xl border-t-4 border-latam-coral bg-white p-6 shadow-card animate-fadeUp ${
+                    i === MODULES.length - 1 ? 'right-0' : 'left-1/2 -translate-x-1/2'
+                  }`}
+                >
                   <div className="grid grid-cols-2 gap-8">
                     {mod.groups.map((group) => (
                       <div key={group.title}>
