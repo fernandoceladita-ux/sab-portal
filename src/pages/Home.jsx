@@ -18,6 +18,12 @@ const MODULE_ICONS = {
   'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol.png`,
   'gestion-operativa': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa.png`,
 }
+// Used only for the full-color transition screen (mobile PageWipe), not the cards.
+const MODULE_WIPE_ICONS = {
+  'datos-personales': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales-label.png`,
+  'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol-label.png`,
+  'gestion-operativa': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa-label.png`,
+}
 const MODULE_COLORS = {
   'datos-personales': 'bg-latam-diavivo',
   'mi-rol': 'bg-latam-estrellada',
@@ -73,7 +79,13 @@ export default function Home() {
           <div className="mx-auto grid w-full max-w-6xl grid-cols-3 gap-2 sm:gap-4">
             {MODULES.map((mod, i) => (
               <div key={mod.key} className="h-full animate-fadeUp" style={{ animationDelay: `${350 + i * 120}ms` }}>
-                <OptionCard to={mod.path} title={mod.label} icon={MODULE_ICONS[mod.key]} color={MODULE_COLORS[mod.key]} />
+                <OptionCard
+                  to={mod.path}
+                  title={mod.label}
+                  icon={MODULE_ICONS[mod.key]}
+                  wipeIcon={MODULE_WIPE_ICONS[mod.key]}
+                  color={MODULE_COLORS[mod.key]}
+                />
               </div>
             ))}
           </div>

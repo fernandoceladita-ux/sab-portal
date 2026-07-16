@@ -3,6 +3,7 @@ import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
 import ModulePage from './pages/ModulePage.jsx'
+import { PageWipeProvider } from './context/PageWipe.jsx'
 
 function Layout() {
   return (
@@ -18,11 +19,13 @@ function Layout() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/:moduleKey" element={<ModulePage />} />
-      </Route>
-    </Routes>
+    <PageWipeProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/:moduleKey" element={<ModulePage />} />
+        </Route>
+      </Routes>
+    </PageWipeProvider>
   )
 }
