@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { MODULES } from '../data/menuData.js'
 import { NEWS } from '../data/news.js'
 import OptionCard from '../components/OptionCard.jsx'
+import NoveltyCarousel from '../components/NoveltyCarousel.jsx'
 import Reveal from '../components/Reveal.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import FaqAccordion from '../components/FaqAccordion.jsx'
@@ -10,7 +11,6 @@ import {
   IconIdCard, IconCalendarCheck, IconWrench, IconChevronDown, IconHelp,
   IconLifeBuoy, IconClipboard, IconGraduation, IconCalendarX, IconUtensils,
 } from '../components/icons.jsx'
-import NoveltyCarousel from '../components/NoveltyCarousel.jsx'
 
 const MODULE_ICONS = { 'datos-personales': IconIdCard, 'mi-rol': IconCalendarCheck, 'gestion-operativa': IconWrench }
 const MODULE_IMAGES = {
@@ -46,14 +46,14 @@ export default function Home() {
         <section className="relative isolate flex flex-[4] min-h-[260px] flex-col items-center justify-between px-5 pb-5 pt-9">
           <div
             className="absolute inset-0 -z-20 bg-cover bg-[center_top_20%] sm:bg-[center_62%]"
-            style={{ backgroundImage: "url('/img/hero.png')" }}
+            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}img/hero.png')` }}
           />
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-latam-profunda/30" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
           <div className="relative z-10 flex w-full max-w-lg flex-1 flex-col items-center animate-fadeUp">
             <img
-              src="/img/titulo_hero.png"
+              src={`${import.meta.env.BASE_URL}img/titulo_hero.png`}
               alt="SAB · Servicio a Bordo · LATAM Airlines Perú"
               className="w-full sm:max-w-[540px]"
             />

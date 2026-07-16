@@ -112,7 +112,7 @@ export default function TramiteForm() {
             {tramite === 'dni' && (
               <>
                 <InfoNote>Es obligatorio adjuntar ambas caras del DNI de forma nítida.</InfoNote>
-                <ImageReference src="/img/actualizacionDatos/referencia-dni.png" alt="Referencia DNI" />
+                <ImageReference src={`${import.meta.env.BASE_URL}img/actualizacionDatos/referencia-dni.png`} alt="Referencia DNI" />
                 <DateField label="Fecha de vencimiento DNI" required />
                 <FileUploadField label="Ingresa una foto de tu DNI" required />
               </>

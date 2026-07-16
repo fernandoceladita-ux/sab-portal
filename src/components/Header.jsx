@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { MODULES } from '../data/menuData.js'
 import { IconMenu, IconClose, IconChevronDown } from './icons.jsx'
 
-const heartLogo = <img src="/img/logo-latam.png" alt="LATAM" className="h-7 w-15 flex-shrink-0 object-contain" />
+const heartLogo = <img src={`${import.meta.env.BASE_URL}img/logo-latam.png`} alt="LATAM" className="h-7 w-15 flex-shrink-0 object-contain" />
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)

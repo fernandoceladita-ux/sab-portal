@@ -11,6 +11,30 @@
       href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* LATAM Sans — pesos locales. Coloca los .otf en public/fonts/ */
+      @font-face {
+        font-family: 'LATAM Sans';
+        src: url('%BASE_URL%fonts/LatamSans-Regular.otf') format('opentype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'LATAM Sans';
+        src: url('%BASE_URL%fonts/LatamSans-Bold.otf') format('opentype');
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'LATAM Sans';
+        src: url('%BASE_URL%fonts/LatamSans-Black.otf') format('opentype');
+        font-weight: 900;
+        font-style: normal;
+        font-display: swap;
+      }
+    </style>
   </head>
   <body class="bg-[#F5F5FA] text-[#181433] antialiased">
     <div id="root"></div>
