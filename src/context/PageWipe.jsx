@@ -1,10 +1,10 @@
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const PageWipeContext = createContext(null)
 
 const MOBILE_BREAKPOINT = 640 // matches Tailwind's `sm`
-const COVER_MS = 650
+const COVER_MS = 1050
 const REVEAL_MS = 380
 
 // Provides wipeTo(path, colorClass, label, icon). On mobile it covers the
@@ -13,8 +13,16 @@ const REVEAL_MS = 380
 // just navigates — the effect is mobile-only.
 export function PageWipeProvider({ children }) {
   const [state, setState] = useState({ phase: 'idle', color: 'bg-latam-estrellada', label: '', icon: '' })
+  const [entered, setEntered] = useState(false)
   const navigate = useNavigate()
   const timeoutRef = useRef(null)
+
+  useEffect(() => {
+    if (state.phase !== 'covering') return undefined
+    setEntered(false)
+    const raf = requestAnimationFrame(() => setEntered(true))
+    return () => cancelAnimationFrame(raf)
+  }, [state.phase])
 
   const wipeTo = useCallback(
     (to, color = 'bg-latam-estrellada', label = '', icon = '') => {
@@ -55,7 +63,17 @@ export function PageWipeProvider({ children }) {
 
       {state.phase !== 'idle' && (
         <div className="pointer-events-none fixed inset-0 z-[210] flex flex-col items-center justify-center sm:hidden">
-          <img src={state.icon} alt={state.label} className="w-56 max-w-[70vw] object-contain animate-fadeUp" />
+          <img
+            src={state.icon}
+            alt={state.label}
+            className={`w-56 max-w-[70vw] object-contain transition-all ease-out ${
+              state.phase === 'revealing'
+                ? 'scale-0 opacity-0 duration-[380ms] ease-in'
+                : entered
+                  ? 'scale-100 opacity-100 duration-300'
+                  : 'scale-50 opacity-0 duration-300'
+            }`}
+          />
         </div>
       )}
     </PageWipeContext.Provider>
