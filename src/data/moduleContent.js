@@ -76,15 +76,18 @@ export const ITEM_CONTENT = {
     description: 'Guía paso a paso para el uso correcto de tus vales de alimentación.',
     tags: ['Viáticos y Alimentación', 'PDF'],
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
+    form: 'instructivo-vales',
   },
   'consultas-viaticos': {
     description: 'Revisa el cálculo de tus viáticos según tus horas de vuelo del periodo.',
     tags: ['Viáticos y Alimentación', 'Consulta'],
     image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=700&q=70',
+    form: 'consultas-viaticos',
   },
   'cambio-uniforme': {
     description: 'Solicita el cambio o reposición de piezas de tu uniforme.',
     tags: ['Presentación Personal', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=70',
+    form: 'cambio-uniforme',
   },
 }

@@ -27,6 +27,7 @@ export default function RegistroSunatView() {
   const formRef = useRef(null)
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [clearing, setClearing] = useState(false)
+  const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
@@ -60,8 +61,12 @@ export default function RegistroSunatView() {
     }
 
     setInvalidFields(new Set())
-    setSent(true)
-    setTimeout(() => setSent(false), 3500)
+    setSending(true)
+    setTimeout(() => {
+      setSending(false)
+      setSent(true)
+      setTimeout(() => setSent(false), 3500)
+    }, 700)
   }
 
   const clearForm = () => {
@@ -162,9 +167,10 @@ export default function RegistroSunatView() {
             </button>
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-latam-coral hover:shadow-card"
+              disabled={sending}
+              className="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Enviar Registro <IconSend className="h-4 w-4" />
+              {sending ? 'Guardando...' : 'Enviar Registro'} <IconSend className="h-4 w-4" />
             </button>
           </div>
         </form>

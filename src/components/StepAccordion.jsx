@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { IconChevronDown } from './icons.jsx'
 
-export default function StepAccordion({ number, title, defaultOpen = true, isLast, children }) {
+export default function StepAccordion({ number, title, defaultOpen = false, isLast, children }) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (

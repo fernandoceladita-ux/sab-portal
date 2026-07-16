@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import StepAccordion from './StepAccordion.jsx'
 import {
@@ -37,6 +37,7 @@ const TRAMITES = [
 const ROUTE_STEPS = ['PORTAL', 'PEOPLE MANAGER', 'MY PROFILE', 'PERSONAL DATA', 'CONTACT INFORMATION']
 
 export default function TramiteForm() {
+  const formRef = useRef(null)
   const [searchParams] = useSearchParams()
   const [tramite, setTramite] = useState(() => {
     const fromUrl = searchParams.get('tramite')
@@ -44,22 +45,46 @@ export default function TramiteForm() {
   })
   const [visaTypes, setVisaTypes] = useState([])
   const [passStatus, setPassStatus] = useState('')
+  const [invalidFields, setInvalidFields] = useState(new Set())
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+
+  const clearInvalid = (e) => {
+    const name = e.target.name
+    if (name && invalidFields.has(name)) {
+      setInvalidFields((prev) => {
+        const next = new Set(prev)
+        next.delete(name)
+        return next
+      })
+    }
+  }
 
   const submit = async (e) => {
     e.preventDefault()
     setError('')
 
+    const invalid = new Set()
+    for (const el of e.currentTarget.elements) {
+      if (el.name && typeof el.checkValidity === 'function' && !el.checkValidity()) {
+        invalid.add(el.name)
+      }
+    }
+
     // RadioGroup/CheckboxGroup son botones, no inputs nativos, así que el
     // navegador no los valida solo — se revisan a mano.
+    let customError = ''
     if (tramite === 'rechazo' && !passStatus) {
-      setError('Completa los campos obligatorios: selecciona si cuentas con tu pasaporte.')
-      return
+      customError = 'Completa los campos obligatorios: selecciona si cuentas con tu pasaporte.'
     }
     if (tramite === 'visa' && visaTypes.length === 0) {
-      setError('Completa los campos obligatorios: selecciona al menos un tipo de VISA.')
+      customError = 'Completa los campos obligatorios: selecciona al menos un tipo de VISA.'
+    }
+
+    if (invalid.size > 0 || customError) {
+      setInvalidFields(invalid)
+      setError(customError || 'Revisa los campos marcados: son obligatorios.')
       return
     }
 
@@ -106,22 +131,37 @@ export default function TramiteForm() {
     }
   }
 
+  const clearForm = () => {
+    formRef.current?.reset()
+    setVisaTypes([])
+    setPassStatus('')
+    setInvalidFields(new Set())
+    setError('')
+  }
+
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl">
+    <form
+      ref={formRef}
+      noValidate
+      onSubmit={submit}
+      onInput={clearInvalid}
+      onChange={clearInvalid}
+      className="mx-auto max-w-3xl animate-fadeUp"
+    >
       <AnticipationAlert>
         Ingresar solicitud con <strong>4 días hábiles de anticipación</strong> para su correcto procesamiento.
       </AnticipationAlert>
 
       <div className="mt-6">
         <StepAccordion number={1} title="Identificación del Tripulante">
-          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" defaultValue="" />
+          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('bp')} />
           <TextField
             name="nombre"
             label="Ingresa tus nombres y apellidos completos"
             hint="(No colocar tildes)"
             required
             placeholder="Ej. Mario Fernandez"
-            defaultValue=""
+            invalid={invalidFields.has('nombre')}
           />
         </StepAccordion>
 
@@ -161,8 +201,20 @@ export default function TramiteForm() {
           <div className="bg-[#fafbfc] px-5 py-6">
             {tramite === 'emergencia' && (
               <>
-                <TextField name="contactoNombre" label="Nombre del Contacto de Emergencia" required placeholder="Tu respuesta" />
-                <TextField name="contactoTelefono" label="Teléfono" required placeholder="Tu respuesta" />
+                <TextField
+                  name="contactoNombre"
+                  label="Nombre del Contacto de Emergencia"
+                  required
+                  placeholder="Tu respuesta"
+                  invalid={invalidFields.has('contactoNombre')}
+                />
+                <TextField
+                  name="contactoTelefono"
+                  label="Teléfono"
+                  required
+                  placeholder="Tu respuesta"
+                  invalid={invalidFields.has('contactoTelefono')}
+                />
               </>
             )}
 
@@ -171,9 +223,28 @@ export default function TramiteForm() {
                 <InfoNote>
                   <strong>IMPORTANTE:</strong> ingresar dirección sin tildes, puntos ni caracteres especiales (#, $, &amp;, -, etc).
                 </InfoNote>
-                <TextField name="direccion" label="Indícanos tu nueva dirección" required placeholder="Tu respuesta" />
-                <SelectField name="distrito" label="Indícanos el distrito" required options={['Miraflores', 'Santiago de Surco', 'Callao']} />
-                <TextField name="coordenadas" label="Agregar sus coordenadas" hint="(Formato Google Maps Ej. -12.0459, -77.0308)" required placeholder="Tu respuesta" />
+                <TextField
+                  name="direccion"
+                  label="Indícanos tu nueva dirección"
+                  required
+                  placeholder="Tu respuesta"
+                  invalid={invalidFields.has('direccion')}
+                />
+                <SelectField
+                  name="distrito"
+                  label="Indícanos el distrito"
+                  required
+                  options={['Miraflores', 'Santiago de Surco', 'Callao']}
+                  invalid={invalidFields.has('distrito')}
+                />
+                <TextField
+                  name="coordenadas"
+                  label="Agregar sus coordenadas"
+                  hint="(Formato Google Maps Ej. -12.0459, -77.0308)"
+                  required
+                  placeholder="Tu respuesta"
+                  invalid={invalidFields.has('coordenadas')}
+                />
                 <RouteInstruction
                   text="Recuerda replicar la actualización de tu domicilio en los sistemas maestros siguiendo la ruta interna:"
                   steps={ROUTE_STEPS}
@@ -185,26 +256,59 @@ export default function TramiteForm() {
               <>
                 <InfoNote>Es obligatorio adjuntar ambas caras del DNI de forma nítida.</InfoNote>
                 <ImageReference src={`${import.meta.env.BASE_URL}img/actualizacionDatos/referencia-dni.png`} alt="Referencia DNI" />
-                <DateField name="dniVencimiento" label="Fecha de vencimiento DNI" required />
-                <FileUploadField label="Ingresa una foto de tu DNI" required />
+                <DateField name="dniVencimiento" label="Fecha de vencimiento DNI" required invalid={invalidFields.has('dniVencimiento')} />
+                <FileUploadField name="dniArchivo" label="Ingresa una foto de tu DNI" required invalid={invalidFields.has('dniArchivo')} />
               </>
             )}
 
             {tramite === 'pasaporte' && (
               <>
                 <InfoNote>Verificar que la información registrada sea idéntica al documento físico.</InfoNote>
-                <TextField name="pasaporteNumero" label="Ingresa el número de tu nuevo pasaporte" required placeholder="Tu respuesta" />
-                <DateField name="pasaporteVencimiento" label="Fecha de Vencimiento del pasaporte" required />
-                <SelectField name="pasaportePais" label="País emisor del pasaporte" required options={['PE (Perú)', 'Otros países']} />
-                <FileUploadField label="Adjunta una foto de tu pasaporte" required />
+                <TextField
+                  name="pasaporteNumero"
+                  label="Ingresa el número de tu nuevo pasaporte"
+                  required
+                  placeholder="Tu respuesta"
+                  invalid={invalidFields.has('pasaporteNumero')}
+                />
+                <DateField
+                  name="pasaporteVencimiento"
+                  label="Fecha de Vencimiento del pasaporte"
+                  required
+                  invalid={invalidFields.has('pasaporteVencimiento')}
+                />
+                <SelectField
+                  name="pasaportePais"
+                  label="País emisor del pasaporte"
+                  required
+                  options={['PE (Perú)', 'Otros países']}
+                  invalid={invalidFields.has('pasaportePais')}
+                />
+                <FileUploadField
+                  name="pasaporteArchivo"
+                  label="Adjunta una foto de tu pasaporte"
+                  required
+                  invalid={invalidFields.has('pasaporteArchivo')}
+                />
               </>
             )}
 
             {tramite === 'telefono' && (
               <>
                 <InfoNote>Puedes actualizar uno o ambos números telefónicos de forma simultánea.</InfoNote>
-                <TextField name="celular" label="Indícanos qué número de celular deseas que consideremos ahora" required placeholder="Ej. 999888777" />
-                <TextField name="telefonoFijo" label="Indícanos qué número de teléfono fijo deseas que consideremos" placeholder="Ej. 014445555 (Opcional)" />
+                <TextField
+                  name="celular"
+                  label="Indícanos qué número de celular deseas que consideremos ahora"
+                  required
+                  placeholder="Ej. 999888777"
+                  invalid={invalidFields.has('celular')}
+                />
+                <TextField
+                  name="telefonoFijo"
+                  label="Indícanos qué número de teléfono fijo deseas que consideremos"
+                  placeholder="Ej. 014445555 (Opcional)"
+                  invalid={invalidFields.has('telefonoFijo')}
+                />
                 <RouteInstruction
                   text="Recuerda replicar la actualización de tus números telefónicos en los sistemas maestros siguiendo la ruta interna:"
                   steps={ROUTE_STEPS}
@@ -214,8 +318,13 @@ export default function TramiteForm() {
 
             {tramite === 'fiebre' && (
               <>
-                <DateField name="fiebreFecha" label="Fecha de colocación de la vacuna" required />
-                <FileUploadField label="Adjunta constancia de Vacuna Fiebre Amarilla" required />
+                <DateField name="fiebreFecha" label="Fecha de colocación de la vacuna" required invalid={invalidFields.has('fiebreFecha')} />
+                <FileUploadField
+                  name="fiebreArchivo"
+                  label="Adjunta constancia de Vacuna Fiebre Amarilla"
+                  required
+                  invalid={invalidFields.has('fiebreArchivo')}
+                />
               </>
             )}
 
@@ -240,10 +349,27 @@ export default function TramiteForm() {
                         hint="(Código en rojo)"
                         required
                         placeholder="Ej. E00000000"
+                        invalid={invalidFields.has(`${cfg.prefix}Codigo`)}
                       />
-                      <DateField name={`${cfg.prefix}Emision`} label="Fecha Emisión de VISA" required />
-                      <DateField name={`${cfg.prefix}Vencimiento`} label="Fecha de Vencimiento de VISA" required />
-                      <FileUploadField label="Ingresa una foto de tu VISA" required hint="Archivo nítido de la VISA seleccionada" />
+                      <DateField
+                        name={`${cfg.prefix}Emision`}
+                        label="Fecha Emisión de VISA"
+                        required
+                        invalid={invalidFields.has(`${cfg.prefix}Emision`)}
+                      />
+                      <DateField
+                        name={`${cfg.prefix}Vencimiento`}
+                        label="Fecha de Vencimiento de VISA"
+                        required
+                        invalid={invalidFields.has(`${cfg.prefix}Vencimiento`)}
+                      />
+                      <FileUploadField
+                        name={`${cfg.prefix}Archivo`}
+                        label="Ingresa una foto de tu VISA"
+                        required
+                        hint="Archivo nítido de la VISA seleccionada"
+                        invalid={invalidFields.has(`${cfg.prefix}Archivo`)}
+                      />
                     </div>
                   )
                 })}
@@ -253,8 +379,21 @@ export default function TramiteForm() {
             {tramite === 'licencia' && (
               <>
                 <InfoNote>Es obligatorio escanear la licencia de manejo completa (ambas caras en un solo archivo PDF legible).</InfoNote>
-                <TextField label="Ingresa el número de tu Licencia de Conducir MTC" required placeholder="Ej. Q00000000" />
-                <FileUploadField label="Ingresa tu Licencia de Manejo en PDF" required hint="Solo PDF · Máx 10 MB" />
+                <TextField
+                  name="licenciaNumero"
+                  label="Ingresa el número de tu Licencia de Conducir MTC"
+                  required
+                  placeholder="Ej. Q00000000"
+                  invalid={invalidFields.has('licenciaNumero')}
+                />
+                <FileUploadField
+                  name="licenciaArchivo"
+                  label="Ingresa tu Licencia de Manejo en PDF"
+                  required
+                  hint="Solo PDF · Máx 10 MB"
+                  accept=".pdf"
+                  invalid={invalidFields.has('licenciaArchivo')}
+                />
               </>
             )}
 
@@ -276,20 +415,25 @@ export default function TramiteForm() {
         </div>
       )}
 
-      <div className="mt-7 flex justify-end">
+      <div className="mt-7 flex flex-col-reverse justify-end gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={clearForm}
+          className="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada"
+        >
+          Borrar formulario
+        </button>
         <button
           type="submit"
           disabled={!tramite || sending}
-          className="flex items-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3.5 text-sm font-extrabold text-white shadow-soft transition enabled:hover:bg-latam-coral disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? 'Enviando...' : 'Enviar Solicitud'} <IconSend className="h-4 w-4" />
         </button>
       </div>
 
       {error && (
-        <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp">
-          No se pudo guardar: {error}
-        </div>
+        <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp">{error}</div>
       )}
 
       {sent && (

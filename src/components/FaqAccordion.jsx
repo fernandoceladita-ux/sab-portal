@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { IconChevronDown } from './icons.jsx'
 
 export default function FaqAccordion({ items }) {
-  const [openIndex, setOpenIndex] = useState(0)
+  const [openIndex, setOpenIndex] = useState(-1)
 
   return (
     <div className="rounded-2xl bg-white p-2 shadow-soft sm:p-4">
