@@ -52,7 +52,7 @@ export default function Home() {
       <div className="hero-vh flex flex-col">
         <section className="relative isolate flex flex-[4] min-h-[260px] flex-col items-center justify-between px-5 pb-5 pt-9">
           <div
-            className="absolute inset-0 -z-20 bg-cover bg-[center_top_20%] sm:bg-[center_62%]"
+            className="absolute inset-0 -z-20 bg-cover bg-[center_top_20%] sm:bg-[center_70%]"
             style={{ backgroundImage: `url('${import.meta.env.BASE_URL}img/hero.png')` }}
           />
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-latam-profunda/30" />
