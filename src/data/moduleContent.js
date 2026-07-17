@@ -8,7 +8,7 @@ export const ITEM_CONTENT = {
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
     form: 'actualizacion-datos',
   },
-  'renovacion-fotocheck': {
+  'autogestion-movilizacion': {
     description: 'Solicitud digital de renovación de credenciales aeroportuarias.',
     tags: ['Expediente Personal', 'AppSheet'],
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70',
@@ -41,6 +41,7 @@ export const ITEM_CONTENT = {
     description: 'Envía tu solicitud de preferencias de rol para el mes subsiguiente.',
     tags: ['Gestión de Tiempos', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=700&q=70',
+    form: 'solicitud-mes-subsiguiente',
   },
   'cambios-voluntarios': {
     description: 'Publica u ofrece cambios voluntarios de tramos con otros tripulantes.',
@@ -52,6 +53,7 @@ export const ITEM_CONTENT = {
     description: 'Registra descansos médicos y adjunta tu documentación de sustento.',
     tags: ['Gestión de Tiempos', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=70',
+    form: 'descanso-medico',
   },
   'seguro-medico': {
     description: 'Activa o consulta el estado de tu seguro médico como tripulante.',

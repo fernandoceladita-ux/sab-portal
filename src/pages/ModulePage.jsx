@@ -13,6 +13,8 @@ import UniformesView from '../components/UniformesView.jsx'
 import ConsultasViaticosView from '../components/ConsultasViaticosView.jsx'
 import InstructivoValesView from '../components/InstructivoValesView.jsx'
 import CambiosVoluntariosView from '../components/CambiosVoluntariosView.jsx'
+import DescansoMedicoView from '../components/DescansoMedicoView.jsx'
+import SolicitudMesSubsiguienteView from '../components/SolicitudMesSubsiguienteView.jsx'
 import SeguroMedicoView from '../components/SeguroMedicoView.jsx'
 import VisaPasaporteView from '../components/VisaPasaporteView.jsx'
 import GruposPbsView from '../components/GruposPbsView.jsx'
@@ -33,6 +35,8 @@ const FORM_COMPONENTS = {
   'consultas-viaticos': ConsultasViaticosView,
   'instructivo-vales': InstructivoValesView,
   'cambios-voluntarios': CambiosVoluntariosView,
+  'descanso-medico': DescansoMedicoView,
+  'solicitud-mes-subsiguiente': SolicitudMesSubsiguienteView,
   'seguro-medico': SeguroMedicoView,
   'visa-pasaporte': VisaPasaporteView,
   'grupos-pbs': GruposPbsView,
@@ -61,7 +65,7 @@ export default function ModulePage() {
   return (
     <Fragment key={moduleKey}>
       <section
-        className="relative flex min-h-[150px] items-end bg-cover bg-center px-5 py-7 sm:min-h-[190px] sm:px-10"
+        className="relative flex min-h-[200px] items-end bg-cover bg-center px-5 py-7 sm:min-h-[220px] sm:px-10"
         style={{ backgroundImage: `url('${BANNER_IMAGE}')` }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-latam-profunda/90 via-latam-profunda/70 to-latam-profunda/30" />

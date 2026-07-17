@@ -43,6 +43,7 @@ export default function TramiteForm() {
     const fromUrl = searchParams.get('tramite')
     return TRAMITES.some((t) => t.id === fromUrl) ? fromUrl : null
   })
+  const [tramiteStepOpen, setTramiteStepOpen] = useState(false)
   const [visaTypes, setVisaTypes] = useState([])
   const [passStatus, setPassStatus] = useState('')
   const [invalidFields, setInvalidFields] = useState(new Set())
@@ -165,7 +166,13 @@ export default function TramiteForm() {
           />
         </StepAccordion>
 
-        <StepAccordion number={2} title="Selección de Trámite a Realizar" isLast>
+        <StepAccordion
+          number={2}
+          title="Selección de Trámite a Realizar"
+          isLast
+          open={tramiteStepOpen}
+          onToggle={setTramiteStepOpen}
+        >
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             {TRAMITES.map((t) => (
               <button
@@ -192,7 +199,7 @@ export default function TramiteForm() {
         </StepAccordion>
       </div>
 
-      {tramite && (
+      {tramite && tramiteStepOpen && (
         <div className="animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
           <div className="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
             <ModuleIcon id={tramite} />

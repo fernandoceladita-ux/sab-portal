@@ -55,7 +55,7 @@ export default function SeguroMedicoView() {
             <strong className="text-slate-800">Anota siempre el número de asistencia proporcionado.</strong>
           </p>
           <p className="text-xs font-semibold text-latam-coral">
-            ⚠️ Recuerda: La asistencia médica finaliza formalmente cuando el profesional de la salud dictamina que
+            Recuerda: La asistencia médica finaliza formalmente cuando el profesional de la salud dictamina que
             estás apto para retomar tus funciones asignadas o si regresas de inmediato a tu país de origen.
           </p>
         </StepAccordion>

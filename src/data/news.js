@@ -43,8 +43,33 @@ export const NEWS = [
     image: 'img/noticia_modal/plazo_reembolso.png',
   },
   {
-    noticia: 'Renovación de Fotocheck: Nuevo Proceso Digital',
-    description: 'Ya puedes renovar tu credencial aeroportuaria 100% desde la web, sin pasar por counter.',
+    noticia: 'Autogestión: Contacto Movilización',
+    description: 'Ya puedes contactar por tu propia cuenta.',
     href: '#',
+    detail: {
+      eyebrow: 'Canal Directo',
+      title: '¡Contáctanos por Google Chat!',
+      tag: 'Coordinación operativa 24/7',
+      body: 'Ante cualquier contingencia que afecte tu asignación de vuelo, el canal más rápido de coordinación con Movilización es **Google Chat desde tu dispositivo móvil**, sin necesidad de llamada telefónica.',
+      highlight: 'Nota: Ideal para resolver contingencias en tiempo real y asegurar la regularidad de tu itinerario de manera ágil.',
+      footer: 'Simulación: Contenido informativo de referencia • Somos LATAM',
+      sections: [
+        {
+          icon: 'help',
+          title: 'Alcance / Cuándo Usarlo',
+          body: 'Retrasos de transporte, imprevistos de salud de último momento o cualquier situación que ponga en riesgo tu presentación a tiempo.',
+        },
+        {
+          icon: 'clock',
+          title: 'Tiempo de Respuesta',
+          body: 'El equipo de Movilización responde en un **máximo de 10 minutos** durante operación activa.',
+        },
+        {
+          icon: 'phone',
+          title: 'Canales Alternos',
+          body: 'Si no tienes conexión a internet, comunícate a la central telefónica de Movilización disponible en tu credencial corporativa.',
+        },
+      ],
+    },
   },
 ]

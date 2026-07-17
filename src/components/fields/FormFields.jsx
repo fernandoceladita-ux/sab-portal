@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { IconUpload, IconCheck, IconArrowRight, IconClock, IconClose } from '../icons.jsx'
+import { IconUpload, IconCheck, IconArrowRight, IconClock, IconClose, IconAlertTriangle } from '../icons.jsx'
 
 const labelCls = 'block text-sm font-bold text-latam-estrellada mb-2'
 const inputBaseCls = 'w-full rounded-xl border px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all'
@@ -42,6 +42,14 @@ export function MonthField({ label, required, invalid, ...props }) {
   return (
     <FieldWrap label={label} required={required}>
       <input type="month" required={required} className={inputCls(invalid)} {...props} />
+    </FieldWrap>
+  )
+}
+
+export function TimeField({ label, required, invalid, ...props }) {
+  return (
+    <FieldWrap label={label} required={required}>
+      <input type="time" required={required} className={inputCls(invalid)} {...props} />
     </FieldWrap>
   )
 }
@@ -288,5 +296,15 @@ export function AnticipationAlert({ children }) {
       <IconClock className="h-5 w-5 flex-shrink-0" />
       <span>{children}</span>
     </div>
+  )
+}
+
+// Nota corta de advertencia (amarillo pálido) para colgar debajo de un campo puntual.
+export function WarningNote({ children }) {
+  return (
+    <p className="-mt-3 mb-5 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">
+      <IconAlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+      {children}
+    </p>
   )
 }

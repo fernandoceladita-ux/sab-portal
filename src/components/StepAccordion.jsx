@@ -1,8 +1,19 @@
 import { useState } from 'react'
 import { IconChevronDown } from './icons.jsx'
 
-export default function StepAccordion({ number, title, defaultOpen = false, isLast, children }) {
-  const [open, setOpen] = useState(defaultOpen)
+// `open`/`onToggle` son opt-in: si no se pasan, el acordeón maneja su propio
+// estado interno exactamente igual que antes. Se usan cuando el padre necesita
+// saber si este paso está abierto (ej. para colapsar contenido dinámico que
+// vive fuera de `children`, como el panel de trámite en TramiteForm).
+export default function StepAccordion({ number, title, defaultOpen = false, isLast, children, open: openProp, onToggle }) {
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+
+  const toggle = () => {
+    if (isControlled) onToggle?.(!open)
+    else setInternalOpen((o) => !o)
+  }
 
   return (
     <div className="relative">
@@ -12,7 +23,7 @@ export default function StepAccordion({ number, title, defaultOpen = false, isLa
       <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <button
           type="button"
-          onClick={() => setOpen((o) => !o)}
+          onClick={toggle}
           className="flex w-full items-center gap-3 px-5 py-4 text-left"
         >
           <span className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">

@@ -111,7 +111,7 @@ export default function FiebreAmarillaView() {
             <strong className="text-slate-800">936 716 963</strong>
           </p>
           <p className="mb-4 text-xs font-semibold text-latam-coral">
-            ⚠️ Mensaje inicial obligatorio: Indica que eres colaborador vigente de LATAM.
+            Mensaje inicial obligatorio: Indica que eres colaborador vigente de LATAM.
           </p>
           <a
             href={WHATSAPP_URL}

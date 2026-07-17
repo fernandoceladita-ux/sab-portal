@@ -1,10 +1,29 @@
 import Modal from './Modal.jsx'
-import { IconPlane, IconCalendar, IconClipboard, IconClose } from './icons.jsx'
+import { IconPlane, IconCalendar, IconClipboard, IconClose, IconHelp, IconClock, IconSmartphone } from './icons.jsx'
 
 const SECTION_ICONS = {
   flight: IconPlane,
   calendar_month: IconCalendar,
   fact_check: IconClipboard,
+  help: IconHelp,
+  clock: IconClock,
+  phone: IconSmartphone,
+}
+
+// Soporta un marcado mínimo `**frase**` en los textos de la noticia para
+// resaltar sutilmente una frase puntual (ej. un plazo o un canal de contacto),
+// sin necesitar JSX dentro de la data (news.js es un .js plano).
+function renderHighlighted(text) {
+  if (!text) return text
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <span key={i} className="rounded bg-latam-coral/25 px-1.5 py-0.5 font-semibold text-white">
+        {part.slice(2, -2)}
+      </span>
+    ) : (
+      part
+    ),
+  )
 }
 
 function InfoCard({ section }) {
@@ -15,7 +34,7 @@ function InfoCard({ section }) {
         <Icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
         <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-white">{section.title}</h4>
       </div>
-      <p className="text-[12.5px] leading-relaxed text-slate-300">{section.body}</p>
+      <p className="text-[12.5px] leading-relaxed text-slate-300">{renderHighlighted(section.body)}</p>
 
       {section.table && (
         <div className="mt-3 overflow-hidden rounded-lg border border-white/10 bg-black/20 text-[12px]">
@@ -106,7 +125,7 @@ export default function NewsDetailModal({ news, onClose }) {
 
           <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-white">{detail.title}</h2>
 
-          <p className="text-[13.5px] font-light leading-relaxed text-slate-200">{detail.body}</p>
+          <p className="text-[13.5px] font-light leading-relaxed text-slate-200">{renderHighlighted(detail.body)}</p>
 
           {detail.highlight && (
             <div className="rounded-r-xl border-l-4 border-latam-coral bg-white/5 p-3.5">
@@ -122,6 +141,12 @@ export default function NewsDetailModal({ news, onClose }) {
                 <InfoCard key={section.title} section={section} />
               ))}
             </div>
+          )}
+
+          {detail.footer && (
+            <p className="border-t border-white/10 pt-4 text-center text-[11px] uppercase tracking-wider text-slate-400">
+              {detail.footer}
+            </p>
           )}
         </div>
       </div>

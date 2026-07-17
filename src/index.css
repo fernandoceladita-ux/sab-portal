@@ -30,12 +30,14 @@ body {
 }
 
 /* Fits the hero + option cards in one screen without the mobile
-   address bar causing a jump; falls back to vh where dvh isn't supported. */
+   address bar causing a jump; falls back to vh where dvh isn't supported.
+   The header is `fixed` (floats over the hero), so it no longer reserves
+   layout space — no offset needed here. */
 .hero-vh {
-  min-height: calc(100vh - 68px);
+  min-height: 100vh;
 }
 @supports (height: 100dvh) {
   .hero-vh {
-    min-height: calc(100dvh - 68px);
+    min-height: 100dvh;
   }
 }

@@ -4,6 +4,8 @@ import { NEWS } from '../data/news.js'
 import OptionCard from '../components/OptionCard.jsx'
 import NoveltyCarousel from '../components/NoveltyCarousel.jsx'
 import NewsDetailModal from '../components/NewsDetailModal.jsx'
+import ReporteDiarioModal from '../components/ReporteDiarioModal.jsx'
+import AbsentismoModal from '../components/AbsentismoModal.jsx'
 import Reveal from '../components/Reveal.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import FaqAccordion from '../components/FaqAccordion.jsx'
@@ -30,6 +32,10 @@ const MODULE_COLORS = {
   'gestion-operacional': 'bg-latam-profunda',
 }
 
+const SOPORTE_OSSA_URL =
+  'https://www.appsheet.com/start/3522a874-2c91-4844-bd27-b76938550f60?platform=desktop#appName=PreviewOSSAV2-594103936&vss=H4sIAAAAAAAAA6WOMQ7CMBAE_7K1X-AWUSAUGhANpjDxRbJI7Ch2ApHlj9HyMS4BRB1R3pxmdxMGS7d91OUV8pR-15ZGSCSFw9iSglRYeRc7XysIhZ1u3rAg93woZOSz-MqRAmRa4Mo_egWsIRdtZambgiaNAz4SvyeFwSwgCzR91Jea5p0s5Mys8mUfyBx5xNLysHHre6udKbzhvErXgfIL8ni8pFYBAAA=&view=Men%C3%BA'
+const MENU_DOM_URL = 'https://drive.google.com/file/d/1mVBRLaGphXi7r8TyKiPpUMkOs9MArmbq/view'
+
 const FAQ_ITEMS = [
   {
     q: '¿Qué debo hacer si mis vales de alimentación no se han cargado?',
@@ -47,6 +53,8 @@ const FAQ_ITEMS = [
 
 export default function Home() {
   const [activeNews, setActiveNews] = useState(null)
+  const [reporteOpen, setReporteOpen] = useState(false)
+  const [absentismoOpen, setAbsentismoOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'SAB Perú · Inicio'
@@ -56,7 +64,7 @@ export default function Home() {
     <>
       {/* HERO + CARDS: fits one screen, no scroll needed to see the 3 options */}
       <div className="hero-vh flex flex-col">
-        <section className="relative isolate flex flex-[4] min-h-[260px] flex-col items-center justify-between px-5 pb-5 pt-9">
+        <section className="relative isolate flex flex-[5] min-h-[260px] flex-col items-center justify-between px-5 pb-5 pt-9">
           <div
             className="absolute inset-0 -z-20 bg-cover bg-[center_top_20%] sm:bg-[center_70%]"
             style={{ backgroundImage: `url('${import.meta.env.BASE_URL}img/hero.png')` }}
@@ -113,10 +121,34 @@ export default function Home() {
         <Reveal as="section" className="mx-auto max-w-6xl px-5 py-14 sm:py-16">
           <SectionHeading eyebrow="Soporte" title="Centro de Ayuda y Reportes" icon={IconLifeBuoy} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <HelpCard icon={IconClipboard} title="Reportes Diario" description="Formulario de movimiento diario y Zero Claims." ctaLabel="Reportar" />
-            <HelpCard icon={IconGraduation} title="Cursos y Licencias" description="Soporte sobre entrenamientos, simuladores y vigencia. Será dirigido a OSSA." ctaLabel="Ir a Soporte" />
-            <HelpCard icon={IconCalendarX} title="Absentismos" description="Carga aquí tus descansos médicos y licencias." ctaLabel="Registrar" />
-            <HelpCard icon={IconUtensils} title="Menú DOM" description="Ver el menú de comidas LP." ctaLabel="Ver Menú" />
+            <HelpCard
+              icon={IconClipboard}
+              title="Movimiento Diario"
+              description="Formulario de movimiento diario y Zero Claims."
+              ctaLabel="Reportar"
+              onClick={() => setReporteOpen(true)}
+            />
+            <HelpCard
+              icon={IconGraduation}
+              title="Cursos y Licencias"
+              description="Soporte sobre entrenamientos, simuladores y vigencia. Será dirigido a OSSA."
+              ctaLabel="Ir a Soporte"
+              href={SOPORTE_OSSA_URL}
+            />
+            <HelpCard
+              icon={IconCalendarX}
+              title="Absentismos"
+              description="Carga aquí tus descansos médicos y licencias."
+              ctaLabel="Registrar"
+              onClick={() => setAbsentismoOpen(true)}
+            />
+            <HelpCard
+              icon={IconUtensils}
+              title="Menú DOM"
+              description="Ver el menú de comidas LP."
+              ctaLabel="Ver Menú"
+              href={MENU_DOM_URL}
+            />
           </div>
         </Reveal>
       </div>
@@ -124,6 +156,8 @@ export default function Home() {
       {(activeNews?.detail || activeNews?.image) && (
         <NewsDetailModal news={activeNews} onClose={() => setActiveNews(null)} />
       )}
+      {reporteOpen && <ReporteDiarioModal onClose={() => setReporteOpen(false)} />}
+      {absentismoOpen && <AbsentismoModal onClose={() => setAbsentismoOpen(false)} />}
     </>
   )
 }

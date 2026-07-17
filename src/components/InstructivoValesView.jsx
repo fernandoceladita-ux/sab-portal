@@ -280,10 +280,10 @@ export default function InstructivoValesView() {
 
   return (
     <div className="mx-auto max-w-4xl animate-fadeUp">
-      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5 text-latam-coral">
+      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5 text-latam-profunda">
         <IconSparkle className="mt-0.5 h-5 w-5 flex-shrink-0" />
         <p className="text-sm leading-relaxed">
-          <strong className="font-extrabold">Tripulante en Reserva de Aeropuerto:</strong> Si te encuentras bajo
+          <strong className="font-extrabold text-latam-coral">Tripulante en Reserva de Aeropuerto:</strong> Si te encuentras bajo
           asignación de reserva en el aeropuerto, hasta próximo aviso, el procedimiento digital varía: deberás
           recoger tu vale en formato físico en la Oficina de Ventas para ser canjeado exclusivamente en el
           restaurante <strong>PeruSuyo Mercado Peruano</strong>.

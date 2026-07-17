@@ -48,7 +48,7 @@ export default function VisaPasaporteView() {
           </p>
           <RouteInstruction steps={['Portal', 'Mis Aplicaciones', 'Mis Solicitudes', 'Certificados e Informes', 'Cartas Visa']} />
           <p className="mt-4 text-xs font-semibold text-latam-coral">
-            ⚠️ Criterio de Selección: Selecciona estrictamente la opción COMISIONES y coloca como motivo de viaje:
+            Criterio de Selección: Selecciona estrictamente la opción COMISIONES y coloca como motivo de viaje:
             VISA CREW (puedes registrar fechas y ciudades referenciales).
           </p>
         </StepAccordion>
