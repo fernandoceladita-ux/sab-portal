@@ -8,10 +8,10 @@ import {
 // `groups` mirrors the two-column layout from the reference screenshots.
 export const MODULES = [
   {
-    key: 'datos-personales',
-    label: 'Datos Personales',
-    path: '/datos-personales',
-    heroTitle: 'Datos Personales',
+    key: 'gestion-personal',
+    label: 'Gestión Personal',
+    path: '/gestion-personal',
+    heroTitle: 'GESTIÓN PERSONAL',
     heroSubtitle: 'Gestiona tu expediente interno y tus trámites regulatorios ante entidades y organismos legales.',
     groups: [
       {
@@ -25,7 +25,6 @@ export const MODULES = [
             externalUrl:
               'https://www.appsheet.com/Account/Login?appName=Solicitud%20De%20Credenciales%20PE&FullScope=False&provider=google&returnUrl=https%3A%2F%2Fwww.appsheet.com%2Fstart%2Ffc09f2b3-fd11-46ae-882b-d8ce2cb7a8d1%3Fplatform%3Ddesktop#appName=SolicitudDeCredencialesPE-501453028&vss=H4sIAAAAAAAAA6WOOw7CMBAF7_Jqn8AliAIhaEA0mMLEG8kisaPYCUSW786aj1ID5b7VjCZhtHTbR11dIU9pvjY0QSIpHKaOFKTC0rvY-0ZBKOx0-xoXltxIzhqtkJHP4mOIFCDTtwL5b4GANeSirS31xVZYtrxJfheOh5lCFmiHqC8NPbOZypm32ldDIHPknJ8ywtqt7p12ZusNS2vdBMoPSSDo2G8BAAA=&view=Bienvenida',
           },
-          { id: 'cesion-vacaciones', label: 'Intercambio o Cesión de Vacaciones', icon: IconCalendar },
         ],
       },
       {
@@ -33,7 +32,7 @@ export const MODULES = [
         items: [
           { id: 'domicilio-dgac', label: 'Domicilio DGAC', icon: IconPlane },
           { id: 'vacuna-fiebre-amarilla', label: 'Vacuna Fiebre Amarilla', icon: IconSyringe },
-          { id: 'registro-sunat', label: 'Registro de Equipos SUNAT', icon: IconWrench },
+          { id: 'visa-pasaporte', label: 'Procedimiento Visa / Pasaporte', icon: IconUser },
         ],
       },
     ],
@@ -50,14 +49,14 @@ export const MODULES = [
         items: [
           { id: 'solicitud-mes-subsiguiente', label: 'Solicitud Mes Subsiguiente', icon: IconIdCard },
           { id: 'cambios-voluntarios', label: 'Cambios Voluntarios', icon: IconRepeat },
-          { id: 'registro-medico', label: 'Registro Médico', icon: IconGem },
+          { id: 'descanso-medico', label: 'Descanso Médico', icon: IconGem },
           { id: 'seguro-medico', label: 'Activa tu seguro Médico', icon: IconHeartPulse },
+          { id: 'cesion-vacaciones', label: 'Intercambio o Cesión de Vacaciones', icon: IconCalendar },
         ],
       },
       {
         title: 'PBS, Visas y Habilitación',
         items: [
-          { id: 'visa-pasaporte', label: 'Procedimiento Visa / Pasaporte', icon: IconUser },
           { id: 'grupos-pbs', label: 'Grupos PBS 2026', icon: IconPdf },
           { id: 'cambios-web-sab', label: 'Cambios Web SAB LP', icon: IconChart },
         ],
@@ -65,10 +64,10 @@ export const MODULES = [
     ],
   },
   {
-    key: 'gestion-operativa',
-    label: 'Gestión Operativa',
-    path: '/gestion-operativa',
-    heroTitle: 'Gestión Operativa',
+    key: 'gestion-operacional',
+    label: 'Gestión Operacional',
+    path: '/gestion-operacional',
+    heroTitle: 'GESTIÓN OPERACIONAL',
     heroSubtitle: 'Todo sobre viáticos, alimentación y presentación personal para tus operaciones diarias.',
     groups: [
       {
@@ -82,6 +81,7 @@ export const MODULES = [
         title: 'Presentación Personal',
         items: [
           { id: 'cambio-uniforme', label: 'Cambio de Uniforme', icon: IconShirt },
+          { id: 'registro-sunat', label: 'Registro de Equipos SUNAT', icon: IconWrench },
         ],
       },
     ],

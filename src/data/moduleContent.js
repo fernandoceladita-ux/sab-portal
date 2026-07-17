@@ -48,7 +48,7 @@ export const ITEM_CONTENT = {
     image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=70',
     form: 'cambios-voluntarios',
   },
-  'registro-medico': {
+  'descanso-medico': {
     description: 'Registra descansos médicos y adjunta tu documentación de sustento.',
     tags: ['Gestión de Tiempos', 'Formulario'],
     image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=70',

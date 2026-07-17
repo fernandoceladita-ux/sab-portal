@@ -69,33 +69,24 @@ export default function Header() {
 
               {openMenu === mod.key && (
                 <div
-                  className={`absolute top-[calc(100%+14px)] z-50 w-[560px] max-w-[90vw] rounded-2xl border-t-4 border-latam-coral bg-white p-6 shadow-card animate-fadeUp ${
+                  className={`absolute top-[calc(100%+14px)] z-50 w-72 max-w-[90vw] rounded-2xl border-t-4 border-latam-coral bg-white p-4 shadow-card animate-fadeUp ${
                     i === MODULES.length - 1 ? 'right-0' : 'left-1/2 -translate-x-1/2'
                   }`}
                 >
-                  <div className="grid grid-cols-2 gap-8">
-                    {mod.groups.map((group) => (
-                      <div key={group.title}>
-                        <p className="mb-3 border-b border-slate-100 pb-2 text-[13px] font-extrabold text-latam-estrellada">
-                          {group.title}
-                        </p>
-                        <ul className="flex flex-col gap-1">
-                          {group.items.map((item) => (
-                            <li key={item.id}>
-                              <MenuLink
-                                item={item}
-                                to={`${mod.path}?item=${item.id}`}
-                                className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-latam-estrellada"
-                              >
-                                <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
-                                {item.label}
-                              </MenuLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                  <ul className="flex flex-col gap-1">
+                    {mod.groups.flatMap((group) => group.items).map((item) => (
+                      <li key={item.id}>
+                        <MenuLink
+                          item={item}
+                          to={`${mod.path}?item=${item.id}`}
+                          className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-latam-estrellada"
+                        >
+                          <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
+                          {item.label}
+                        </MenuLink>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
@@ -138,27 +129,20 @@ export default function Header() {
                 >
                   <div className="overflow-hidden">
                     <div className="flex flex-col gap-4 pb-4">
-                      {mod.groups.map((group) => (
-                        <div key={group.title}>
-                          <p className="mb-1.5 text-xs font-extrabold uppercase tracking-wide text-latam-estrellada/70">
-                            {group.title}
-                          </p>
-                          <ul className="flex flex-col">
-                            {group.items.map((item) => (
-                              <li key={item.id}>
-                                <MenuLink
-                                  item={item}
-                                  to={`${mod.path}?item=${item.id}`}
-                                  className="flex items-center gap-3 rounded-lg py-2.5 text-[14px] font-semibold text-slate-600 active:bg-slate-50"
-                                >
-                                  <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
-                                  {item.label}
-                                </MenuLink>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                      <ul className="flex flex-col">
+                        {mod.groups.flatMap((group) => group.items).map((item) => (
+                          <li key={item.id}>
+                            <MenuLink
+                              item={item}
+                              to={`${mod.path}?item=${item.id}`}
+                              className="flex items-center gap-3 rounded-lg py-2.5 text-[14px] font-semibold text-slate-600 active:bg-slate-50"
+                            >
+                              <item.icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
+                              {item.label}
+                            </MenuLink>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>

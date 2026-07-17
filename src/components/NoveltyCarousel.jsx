@@ -1,59 +1,64 @@
 import { useEffect, useRef, useState } from 'react'
 import NoveltyBanner from './NoveltyBanner.jsx'
 
-const AUTO_MS = 15000  // tiempo entre cambios automáticos
-const FADE_MS = 480   // duración del fundido
+const AUTO_MS = 15000 // tiempo entre cambios automáticos
 
-// Rota entre varias <NoveltyBanner>, con fundido + leve desplazamiento,
-// auto-avance, y puntos para navegar manualmente.
+// Carrusel deslizable con el dedo (scroll-snap nativo), auto-avance,
+// y puntos para navegar manualmente.
 export default function NoveltyCarousel({ items, onOpenDetail, className = '' }) {
+  const trackRef = useRef(null)
   const [index, setIndex] = useState(0)
-  const [visible, setVisible] = useState(true)
-  const timerRef = useRef(null)
 
-  const changeTo = (next) => {
-    if (next === index) return
-    setVisible(false)
-    setTimeout(() => {
-      setIndex(next)
-      setVisible(true)
-    }, FADE_MS)
+  const scrollToIndex = (i) => {
+    trackRef.current?.children[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }
 
   useEffect(() => {
+    const track = trackRef.current
+    if (!track) return undefined
+    const slides = Array.from(track.children)
+    const io = new IntersectionObserver(
+      (entries) => {
+        const mostVisible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (mostVisible) {
+          const idx = slides.indexOf(mostVisible.target)
+          if (idx !== -1) setIndex(idx)
+        }
+      },
+      { root: track, threshold: [0.5, 0.75, 1] },
+    )
+    slides.forEach((s) => io.observe(s))
+    return () => io.disconnect()
+  }, [items.length])
+
+  useEffect(() => {
     if (items.length <= 1) return undefined
-    timerRef.current = setInterval(() => {
-      setVisible(false)
-      setTimeout(() => {
-        setIndex((i) => (i + 1) % items.length)
-        setVisible(true)
-      }, FADE_MS)
+    const timer = setInterval(() => {
+      scrollToIndex((index + 1) % items.length)
     }, AUTO_MS)
-    return () => clearInterval(timerRef.current)
+    return () => clearInterval(timer)
   }, [items.length, index])
 
   if (!items?.length) return null
-  const current = items[index]
 
   return (
     <div className={`relative z-20 flex w-full flex-col items-center gap-4 ${className}`}>
       <div
-        className="w-full ease-out"
-        style={{
-          transitionProperty: 'opacity, transform',
-          transitionDuration: `${FADE_MS}ms`,
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(12px)',
-        }}
+        ref={trackRef}
+        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
       >
-        <NoveltyBanner
-          noticia={current.noticia}
-          description={current.description}
-          href={current.href}
-          buttonLabel={current.buttonLabel}
-          hasDetail={Boolean(current.detail || current.image)}
-          onOpenDetail={() => onOpenDetail?.(current)}
-        />
+        {items.map((item, i) => (
+          <div key={i} className="w-full flex-shrink-0 snap-center">
+            <NoveltyBanner
+              noticia={item.noticia}
+              description={item.description}
+              href={item.href}
+              buttonLabel={item.buttonLabel}
+              hasDetail={Boolean(item.detail || item.image)}
+              onOpenDetail={() => onOpenDetail?.(item)}
+            />
+          </div>
+        ))}
       </div>
 
       {items.length > 1 && (
@@ -61,7 +66,7 @@ export default function NoveltyCarousel({ items, onOpenDetail, className = '' })
           {items.map((_, i) => (
             <button
               key={i}
-              onClick={() => changeTo(i)}
+              onClick={() => scrollToIndex(i)}
               aria-label={`Ver novedad ${i + 1}`}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === index ? 'w-6 bg-latam-coral' : 'w-1.5 bg-white/40 hover:bg-white/70'

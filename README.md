@@ -27,7 +27,7 @@ src/
     icons.jsx               Set propio de íconos SVG (sin dependencias externas)
     TramiteForm.jsx         Formulario multi-paso de "Actualización de Datos" (9 flujos condicionales)
   data/
-    menuData.js         Contenido de los 3 menús (Datos Personales / Mi Rol / Gestión Operativa)
+    menuData.js         Contenido de los 3 menús (Datos Personales / Mi Rol / Gestión Operacional)
     moduleContent.js     Descripciones, tags e imágenes de cada trámite (carrusel)
   pages/
     Home.jsx            Home: hero + 3 tarjetas (visible sin scroll) + FAQ + Centro de Ayuda
@@ -54,6 +54,6 @@ Coral Atardecer `#ED1650`, tipografía Lato (alternativa a LATAM Sans para web).
 ## Pendiente / próximos pasos sugeridos
 
 - Conectar el envío de `TramiteForm` a tu backend real (Apps Script / BigQuery / AppSheet).
-- Completar los formularios de "Mi Rol" y "Gestión Operativa" (hoy muestran un placeholder;
+- Completar los formularios de "Mi Rol" y "Gestión Operacional" (hoy muestran un placeholder;
   siguen el mismo patrón que "Actualización de Datos").
 - Reemplazar las imágenes de Unsplash por fotografía propia de LATAM si aplica por licencia interna.

@@ -14,20 +14,20 @@ import {
 } from '../components/icons.jsx'
 
 const MODULE_ICONS = {
-  'datos-personales': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales.png`,
+  'gestion-personal': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales.png`,
   'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol.png`,
-  'gestion-operativa': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa.png`,
+  'gestion-operacional': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa.png`,
 }
 // Used only for the full-color transition screen (mobile PageWipe), not the cards.
 const MODULE_WIPE_ICONS = {
-  'datos-personales': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales-label.png`,
+  'gestion-personal': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales-label.png`,
   'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol-label.png`,
-  'gestion-operativa': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa-label.png`,
+  'gestion-operacional': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa-label.png`,
 }
 const MODULE_COLORS = {
-  'datos-personales': 'bg-latam-diavivo',
+  'gestion-personal': 'bg-latam-diavivo',
   'mi-rol': 'bg-latam-estrellada',
-  'gestion-operativa': 'bg-latam-profunda',
+  'gestion-operacional': 'bg-latam-profunda',
 }
 
 const FAQ_ITEMS = [

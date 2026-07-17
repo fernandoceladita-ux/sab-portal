@@ -133,7 +133,7 @@ export default function FiebreAmarillaView() {
             habilitar tu programación en rol para rutas restringidas.
           </p>
           <Link
-            to="/datos-personales?item=actualizacion-datos&tramite=fiebre"
+            to="/gestion-personal?item=actualizacion-datos&tramite=fiebre"
             className="inline-flex items-center gap-2 rounded-xl bg-latam-estrellada px-6 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-latam-coral hover:shadow-card"
           >
             Abrir Ficha de Actualización de Datos <IconSend className="h-4 w-4" />

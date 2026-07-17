@@ -105,7 +105,7 @@ export default function VisaPasaporteView() {
               unificada de actualización.
             </p>
             <Link
-              to="/datos-personales?item=actualizacion-datos&tramite=visa"
+              to="/gestion-personal?item=actualizacion-datos&tramite=visa"
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-6 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-latam-coral hover:shadow-card sm:w-auto"
             >
               Abrir Ficha de Actualización en Sección VISA <IconSend className="h-4 w-4" />

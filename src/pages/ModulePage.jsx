@@ -67,7 +67,7 @@ export default function ModulePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-latam-profunda/90 via-latam-profunda/70 to-latam-profunda/30" />
         <div className="relative z-10 max-w-xl animate-fadeUp">
           <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{mod.heroTitle}</h1>
-          <p className="mt-1.5 text-sm text-white sm:text-[15px]">{mod.heroSubtitle}</p>
+          <p className="mt-1.5 text-[17px] text-white sm:text-[20px]">{mod.heroSubtitle}</p>
         </div>
       </section>
 
