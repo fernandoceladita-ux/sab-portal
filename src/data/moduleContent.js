@@ -8,7 +8,7 @@ export const ITEM_CONTENT = {
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=70',
     form: 'actualizacion-datos',
   },
-  'autogestion-movilizacion': {
+  'renovacion-fotocheck': {
     description: 'Solicitud digital de renovación de credenciales aeroportuarias.',
     tags: ['Expediente Personal', 'AppSheet'],
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70',
