@@ -67,7 +67,6 @@ export default function Header() {
           {heartLogo}
           <span className="flex flex-col leading-tight">
             <span className={`text-[15px] font-extrabold transition-colors ${solid ? 'text-latam-estrellada' : 'text-white'}`}>LATAM</span>
-            <span className={`text-[11px] font-medium transition-colors ${solid ? 'text-slate-400' : 'text-white/70'}`}>Servicio a Bordo</span>
           </span>
         </Link>
 

@@ -142,13 +142,6 @@ export default function Home() {
               ctaLabel="Registrar"
               onClick={() => setAbsentismoOpen(true)}
             />
-            <HelpCard
-              icon={IconUtensils}
-              title="Menú DOM"
-              description="Ver el menú de comidas LP."
-              ctaLabel="Ver Menú"
-              href={MENU_DOM_URL}
-            />
           </div>
         </Reveal>
       </div>

@@ -51,9 +51,27 @@ export default function ModulePage() {
   const [selectedId, setSelectedId] = useState(params.get('item') || null)
   const itemParam = params.get('item')
 
+  // Anima el scroll hasta el panel de detalle para que se sienta como una
+  // "redirección" hacia el contenido, tanto al elegir una tarjeta del
+  // carrusel como al llegar ya con un ítem preseleccionado (ej. desde el header).
+  const scrollToDetail = () => {
+    requestAnimationFrame(() => {
+      document.getElementById('detalle-seleccion')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  const selectItem = (id) => {
+    setSelectedId(id)
+    scrollToDetail()
+  }
+
   useEffect(() => {
-    if (itemParam) setSelectedId(itemParam)
     window.scrollTo({ top: 0, behavior: 'auto' })
+    if (itemParam) {
+      setSelectedId(itemParam)
+      const t = setTimeout(scrollToDetail, 350)
+      return () => clearTimeout(t)
+    }
   }, [moduleKey, itemParam])
 
   if (!mod) return null
@@ -83,13 +101,13 @@ export default function ModulePage() {
               item={item}
               content={ITEM_CONTENT[item.id]}
               active={selectedId === item.id}
-              onSelect={() => setSelectedId(item.id)}
+              onSelect={() => selectItem(item.id)}
             />
           ))}
         </Carousel>
       </section>
 
-      <Reveal as="section" className="mx-auto max-w-4xl px-5 pb-16 sm:px-6">
+      <Reveal as="section" id="detalle-seleccion" className="mx-auto max-w-4xl px-5 pb-16 sm:px-6">
         {!selectedItem && (
           <div className="rounded-2xl bg-white p-8 text-center text-sm font-medium text-slate-400 shadow-sm">
             Selecciona una opción del carrusel para ver más detalles aquí.
