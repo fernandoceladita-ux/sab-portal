@@ -84,7 +84,7 @@ export default function Header() {
         <Link to="/" className="flex items-center gap-2.5">
           {heartLogo}
           <span className="flex flex-col leading-tight">
-            <span className={`text-[15px] font-extrabold transition-colors ${solid ? 'text-latam-estrellada' : 'text-white'}`}>LATAM</span>
+            <span className={`text-[18px] font-bold transition-colors ${solid ? 'text-latam-estrellada' : 'text-white'}`}>LATAM</span>
           </span>
         </Link>
 

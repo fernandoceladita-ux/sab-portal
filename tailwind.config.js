@@ -47,6 +47,10 @@ export default {
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
         },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(237,22,80,0.75)', transform: 'scale(1)' },
+          '50%': { boxShadow: '0 0 28px 10px rgba(237,22,80,0.8)', transform: 'scale(1.06)' },
+        },
       },
       animation: {
         fadeUp: 'fadeUp .7s cubic-bezier(.22,1,.36,1) both',
@@ -54,6 +58,7 @@ export default {
         flyAcross: 'flyAcross 1500ms cubic-bezier(.45,0,.55,1) forwards',
         shake: 'shake 420ms ease-in-out',
         fadeIn: 'fadeIn 350ms ease-out both',
+        glowPulse: 'glowPulse 1.4s ease-in-out infinite',
       },
     },
   },

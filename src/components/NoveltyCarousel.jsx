@@ -51,7 +51,7 @@ export default function NoveltyCarousel({ items, onOpenDetail, className = '' })
     <div className={`relative z-20 flex w-full flex-col items-center gap-4 ${className}`}>
       <div
         ref={trackRef}
-        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
+        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth py-4 -my-4"
       >
         {items.map((item, i) => (
           <div key={i} className="w-full flex-shrink-0 snap-center">

@@ -22,9 +22,9 @@ const MODULE_ICONS = {
 }
 // Used only for the full-color transition screen (mobile PageWipe), not the cards.
 const MODULE_WIPE_ICONS = {
-  'gestion-personal': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales-label.png`,
-  'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol-label.png`,
-  'gestion-operacional': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa-label.png`,
+  'gestion-personal': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_datos_personales.png`,
+  'mi-rol': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_mi_rol.png`,
+  'gestion-operacional': `${import.meta.env.BASE_URL}img/btn_banners_home/btn_gestion_operativa.png`,
 }
 const MODULE_COLORS = {
   'gestion-personal': 'bg-latam-diavivo',
@@ -111,7 +111,7 @@ export default function Home() {
       </div>
 
       {/* FAQ */}
-      <Reveal as="section" id="faq" className="mx-auto max-w-4xl px-5 py-14 sm:py-16">
+      <Reveal as="section" id="faq" className="mx-auto max-w-4xl scroll-mt-[84px] px-5 py-14 sm:py-16">
         <SectionHeading eyebrow="Ayuda rápida" title="Preguntas Frecuentes" icon={IconHelp} />
         <FaqAccordion items={FAQ_ITEMS} />
       </Reveal>
