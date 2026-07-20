@@ -54,7 +54,10 @@ export default function ModulePage() {
   // Anima el scroll hasta el panel de detalle para que se sienta como una
   // "redirección" hacia el contenido, tanto al elegir una tarjeta del
   // carrusel como al llegar ya con un ítem preseleccionado (ej. desde el header).
-  const scrollToDetail = () => {
+  // De paso centra la tarjeta correspondiente en el carrusel (por detrás),
+  // para que si el usuario vuelve a subir vea marcada la opción elegida.
+  const scrollToDetail = (id) => {
+    document.getElementById(`carousel-item-${id}`)?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
     requestAnimationFrame(() => {
       document.getElementById('detalle-seleccion')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
@@ -62,14 +65,14 @@ export default function ModulePage() {
 
   const selectItem = (id) => {
     setSelectedId(id)
-    scrollToDetail()
+    scrollToDetail(id)
   }
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
     if (itemParam) {
       setSelectedId(itemParam)
-      const t = setTimeout(scrollToDetail, 350)
+      const t = setTimeout(() => scrollToDetail(itemParam), 350)
       return () => clearTimeout(t)
     }
   }, [moduleKey, itemParam])

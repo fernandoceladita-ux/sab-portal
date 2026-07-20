@@ -1,5 +1,5 @@
 export default function ItemCard({ item, content, active, onSelect }) {
-  const cardClassName = `group flex w-[250px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition sm:w-[270px] ${
+  const cardClassName = `group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition sm:w-[270px] ${
     active ? 'border-latam-coral ring-2 ring-latam-coral/30' : 'border-slate-200 hover:border-latam-estrellada/40'
   }`
 
@@ -34,14 +34,14 @@ export default function ItemCard({ item, content, active, onSelect }) {
   // seleccionar el detalle dentro del portal.
   if (item.externalUrl) {
     return (
-      <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className={cardClassName}>
+      <a id={`carousel-item-${item.id}`} href={item.externalUrl} target="_blank" rel="noopener noreferrer" className={cardClassName}>
         {cardContent}
       </a>
     )
   }
 
   return (
-    <button onClick={onSelect} className={cardClassName}>
+    <button id={`carousel-item-${item.id}`} onClick={onSelect} className={cardClassName}>
       {cardContent}
     </button>
   )

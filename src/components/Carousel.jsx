@@ -17,7 +17,10 @@ export default function Carousel({ children }) {
       >
         <IconChevronRight className="h-4 w-4 rotate-180" />
       </button>
-      <div ref={trackRef} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 sm:px-0">
+      <div
+        ref={trackRef}
+        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-[calc(50%-125px)] pb-2 sm:px-0"
+      >
         {children}
       </div>
       <button
