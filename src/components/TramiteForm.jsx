@@ -155,13 +155,12 @@ export default function TramiteForm() {
 
       <div className="mt-6">
         <StepAccordion number={1} title="Identificación del Tripulante">
-          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('bp')} />
+          <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
           <TextField
             name="nombre"
             label="Ingresa tus nombres y apellidos completos"
             hint="(No colocar tildes)"
             required
-            placeholder="Ej. Mario Fernandez"
             invalid={invalidFields.has('nombre')}
           />
         </StepAccordion>
@@ -212,14 +211,12 @@ export default function TramiteForm() {
                   name="contactoNombre"
                   label="Nombre del Contacto de Emergencia"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('contactoNombre')}
                 />
                 <TextField
                   name="contactoTelefono"
                   label="Teléfono"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('contactoTelefono')}
                 />
               </>
@@ -234,14 +231,57 @@ export default function TramiteForm() {
                   name="direccion"
                   label="Indícanos tu nueva dirección"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('direccion')}
                 />
                 <SelectField
                   name="distrito"
                   label="Indícanos el distrito"
                   required
-                  options={['Miraflores', 'Santiago de Surco', 'Callao']}
+                  options={[
+                    'Ancón',
+                    'Ate',
+                    'Barranco',
+                    'Breña',
+                    'Carabayllo',
+                    'Chaclacayo',
+                    'Chorrillos',
+                    'Cieneguilla',
+                    'Comas',
+                    'El Agustino',
+                    'Independencia',
+                    'Jesús María',
+                    'La Molina',
+                    'La Victoria',
+                    'Lima (Cercado de Lima)',
+                    'Lince',
+                    'Los Olivos',
+                    'Lurigancho-Chosica',
+                    'Lurín',
+                    'Magdalena del Mar',
+                    'Miraflores',
+                    'Pachacámac',
+                    'Pucusana',
+                    'Pueblo Libre',
+                    'Puente Piedra',
+                    'Punta Hermosa',
+                    'Punta Negra',
+                    'Rímac',
+                    'San Bartolo',
+                    'San Borja',
+                    'San Isidro',
+                    'San Juan de Lurigancho',
+                    'San Juan de Miraflores',
+                    'San Luis',
+                    'San Martín de Porres',
+                    'San Miguel',
+                    'Santa Anita',
+                    'Santa María del Mar',
+                    'Santa Rosa',
+                    'Santiago de Surco',
+                    'Surquillo',
+                    'Villa El Salvador',
+                    'Villa María del Triunfo'
+                  ]}
                   invalid={invalidFields.has('distrito')}
                 />
                 <TextField
@@ -249,7 +289,6 @@ export default function TramiteForm() {
                   label="Agregar sus coordenadas"
                   hint="(Formato Google Maps Ej. -12.0459, -77.0308)"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('coordenadas')}
                 />
                 <RouteInstruction
@@ -275,7 +314,6 @@ export default function TramiteForm() {
                   name="pasaporteNumero"
                   label="Ingresa el número de tu nuevo pasaporte"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('pasaporteNumero')}
                 />
                 <DateField

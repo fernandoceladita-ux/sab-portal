@@ -95,8 +95,8 @@ export default function VacacionesForm() {
             placeholder="nombre.apellido@latam.com"
             invalid={invalidFields.has('correo')}
           />
-          <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('bp')} />
-          <TextField name="nombre" label="Apellidos y nombres" required placeholder="Tu respuesta" invalid={invalidFields.has('nombre')} />
+          <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
+          <TextField name="nombre" label="Apellidos y nombres" required invalid={invalidFields.has('nombre')} />
           <SelectField name="categoria" label="Categoría" required options={CATEGORIAS} invalid={invalidFields.has('categoria')} />
         </StepAccordion>
 
@@ -158,14 +158,12 @@ export default function VacacionesForm() {
                     name="companeroBP"
                     label="BP del Compañero de Permuta"
                     required
-                    placeholder="Ej. 6014982"
                     invalid={invalidFields.has('companeroBP')}
                   />
                   <TextField
                     name="companeroNombre"
                     label="Nombres Completos del Compañero"
                     required
-                    placeholder="Tu respuesta"
                     invalid={invalidFields.has('companeroNombre')}
                   />
                   <MonthField name="mesCambio" label="Mes Original del Cambio" required invalid={invalidFields.has('mesCambio')} />
@@ -178,14 +176,12 @@ export default function VacacionesForm() {
                     name="beneficiarioBP"
                     label="BP del Colaborador Beneficiario"
                     required
-                    placeholder="Ej. 6014982"
                     invalid={invalidFields.has('beneficiarioBP')}
                   />
                   <TextField
                     name="beneficiarioNombre"
                     label="Nombres Completos del Beneficiario"
                     required
-                    placeholder="Tu respuesta"
                     invalid={invalidFields.has('beneficiarioNombre')}
                   />
                   <TextField
@@ -193,7 +189,6 @@ export default function VacacionesForm() {
                     label="Bloque de Días a Ceder"
                     hint="(Ej. 01/03/2026 al 15/03/2026)"
                     required
-                    placeholder="Tu respuesta"
                     invalid={invalidFields.has('bloqueDias')}
                   />
                 </>

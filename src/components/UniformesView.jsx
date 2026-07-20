@@ -131,7 +131,6 @@ export default function UniformesView() {
             name="nombreColaborador"
             label="Nombre y Apellidos"
             required
-            placeholder="Tu respuesta"
             invalid={invalidFields.has('nombreColaborador')}
           />
         </StepAccordion>
@@ -172,14 +171,12 @@ export default function UniformesView() {
                     name="lanyardBP"
                     label="Ingresar BP"
                     required
-                    placeholder="Ej. 6014982"
                     invalid={invalidFields.has('lanyardBP')}
                   />
                   <TextField
                     name="lanyardNombre"
                     label="Nombre Completo"
                     required
-                    placeholder="Tu respuesta"
                     invalid={invalidFields.has('lanyardNombre')}
                   />
                 </div>
@@ -193,12 +190,11 @@ export default function UniformesView() {
             {canal === 'calidad' && (
               <>
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                  <TextField name="calidadBP" label="BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('calidadBP')} />
+                  <TextField name="calidadBP" label="BP" required invalid={invalidFields.has('calidadBP')} />
                   <TextField
                     name="calidadNombre"
                     label="Nombre"
                     required
-                    placeholder="Tu respuesta"
                     invalid={invalidFields.has('calidadNombre')}
                   />
                 </div>

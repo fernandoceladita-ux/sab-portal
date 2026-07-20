@@ -223,7 +223,6 @@ export default function DescansoMedicoView() {
               type="number"
               label="BP"
               required
-              placeholder="Ej. 6014982"
               invalid={invalidFields.has('bp')}
             />
             <SelectField name="filial" label="Filial" required options={FILIALES} invalid={invalidFields.has('filial')} />

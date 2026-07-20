@@ -147,12 +147,11 @@ export default function SolicitudMesSubsiguienteView() {
       <form ref={formRef} noValidate onSubmit={submit} onInput={syncState} onChange={syncState}>
         <StepAccordion number={1} title="Identificación del Tripulante">
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <TextField name="bp" label="Ingresa tu BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('bp')} />
+            <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
             <TextField
               name="nombre"
               label="Apellidos y Nombres"
               required
-              placeholder="Ej. Mario Fernandez"
               invalid={invalidFields.has('nombre')}
             />
             <div className="sm:col-span-2">

@@ -118,8 +118,8 @@ export default function RegistroSunatView() {
                 invalid={invalidFields.has('correo')}
               />
             </div>
-            <TextField name="bp" label="BP" required placeholder="Ej. 6014982" invalid={invalidFields.has('bp')} />
-            <TextField name="nombre" label="Apellidos y Nombres" required placeholder="Tu respuesta" invalid={invalidFields.has('nombre')} />
+            <TextField name="bp" label="BP" required invalid={invalidFields.has('bp')} />
+            <TextField name="nombre" label="Apellidos y Nombres" required invalid={invalidFields.has('nombre')} />
             <DateField name="fechaNacimiento" label="Fecha de Nacimiento" required invalid={invalidFields.has('fechaNacimiento')} />
             <TextField
               name="pasaporte"

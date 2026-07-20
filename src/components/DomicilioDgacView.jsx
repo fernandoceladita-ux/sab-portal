@@ -6,7 +6,51 @@ import {
   IconChevronDown, IconEdit, IconSend,
 } from './icons.jsx'
 
-const DISTRITOS = ['Miraflores', 'Santiago de Surco', 'Callao']
+const DISTRITOS = [
+  'Ancón',
+  'Ate',
+  'Barranco',
+  'Breña',
+  'Carabayllo',
+  'Chaclacayo',
+  'Chorrillos',
+  'Cieneguilla',
+  'Comas',
+  'El Agustino',
+  'Independencia',
+  'Jesús María',
+  'La Molina',
+  'La Victoria',
+  'Lima (Cercado de Lima)',
+  'Lince',
+  'Los Olivos',
+  'Lurigancho-Chosica',
+  'Lurín',
+  'Magdalena del Mar',
+  'Miraflores',
+  'Pachacámac',
+  'Pucusana',
+  'Pueblo Libre',
+  'Puente Piedra',
+  'Punta Hermosa',
+  'Punta Negra',
+  'Rímac',
+  'San Bartolo',
+  'San Borja',
+  'San Isidro',
+  'San Juan de Lurigancho',
+  'San Juan de Miraflores',
+  'San Luis',
+  'San Martín de Porres',
+  'San Miguel',
+  'Santa Anita',
+  'Santa María del Mar',
+  'Santa Rosa',
+  'Santiago de Surco',
+  'Surquillo',
+  'Villa El Salvador',
+  'Villa María del Triunfo'
+]
 
 const TIPOS = [
   'Actualización Contacto Emergencia',
@@ -212,7 +256,6 @@ export default function DomicilioDgacView() {
               label="Ingresa tu BP"
               hint="(Código de empleado de 7 dígitos sin tildes)"
               required
-              placeholder="Ej. 6014982"
               invalid={invalidFields.has('bp')}
             />
             <TextField
@@ -220,7 +263,6 @@ export default function DomicilioDgacView() {
               label="Ingresa tus nombres y apellidos completos"
               hint="(Evitar colocar tildes)"
               required
-              placeholder="Ej. Mario Fernandez"
               invalid={invalidFields.has('nombre')}
             />
 
@@ -274,7 +316,6 @@ export default function DomicilioDgacView() {
                   label="Agregar sus coordenadas"
                   hint="(Formato numérico, ej: -12.0459, -77.0308)"
                   required
-                  placeholder="Tu respuesta"
                   invalid={invalidFields.has('coordenadas')}
                 />
                 <CoordsGuide />
