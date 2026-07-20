@@ -47,24 +47,40 @@ export default function NoveltyCarousel({ items, onOpenDetail, className = '' })
 
   if (!items?.length) return null
 
+  const current = items[index]
+  const currentHasDetail = Boolean(current.detail || current.image)
+
   return (
-    <div className={`relative z-20 flex w-full flex-col items-center gap-4 ${className}`}>
+    <div className={`relative z-20 flex w-full flex-col items-center gap-3 ${className}`}>
       <div
         ref={trackRef}
-        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth py-4 -my-4"
+        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
       >
         {items.map((item, i) => (
           <div key={i} className="w-full flex-shrink-0 snap-center">
-            <NoveltyBanner
-              noticia={item.noticia}
-              description={item.description}
-              href={item.href}
-              buttonLabel={item.buttonLabel}
-              hasDetail={Boolean(item.detail || item.image)}
-              onOpenDetail={() => onOpenDetail?.(item)}
-            />
+            <NoveltyBanner noticia={item.noticia} description={item.description} />
           </div>
         ))}
+      </div>
+
+      {/* Botón fuera del track con scroll: nunca lo recorta el overflow-x del carrusel. */}
+      <div key={index} className="w-full max-w-lg animate-fadeIn px-4">
+        {currentHasDetail ? (
+          <button
+            type="button"
+            onClick={() => onOpenDetail?.(current)}
+            className="inline-block animate-glowPulse rounded-lg bg-latam-coral px-5 py-2 text-sm font-bold uppercase tracking-wide text-white"
+          >
+            {current.buttonLabel ?? 'Ver detalle'}
+          </button>
+        ) : (
+          <a
+            href={current.href}
+            className="inline-block animate-glowPulse rounded-lg bg-latam-coral px-5 py-2 text-sm font-bold uppercase tracking-wide text-white"
+          >
+            {current.buttonLabel ?? 'Ver detalle'}
+          </a>
+        )}
       </div>
 
       {items.length > 1 && (

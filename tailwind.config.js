@@ -58,7 +58,7 @@ export default {
         flyAcross: 'flyAcross 1500ms cubic-bezier(.45,0,.55,1) forwards',
         shake: 'shake 420ms ease-in-out',
         fadeIn: 'fadeIn 350ms ease-out both',
-        glowPulse: 'glowPulse 1.4s ease-in-out infinite',
+        glowPulse: 'glowPulse 2.5s ease-in-out infinite',
       },
     },
   },
