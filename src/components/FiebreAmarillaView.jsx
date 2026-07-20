@@ -47,9 +47,8 @@ export default function FiebreAmarillaView() {
         pendientes de vacunación puedan hacerlo mediante el proveedor contratado por la empresa.
       </p>
 
-      <div className="mb-6 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5">
+      <div className="mb-6 rounded-2xl p-5">
         <div className="mb-3 flex items-center gap-2 text-latam-coral">
-          <IconAlertTriangle className="h-5 w-5 flex-shrink-0" />
           <p className="text-sm font-extrabold uppercase tracking-wide">
             ¿Qué debes evitar? Recomendaciones operacionales previas
           </p>

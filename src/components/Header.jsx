@@ -41,10 +41,20 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // `location.key` cambia en CADA navegación (incluida cuando solo cambia
+  // `?item=` dentro del mismo módulo) — a diferencia de `pathname`, que se
+  // quedaba igual y por eso el header no se cerraba al elegir una opción.
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
-  }, [location.pathname])
+  }, [location.key])
+
+  // Al cerrarse el drawer (por cualquier motivo), se olvidan los
+  // desplegables internos para que la próxima vez que se abra arranque
+  // todo contraído.
+  useEffect(() => {
+    if (!mobileOpen) setMobileExpanded(null)
+  }, [mobileOpen])
 
   useEffect(() => {
     const onClick = (e) => {
@@ -57,11 +67,19 @@ export default function Header() {
   const solid = scrolled || mobileOpen
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
-        solid ? 'border-slate-200 bg-white/90 shadow-sm backdrop-blur-md' : 'border-transparent bg-transparent'
-      }`}
-    >
+    <>
+      {mobileOpen && (
+        <div
+          aria-hidden
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-40 animate-fadeIn bg-latam-profunda/40 backdrop-blur-sm [animation-duration:.2s] lg:hidden"
+        />
+      )}
+      <header
+        className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
+          solid ? 'border-slate-200 bg-white/90 shadow-sm backdrop-blur-md' : 'border-transparent bg-transparent'
+        }`}
+      >
       <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
         <Link to="/" className="flex items-center gap-2.5">
           {heartLogo}
@@ -184,7 +202,8 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
+      </header>
+    </>
   )
 }
 

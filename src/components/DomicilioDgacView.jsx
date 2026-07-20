@@ -116,8 +116,7 @@ export default function DomicilioDgacView() {
 
   return (
     <div className="mx-auto max-w-3xl animate-fadeUp">
-      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5 text-latam-profunda">
-        <IconAlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-latam-coral" />
+      <div className="mb-6 flex items-start gap-3 p-5 text-slate-600">
         <p className="text-sm leading-relaxed">
           <strong className="font-extrabold uppercase tracking-wide text-latam-coral">Cumplimiento Regulatorio Obligatorio:</strong>{' '}
           Según la normativa, el titular de una licencia que cambia su domicilio legal no podrá ejercer los

@@ -9,6 +9,8 @@ import {
 const IMG_DIR = `${import.meta.env.BASE_URL}img/gestion-operativa/instructivo_vales/`
 const QR_IMAGE = `${IMG_DIR}${encodeURIComponent('codigo QR de la app.png')}`
 const RESTAURANTES_IMAGE = `${IMG_DIR}restaurantes_autorizados.png`
+// TODO: reemplazar por el link real al que apunta el QR (store/landing de la app).
+const QR_DOWNLOAD_LINK = '#'
 
 const STEPS = [
   {
@@ -94,7 +96,10 @@ function QrButton({ onClick }) {
   )
 }
 
-function ImageModal({ title, src, alt, onClose }) {
+// `downloadLink` es opt-in: solo el QR de descarga de la app lo usa, como
+// alternativa para mobile — no se puede escanear un QR desde la misma
+// pantalla del celular que lo está mostrando.
+function ImageModal({ title, src, alt, onClose, downloadLink }) {
   const [entered, setEntered] = useState(false)
 
   useEffect(() => {
@@ -117,6 +122,19 @@ function ImageModal({ title, src, alt, onClose }) {
       </div>
       <div className="p-5">
         <img src={src} alt={alt} className="w-full rounded-xl" />
+        {downloadLink && (
+          <>
+            
+            <a
+              href={downloadLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-5 py-3 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-latam-coral"
+            >
+              Abrir enlace de descarga directo
+            </a>
+          </>
+        )}
       </div>
     </Modal>
   )
@@ -258,7 +276,7 @@ function ConsideracionesAccordion() {
               <div
                 key={c.title}
                 className={`rounded-xl border p-4 transition hover:-translate-y-0.5 ${
-                  c.danger ? 'border-latam-coral/30 bg-latam-coral/5' : 'border-slate-200 bg-slate-50'
+                  c.danger ? 'border-slate-200 bg-slate-50' : 'border-slate-200 bg-slate-50'
                 }`}
               >
                 <p className={`mb-1.5 flex items-center gap-2 text-sm font-extrabold ${c.danger ? 'text-latam-coral' : 'text-latam-estrellada'}`}>
@@ -280,8 +298,8 @@ export default function InstructivoValesView() {
 
   return (
     <div className="mx-auto max-w-4xl animate-fadeUp">
-      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5 text-latam-profunda">
-        <IconSparkle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+      <div className="mb-6 flex items-start gap-3 p-5 text-slate-600">
+        <IconSparkle className="mt-0.5 h-5 w-5 flex-shrink-0 text-latam-coral" />
         <p className="text-sm leading-relaxed">
           <strong className="font-extrabold text-latam-coral">Tripulante en Reserva de Aeropuerto:</strong> Si te encuentras bajo
           asignación de reserva en el aeropuerto, hasta próximo aviso, el procedimiento digital varía: deberás
@@ -312,7 +330,13 @@ export default function InstructivoValesView() {
       <p className="mt-2 px-1 text-xs text-slate-400">Toca el título para ver el mapa completo.</p>
 
       {qrOpen && (
-        <ImageModal title="Código QR de Descarga" src={QR_IMAGE} alt="Código QR para descargar la app" onClose={() => setQrOpen(false)} />
+        <ImageModal
+          title="Código QR de Descarga"
+          src={QR_IMAGE}
+          alt="Código QR para descargar la app"
+          onClose={() => setQrOpen(false)}
+          downloadLink={QR_DOWNLOAD_LINK}
+        />
       )}
       {restaurantesOpen && (
         <ImageModal

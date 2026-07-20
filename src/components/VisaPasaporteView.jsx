@@ -11,7 +11,7 @@ export default function VisaPasaporteView() {
         alineado a nuestras guías globales.
       </p>
 
-      <div className="mb-6 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-5 sm:p-6">
+      <div className="mb-6 rounded-2xl">
         <div className="mb-4 flex items-center gap-2 text-latam-coral">
           <IconClock className="h-5 w-5 flex-shrink-0" />
           <p className="text-sm font-extrabold uppercase tracking-wide">Reglas Críticas de Anticipación (leer antes de iniciar)</p>

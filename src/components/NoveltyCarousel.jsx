@@ -9,8 +9,14 @@ export default function NoveltyCarousel({ items, onOpenDetail, className = '' })
   const trackRef = useRef(null)
   const [index, setIndex] = useState(0)
 
+  // Solo mueve el scroll horizontal del propio carrusel — a diferencia de
+  // `scrollIntoView`, nunca toca el scroll vertical de la página (que
+  // interrumpía al usuario si estaba leyendo más abajo, ej. el footer).
   const scrollToIndex = (i) => {
-    trackRef.current?.children[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    const track = trackRef.current
+    const child = track?.children[i]
+    if (!track || !child) return
+    track.scrollTo({ left: child.offsetLeft, behavior: 'smooth' })
   }
 
   useEffect(() => {

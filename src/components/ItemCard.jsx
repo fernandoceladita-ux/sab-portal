@@ -1,6 +1,6 @@
 export default function ItemCard({ item, content, active, onSelect }) {
-  const cardClassName = `group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition sm:w-[270px] ${
-    active ? 'border-latam-coral ring-2 ring-latam-coral/30' : 'border-slate-200 hover:border-latam-estrellada/40'
+  const cardClassName = `group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] ${
+    active ? 'scale-[1.04] border-latam-estrellada shadow-card' : 'border-slate-200 shadow-sm hover:border-latam-estrellada/40'
   }`
 
   const cardContent = (

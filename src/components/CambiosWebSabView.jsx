@@ -13,7 +13,7 @@ const TABS = [
       {
         icon: IconClock,
         title: 'Tiempo extra posterior al PDR',
-        tone: 'success',
+        tone: 'danger',
         badge: 'Protección Activa',
         body: (
           <>
@@ -39,7 +39,7 @@ const TABS = [
       {
         icon: IconCalendar,
         title: 'ETA previo a libre (Llegadas de Noche)',
-        tone: 'warning',
+        tone: 'danger',
         badge: 'Restringido',
         body: (
           <>
@@ -73,7 +73,7 @@ const TABS = [
       {
         icon: IconChart,
         title: 'Limitación mensual y trimestral de horas block',
-        tone: 'warning',
+        tone: 'danger',
         badge: 'Cómputo Técnico',
         body: (
           <>
@@ -101,7 +101,7 @@ const TABS = [
       {
         icon: IconCheck,
         title: 'Secuencias reglamentarias RAP',
-        tone: 'success',
+        tone: 'danger',
         badge: 'Validado por RAP',
         body: (
           <>
@@ -135,7 +135,7 @@ const TABS = [
       {
         icon: IconUser,
         title: 'Cambio entre HRK',
-        tone: 'warning',
+        tone: 'danger',
         badge: 'Exclusivo HRK',
         body: (
           <>
@@ -161,7 +161,7 @@ const TABS = [
       {
         icon: IconPlane,
         title: 'Arribo en décimo día',
-        tone: 'warning',
+        tone: 'danger',
         badge: 'Tope: 20:00 hrs LIM',
         body: (
           <>
@@ -176,9 +176,7 @@ const TABS = [
 ]
 
 const BADGE_TONES = {
-  success: 'bg-green-100 text-green-700',
-  danger: 'bg-latam-coral/10 text-latam-coral',
-  warning: 'bg-amber-100 text-amber-700',
+  danger: 'bg-latam-coral text-white',
 }
 
 function RuleCard({ icon: Icon, title, body, badge, tone }) {
