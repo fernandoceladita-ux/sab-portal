@@ -176,7 +176,7 @@ export default function DescansoMedicoView() {
         (inclusive en condición de reserva), sigue estrictamente los pasos del flujo regulatorio de la compañía.
       </p>
 
-      <StepAccordion number={1} title="Reportar de inmediato a Movimiento Diario" defaultOpen>
+      <StepAccordion number={1} title="Reportar de inmediato a Movimiento Diario">
         <p className="mb-4 text-sm leading-relaxed text-slate-600">
           Si el tiempo hasta el inicio de la actividad o el STD de tu vuelo es{' '}
           <strong className="text-slate-800">mayor o igual a 05 horas</strong>, debes comunicarte prioritariamente

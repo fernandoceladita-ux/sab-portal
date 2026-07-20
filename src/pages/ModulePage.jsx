@@ -110,7 +110,7 @@ export default function ModulePage() {
         </Carousel>
       </section>
 
-      <Reveal as="section" id="detalle-seleccion" className="mx-auto max-w-4xl px-5 pb-16 sm:px-6">
+      <Reveal as="section" id="detalle-seleccion" className="mx-auto max-w-4xl scroll-mt-[84px] px-5 pb-16 sm:px-6">
         {!selectedItem && (
           <div className="rounded-2xl bg-white p-8 text-center text-sm font-medium text-slate-400 shadow-sm">
             Selecciona una opción del carrusel para ver más detalles aquí.
