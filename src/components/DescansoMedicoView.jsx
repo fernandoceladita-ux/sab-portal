@@ -5,6 +5,7 @@ import {
   IconSmartphone, IconMail, IconShieldCheck, IconWifi, IconArrowUpRight, IconChevronDown,
   IconSend, IconCheck,
 } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
 
 // TODO: ajustar a las filiales/rangos reales cuando se confirmen.
 const FILIALES = ['PE (LATAM Perú)', 'CL (LATAM Chile)', 'CO (LATAM Colombia)', 'EC (LATAM Ecuador)']
@@ -116,8 +117,20 @@ function InternationalAssistanceAccordion() {
   )
 }
 
+// Lee un File del navegador y lo devuelve como base64 puro (sin el prefijo
+// "data:tipo;base64,"), listo para mandar a Apps Script y subir a Drive.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function DescansoMedicoView() {
   const formRef = useRef(null)
+  const [documentoFile, setDocumentoFile] = useState(null)
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [formValid, setFormValid] = useState(false)
   const [sending, setSending] = useState(false)
@@ -136,7 +149,7 @@ export default function DescansoMedicoView() {
     setFormValid(formRef.current?.checkValidity() ?? false)
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -153,17 +166,36 @@ export default function DescansoMedicoView() {
       return
     }
 
+    const formData = new FormData(e.currentTarget)
     setInvalidFields(new Set())
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      const documentoDM = documentoFile ? await fileToBase64(documentoFile) : ''
+      await submitTramite({
+        formType: 'descanso-medico',
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        filial: formData.get('filial'),
+        rank: formData.get('rank'),
+        fechaInicio: formData.get('fechaInicio'),
+        fechaFin: formData.get('fechaFin'),
+        documentoDM,
+        documentoDMNombre: documentoFile?.name || '',
+        documentoDMTipo: documentoFile?.type || '',
+      })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
-    }, 700)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const cancel = () => {
     formRef.current?.reset()
+    setDocumentoFile(null)
     setInvalidFields(new Set())
     setFormValid(false)
     setError('')
@@ -213,9 +245,11 @@ export default function DescansoMedicoView() {
                 name="correo"
                 type="email"
                 label="Correo electrónico"
+                hint="(@latam.com)"
                 required
-                disabled
-                defaultValue="mario.fernandez@latam.com"
+                pattern=".+@latam\.com$"
+                title="Debe ser un correo corporativo @latam.com"
+                invalid={invalidFields.has('correo')}
               />
             </div>
             <TextField
@@ -225,10 +259,14 @@ export default function DescansoMedicoView() {
               required
               invalid={invalidFields.has('bp')}
             />
+            <TextField
+              name="nombre"
+              label="Nombre y Apellidos"
+              required
+              invalid={invalidFields.has('nombre')}
+            />
             <SelectField name="filial" label="Filial" required options={FILIALES} invalid={invalidFields.has('filial')} />
-            <div className="sm:col-span-2">
-              <SelectField name="rank" label="Rank" required options={RANKS} invalid={invalidFields.has('rank')} />
-            </div>
+            <SelectField name="rank" label="Rank" required options={RANKS} invalid={invalidFields.has('rank')} />
 
             <div>
               <DateField
@@ -259,6 +297,7 @@ export default function DescansoMedicoView() {
                 accept=".pdf,.png,.jpg,.jpeg"
                 maxSizeMB={10}
                 invalid={invalidFields.has('documentoDM')}
+                onFileChange={setDocumentoFile}
               />
             </div>
           </div>

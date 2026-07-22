@@ -6,6 +6,7 @@ import {
 import {
   IconClock, IconCalendarCheck, IconPlane, IconIdCard, IconSparkle, IconSend, IconCheck,
 } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
 
 const MESES_ROL = [
   'Agosto 2026 (Dentro de plazo reglamentario)',
@@ -84,7 +85,7 @@ export default function SolicitudMesSubsiguienteView() {
     setFormValid(formRef.current?.checkValidity() ?? false)
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -101,13 +102,44 @@ export default function SolicitudMesSubsiguienteView() {
       return
     }
 
+    const formData = new FormData(e.currentTarget)
     setInvalidFields(new Set())
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      await submitTramite({
+        formType: 'mes-subsiguiente',
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        mesRol: formData.get('mesRol'),
+        novedad: NOVEDADES.find((n) => n.id === novedad)?.label,
+        fechaAfectacion: formData.get('fechaAfectacion'),
+        numVuelo1: formData.get('numVuelo1'),
+        ruta1: formData.get('ruta1'),
+        horaLlegada1: formData.get('horaLlegada1'),
+        comentario1: formData.get('comentario1'),
+        fechaVuelosAdicionales: formData.get('fechaVuelosAdicionales'),
+        numVuelo2: formData.get('numVuelo2'),
+        ruta2: formData.get('ruta2'),
+        mesLibreDeseado: formData.get('mesLibreDeseado'),
+        comentario2: formData.get('comentario2'),
+        fechaLibreJefatura: formData.get('fechaLibreJefatura'),
+        motivoJefatura: formData.get('motivoJefatura'),
+        documentoTecnico: formData.get('documentoTecnico'),
+        fechaCita: formData.get('fechaCita'),
+        horaCita: formData.get('horaCita'),
+        comentario4: formData.get('comentario4'),
+        tipoPermiso: formData.get('tipoPermiso'),
+        fechaInicioPermiso: formData.get('fechaInicioPermiso'),
+        fechaFinPermiso: formData.get('fechaFinPermiso'),
+      })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
-    }, 700)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const cancel = () => {
@@ -147,6 +179,18 @@ export default function SolicitudMesSubsiguienteView() {
       <form ref={formRef} noValidate onSubmit={submit} onInput={syncState} onChange={syncState}>
         <StepAccordion number={1} title="Identificación del Tripulante">
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <TextField
+                name="correo"
+                type="email"
+                label="Correo electrónico corporativo"
+                hint="(@latam.com)"
+                required
+                pattern=".+@latam\.com$"
+                title="Debe ser un correo corporativo @latam.com"
+                invalid={invalidFields.has('correo')}
+              />
+            </div>
             <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
             <TextField
               name="nombre"
