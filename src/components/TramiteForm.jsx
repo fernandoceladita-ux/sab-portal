@@ -100,6 +100,7 @@ export default function TramiteForm() {
     setSending(true)
     try {
       await submitTramite({
+        correo: formData.get('correo'),
         bp: formData.get('bp'),
         nombre: formData.get('nombre'),
         tramite: TRAMITES.find((t) => t.id === tramite)?.label,
@@ -155,6 +156,16 @@ export default function TramiteForm() {
 
       <div className="mt-6">
         <StepAccordion number={1} title="Identificación del Tripulante">
+          <TextField
+            name="correo"
+            type="email"
+            label="Correo electrónico corporativo"
+            hint="(@latam.com)"
+            required
+            pattern=".+@latam\.com$"
+            title="Debe ser un correo corporativo @latam.com"
+            invalid={invalidFields.has('correo')}
+          />
           <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
           <TextField
             name="nombre"

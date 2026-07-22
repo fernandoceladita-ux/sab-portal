@@ -220,7 +220,7 @@ export default function DomicilioDgacView() {
         </p>
       </StepAccordion>
 
-      <StepAccordion number={4} title="Presentación Física en Mesa de Partes" isLast>
+      <StepAccordion number={4} title="Presentación Física en Mesa de Partes">
         <p className="mb-3 text-sm leading-relaxed text-slate-600">
           Lleva personalmente el expediente completo a las oficinas centrales de la DGAC (Mesa de Partes):
         </p>
@@ -240,7 +240,8 @@ export default function DomicilioDgacView() {
         </TipCallout>
       </StepAccordion>
 
-      <p className="mb-5 text-sm leading-relaxed text-slate-600">
+      <StepAccordion number={5} title="Formulario Digital de Reporte Interno" isLast>
+        <p className="mb-5 text-sm leading-relaxed text-slate-600">
           Una vez que la DGAC te haga entrega formal de tu nueva licencia física corregida, debes reportarlo de
           inmediato en los sistemas de la aerolínea completando la siguiente ficha digital:
         </p>
@@ -350,15 +351,16 @@ export default function DomicilioDgacView() {
           </form>
         </div>
 
-      {error && (
-        <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp">{error}</div>
-      )}
+        {error && (
+          <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp">{error}</div>
+        )}
 
-      {sent && (
-        <div className="mt-4 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
-          <IconCheck className="h-5 w-5" /> Registro enviado correctamente a los sistemas de soporte.
-        </div>
-      )}
+        {sent && (
+          <div className="mt-4 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+            <IconCheck className="h-5 w-5" /> Registro enviado correctamente a los sistemas de soporte.
+          </div>
+        )}
+      </StepAccordion>
     </div>
   )
 }

@@ -13,12 +13,21 @@ function doGet() {
   return jsonResponse({ status: 'ok', message: 'SAB Portal sheet bridge activo. Este endpoint solo acepta POST.' })
 }
 
+// Máximo de envíos aceptados por minuto, contados globalmente (no hay forma
+// de identificar al llamante individual en un Web App anónimo de Apps
+// Script). Frena ráfagas/spam sin depender de nada del lado del cliente.
+const RATE_LIMIT_PER_MINUTE = 20
+
 function doPost(e) {
   const SHARED_TOKEN = 'CAMBIA_ESTE_TOKEN'
   const SHEET_ID = '1WSl5ChIUUzCNO4jcV3UHxVlELuKtja1hHDSZdPJia8U'
   const TARGET_GID = 2110233367
 
   try {
+    if (!checkRateLimit()) {
+      return jsonResponse({ status: 'error', message: 'Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.' })
+    }
+
     const data = JSON.parse(e.postData.contents)
 
     if (data.token !== SHARED_TOKEN) {
@@ -27,6 +36,11 @@ function doPost(e) {
 
     if (!String(data.bp || '').trim() || !String(data.nombre || '').trim()) {
       return jsonResponse({ status: 'error', message: 'BP y nombre son obligatorios' })
+    }
+
+    const correo = String(data.correo || '').trim().toLowerCase()
+    if (!correo.endsWith('@latam.com')) {
+      return jsonResponse({ status: 'error', message: 'El correo debe ser una cuenta corporativa @latam.com' })
     }
 
     const ss = SpreadsheetApp.openById(SHEET_ID)
@@ -42,6 +56,7 @@ function doPost(e) {
     // "licencia" no está acá: su única columna relevante es de archivo.
     const valuesByHeader = {
       'Marca temporal': new Date(),
+      'Dirección de correo electrónico': sanitizeValue(correo),
       'Ingresa tu BP': sanitizeValue(data.bp),
       'Ingresa tus nombres y apellidos completos': sanitizeValue(data.nombre),
       'Selecciona que actualización deseas realizar': sanitizeValue(data.tramite),
@@ -73,6 +88,18 @@ function doPost(e) {
   } catch (err) {
     return jsonResponse({ status: 'error', message: err.message })
   }
+}
+
+// Contador por minuto en CacheService (compartido entre todas las
+// ejecuciones del script). Al tope, corta en seco durante el resto de ese
+// minuto — se resetea solo en el siguiente bucket.
+function checkRateLimit() {
+  const cache = CacheService.getScriptCache()
+  const bucket = 'submits_' + Math.floor(Date.now() / 60000)
+  const count = Number(cache.get(bucket) || 0)
+  if (count >= RATE_LIMIT_PER_MINUTE) return false
+  cache.put(bucket, String(count + 1), 90)
+  return true
 }
 
 // Evita inyección de fórmulas: si el valor empieza con = + - @, Sheets lo

@@ -28,6 +28,7 @@ const CANALES = [
 export default function UniformesView() {
   const formRef = useRef(null)
   const [canal, setCanal] = useState(null)
+  const [canalStepOpen, setCanalStepOpen] = useState(false)
   const [motivo, setMotivo] = useState('')
   const [base, setBase] = useState('')
   const [calidadTipo, setCalidadTipo] = useState('')
@@ -135,7 +136,13 @@ export default function UniformesView() {
           />
         </StepAccordion>
 
-        <StepAccordion number={2} title="Selecciona el canal o requerimiento de uniformes" isLast>
+        <StepAccordion
+          number={2}
+          title="Selecciona el canal o requerimiento de uniformes"
+          isLast
+          open={canalStepOpen}
+          onToggle={setCanalStepOpen}
+        >
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             {CANALES.map((c) => (
               <button
@@ -157,7 +164,7 @@ export default function UniformesView() {
         </StepAccordion>
       </div>
 
-      {activeCanal && (
+      {activeCanal && canalStepOpen && (
         <div className="animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
           <div className="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
             <activeCanal.icon className="h-4 w-4" />

@@ -24,6 +24,7 @@ const RULES = {
 export default function VacacionesForm() {
   const formRef = useRef(null)
   const [tipo, setTipo] = useState(null)
+  const [tipoStepOpen, setTipoStepOpen] = useState(false)
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -100,7 +101,7 @@ export default function VacacionesForm() {
           <SelectField name="categoria" label="Categoría" required options={CATEGORIAS} invalid={invalidFields.has('categoria')} />
         </StepAccordion>
 
-        <StepAccordion number={2} title="Tipo de Solicitud" isLast>
+        <StepAccordion number={2} title="Tipo de Solicitud" isLast open={tipoStepOpen} onToggle={setTipoStepOpen}>
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             {TIPOS.map((t) => (
               <button
@@ -127,7 +128,7 @@ export default function VacacionesForm() {
         </StepAccordion>
       </div>
 
-      {activeTipo && (
+      {activeTipo && tipoStepOpen && (
         <div className="animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
           <div className="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
             <activeTipo.icon className="h-4 w-4" />
