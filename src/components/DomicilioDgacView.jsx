@@ -203,7 +203,8 @@ export default function DomicilioDgacView() {
           Aeronáutica" e indicar explícitamente dentro de la descripción el motivo: "Actualización de dirección".
         </p>
         <a
-          href={`${import.meta.env.BASE_URL}docs/formulario-dgac-001-12.pdf`}
+        // pasar un link dentro de descarga formnulario y se abre otro pestaña: https://portal.mtc.gob.pe/servicios_tramite/plataforma/documentos/Formulario2022/DSA/PDF_F_001-12.pdf
+          href="https://portal.mtc.gob.pe/servicios_tramite/plataforma/documentos/Formulario2022/DSA/PDF_F_001-12.pdf"
           download
           target="_blank"
           rel="noopener noreferrer"
