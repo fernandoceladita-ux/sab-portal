@@ -12,7 +12,7 @@
 // particular. Lo que cambia por formulario es `formType` en el payload, que
 // decide a qué GID y con qué mapeo de encabezados se escribe.
 
-const SHARED_TOKEN = 'CAMBIA_ESTE_TOKEN'
+const SHARED_TOKEN = 'ACTUALIZACION'
 const SHEET_ID = '1WSl5ChIUUzCNO4jcV3UHxVlELuKtja1hHDSZdPJia8U'
 
 // Máximo de envíos aceptados por minuto, contados globalmente (no hay forma
@@ -38,6 +38,23 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: 'Token inválido' })
     }
 
+    // Cambio de Uniforme no tiene un único campo `bp`/`nombre` (varía según
+    // canal: lanyard o calidad), así que valida y sale antes de la regla
+    // genérica de abajo, que sí aplica a los demás formularios.
+    if (data.formType === 'cambio-uniforme') {
+      const correoU = String(data.correo || '').trim().toLowerCase()
+      if (!correoU.endsWith('@latam.com')) {
+        return jsonResponse({ status: 'error', message: 'El correo debe ser una cuenta corporativa @latam.com' })
+      }
+      if (!String(data.nombreColaborador || '').trim()) {
+        return jsonResponse({ status: 'error', message: 'Nombre y apellidos son obligatorios' })
+      }
+      const fotoUrl = data.calidadFoto
+        ? uploadFileToDrive(data.calidadFoto, data.calidadFotoNombre, data.calidadFotoTipo, UNIFORMES_FOLDER_ID)
+        : ''
+      return writeToSheet(UNIFORMES_GID, buildUniformesRow(data, correoU, fotoUrl))
+    }
+
     if (!String(data.bp || '').trim() || !String(data.nombre || '').trim()) {
       return jsonResponse({ status: 'error', message: 'BP y nombre son obligatorios' })
     }
@@ -52,7 +69,7 @@ function doPost(e) {
     }
 
     if (data.formType === 'descanso-medico') {
-      const documentoUrl = uploadFileToDrive(data.documentoDM, data.documentoDMNombre, data.documentoDMTipo)
+      const documentoUrl = uploadFileToDrive(data.documentoDM, data.documentoDMNombre, data.documentoDMTipo, DESCANSO_MEDICO_FOLDER_ID)
       return writeToSheet(DESCANSO_MEDICO_GID, buildDescansoMedicoRow(data, correo, documentoUrl))
     }
 
@@ -77,7 +94,12 @@ const DESCANSO_MEDICO_FOLDER_ID = '1GD46b5Zigv8wSKE2jdpNwJnJV3-JH4JW'
 // TODO: reemplazar por el GID real de la pestaña "Vacaciones" (créala con los
 // encabezados que te pasó Claude y pon aquí el número después de #gid= en la
 // URL al hacer click en esa pestaña).
-const VACACIONES_GID = 0
+const VACACIONES_GID = 1772728526
+// TODO: reemplazar por el GID real de la pestaña "Cambio de Uniforme".
+const UNIFORMES_GID = 815933579
+// TODO: crea una carpeta en Drive para las fotos de prendas por problemas de
+// calidad (igual que hiciste con la de Descanso Médico) y pon aquí su ID.
+const UNIFORMES_FOLDER_ID = '1ivO-uXw8HWzFICk0w3RzPwUv7tnYHNDT'
 
 function buildActualizacionDatosRow(data, correo) {
   // "licencia" no está acá: su única columna relevante es de archivo.
@@ -173,13 +195,31 @@ function buildVacacionesRow(data, correo) {
   }
 }
 
+function buildUniformesRow(data, correo, fotoUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'Nombre Colaborador': sanitizeValue(data.nombreColaborador),
+    'Canal': sanitizeValue(data.canal),
+    'BP (Lanyard)': sanitizeValue(data.lanyardBP),
+    'Nombre (Lanyard)': sanitizeValue(data.lanyardNombre),
+    'Motivo (Lanyard)': sanitizeValue(data.motivo),
+    'Base (Lanyard)': sanitizeValue(data.base),
+    'BP (Calidad)': sanitizeValue(data.calidadBP),
+    'Nombre (Calidad)': sanitizeValue(data.calidadNombre),
+    'Tipo de Solicitud (Calidad)': sanitizeValue(data.calidadTipo),
+    'Detalle (Calidad)': sanitizeValue(data.calidadDetalle),
+    'Foto de Prenda (Calidad)': fotoUrl || '',
+  }
+}
+
 // Decodifica el base64 recibido del formulario y sube el archivo a la
-// carpeta de Drive configurada. Hereda los permisos de esa carpeta — no lo
-// hace público, así que la carpeta debe estar compartida con quien deba
-// revisar los sustentos.
-function uploadFileToDrive(base64, fileName, mimeType) {
+// carpeta de Drive indicada. Hereda los permisos de esa carpeta — no lo hace
+// público, así que la carpeta debe estar compartida con quien deba revisar
+// los archivos.
+function uploadFileToDrive(base64, fileName, mimeType, folderId) {
   if (!base64) return ''
-  const folder = DriveApp.getFolderById(DESCANSO_MEDICO_FOLDER_ID)
+  const folder = DriveApp.getFolderById(folderId)
   const bytes = Utilities.base64Decode(base64)
   const blob = Utilities.newBlob(bytes, mimeType || 'application/octet-stream', fileName || 'documento')
   const file = folder.createFile(blob)

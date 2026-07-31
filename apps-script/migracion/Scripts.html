@@ -1,0 +1,274 @@
+<script>
+  // ===================== Header: fondo sólido al hacer scroll =====================
+  const header = document.getElementById('site-header')
+  const brandLabel = document.getElementById('brand-label')
+  const mobileDrawer = document.getElementById('mobile-drawer')
+  const mobileOverlay = document.getElementById('mobile-overlay')
+  let mobileOpen = false
+
+  function applyHeaderSkin() {
+    const solid = window.scrollY > 8 || mobileOpen
+    if (solid) {
+      header.classList.add('border-slate-200', 'bg-white/90', 'shadow-sm', 'backdrop-blur-md')
+      header.classList.remove('border-transparent', 'bg-transparent')
+      brandLabel.classList.add('text-latam-estrellada')
+      brandLabel.classList.remove('text-white')
+    } else {
+      header.classList.remove('border-slate-200', 'bg-white/90', 'shadow-sm', 'backdrop-blur-md')
+      header.classList.add('border-transparent', 'bg-transparent')
+      brandLabel.classList.remove('text-latam-estrellada')
+      brandLabel.classList.add('text-white')
+    }
+    document.querySelectorAll('.nav-inicio, .menu-trigger').forEach((el) => {
+      if (solid) {
+        el.classList.add('text-slate-700')
+        el.classList.remove('text-white/85', 'text-white')
+      } else {
+        el.classList.remove('text-slate-700')
+        el.classList.add('text-white/85')
+      }
+    })
+    document.getElementById('mobile-toggle').classList.toggle('text-latam-estrellada', solid)
+    document.getElementById('mobile-toggle').classList.toggle('text-white', !solid)
+  }
+  window.addEventListener('scroll', applyHeaderSkin, { passive: true })
+  applyHeaderSkin()
+
+  // ===================== Mega-menú desktop =====================
+  let openMenuKey = null
+  function toggleMenu(key) {
+    document.querySelectorAll('.mega-panel').forEach((p) => {
+      if (p.id !== 'menu-' + key) p.classList.add('hidden')
+    })
+    document.querySelectorAll('.menu-trigger .chevron').forEach((c) => c.classList.remove('rotate-180'))
+    const panel = document.getElementById('menu-' + key)
+    const isOpen = !panel.classList.contains('hidden')
+    if (isOpen) {
+      panel.classList.add('hidden')
+      openMenuKey = null
+    } else {
+      panel.classList.remove('hidden')
+      openMenuKey = key
+      document.querySelector('.menu-trigger[data-module="' + key + '"] .chevron').classList.add('rotate-180')
+    }
+  }
+  document.addEventListener('mousedown', (e) => {
+    if (!openMenuKey) return
+    const panel = document.getElementById('menu-' + openMenuKey)
+    const trigger = document.querySelector('.menu-trigger[data-module="' + openMenuKey + '"]')
+    if (panel && !panel.contains(e.target) && trigger && !trigger.contains(e.target)) {
+      panel.classList.add('hidden')
+      document.querySelectorAll('.menu-trigger .chevron').forEach((c) => c.classList.remove('rotate-180'))
+      openMenuKey = null
+    }
+  })
+
+  // ===================== Drawer mobile =====================
+  function toggleMobileMenu() {
+    mobileOpen = !mobileOpen
+    document.getElementById('icon-menu').classList.toggle('hidden', mobileOpen)
+    document.getElementById('icon-close').classList.toggle('hidden', !mobileOpen)
+    mobileOverlay.classList.toggle('hidden', !mobileOpen)
+    mobileDrawer.classList.toggle('grid-rows-[0fr]', !mobileOpen)
+    mobileDrawer.classList.toggle('grid-rows-[1fr]', mobileOpen)
+    mobileDrawer.classList.toggle('border-t', mobileOpen)
+    mobileDrawer.classList.toggle('border-slate-100', mobileOpen)
+    applyHeaderSkin()
+  }
+  function closeMobileMenu() {
+    if (mobileOpen) toggleMobileMenu()
+  }
+  function toggleMobileGroup(key) {
+    const panel = document.getElementById('mobile-panel-' + key)
+    const isOpen = panel.classList.contains('grid-rows-[1fr]')
+    document.querySelectorAll('[id^="mobile-panel-"]').forEach((p) => {
+      p.classList.remove('grid-rows-[1fr]')
+      p.classList.add('grid-rows-[0fr]')
+    })
+    document.querySelectorAll('[data-mobile-module] .chevron').forEach((c) => c.classList.remove('rotate-180'))
+    document.querySelectorAll('[data-mobile-module]').forEach((b) => {
+      b.classList.remove('text-white')
+      b.classList.add('text-slate-800')
+      b.style.backgroundColor = ''
+    })
+    if (!isOpen) {
+      panel.classList.remove('grid-rows-[0fr]')
+      panel.classList.add('grid-rows-[1fr]')
+      const btn = document.querySelector('[data-mobile-module="' + key + '"]')
+      btn.querySelector('.chevron').classList.add('rotate-180')
+    }
+  }
+
+  // ===================== FAQ accordion =====================
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item')
+    const panel = item.querySelector('.faq-panel')
+    const chevron = btn.querySelector('.chevron')
+    const isOpen = panel.classList.contains('grid-rows-[1fr]')
+    document.querySelectorAll('.faq-panel').forEach((p) => {
+      p.classList.remove('grid-rows-[1fr]')
+      p.classList.add('grid-rows-[0fr]')
+    })
+    document.querySelectorAll('.faq-item .chevron').forEach((c) => c.classList.remove('rotate-180'))
+    if (!isOpen) {
+      panel.classList.remove('grid-rows-[0fr]')
+      panel.classList.add('grid-rows-[1fr]')
+      chevron.classList.add('rotate-180')
+    }
+  }
+
+  // ===================== Carrusel de novedades =====================
+  const NOVELTY_COUNT = 3
+  const NOVELTY_AUTO_MS = 15000
+  const noveltyTrack = document.getElementById('novelty-track')
+  let noveltyIndex = 0
+  let noveltyTimer = null
+
+  function noveltyGoTo(i) {
+    const child = noveltyTrack.children[i]
+    if (!child) return
+    noveltyTrack.scrollTo({ left: child.offsetLeft, behavior: 'smooth' })
+  }
+
+  function updateNoveltyUI(i) {
+    noveltyIndex = i
+    document.querySelectorAll('[data-novelty-dot]').forEach((dot) => {
+      const idx = Number(dot.dataset.noveltyDot)
+      if (idx === i) {
+        dot.classList.add('w-6', 'bg-latam-coral')
+        dot.classList.remove('w-1.5', 'bg-white/40')
+      } else {
+        dot.classList.remove('w-6', 'bg-latam-coral')
+        dot.classList.add('w-1.5', 'bg-white/40')
+      }
+    })
+    const btnWrap = document.getElementById('novelty-btn-wrap')
+    const btn = btnWrap.querySelector('.novelty-btn')
+    btn.setAttribute('onclick', 'openNewsDetail(' + i + ')')
+    btnWrap.classList.remove('animate-fadeIn')
+    void btnWrap.offsetWidth
+    btnWrap.classList.add('animate-fadeIn')
+  }
+
+  if (noveltyTrack) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const mostVisible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (mostVisible) {
+          const idx = Array.from(noveltyTrack.children).indexOf(mostVisible.target)
+          if (idx !== -1) updateNoveltyUI(idx)
+        }
+      },
+      { root: noveltyTrack, threshold: [0.5, 0.75, 1] },
+    )
+    Array.from(noveltyTrack.children).forEach((s) => io.observe(s))
+
+    noveltyTimer = setInterval(() => {
+      noveltyGoTo((noveltyIndex + 1) % NOVELTY_COUNT)
+    }, NOVELTY_AUTO_MS)
+  }
+
+  // ===================== Modal: detalle de noticia =====================
+  function openNewsDetail(index) {
+    document.querySelectorAll('.news-panel').forEach((p) => p.classList.add('hidden'))
+    const panel = document.querySelector('[data-news-panel="' + index + '"]')
+    if (panel) panel.classList.remove('hidden')
+    openModal('modal-news')
+  }
+
+  // ===================== Modales genéricos =====================
+  function openModal(id) {
+    const modal = document.getElementById(id)
+    modal.classList.remove('hidden')
+    modal.classList.add('flex')
+    document.body.style.overflow = 'hidden'
+  }
+  function closeModal(id) {
+    const modal = document.getElementById(id)
+    modal.classList.add('hidden')
+    modal.classList.remove('flex')
+    document.body.style.overflow = ''
+  }
+  function closeModalBackdrop(e, id) {
+    if (e.target.id === id) closeModal(id)
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return
+    document.querySelectorAll('.modal-overlay:not(.hidden)').forEach((m) => closeModal(m.id))
+  })
+
+  // ===================== Formularios de los modales (simulados) =====================
+  // Igual que en la versión React: por ahora estos dos formularios no están
+  // conectados a un backend real, solo simulan el envío (setTimeout). Se
+  // pueden conectar más adelante al mismo bridge de Google Sheets que usan
+  // los formularios de trámites (ver /apps-script/Code.gs).
+  function fakeSubmit(e, formId, successId, modalId) {
+    e.preventDefault()
+    const form = document.getElementById(formId)
+    if (!form.checkValidity()) {
+      form.reportValidity()
+      return
+    }
+    const btn = form.querySelector('button[type="submit"]')
+    const label = btn.querySelector('.btn-label')
+    btn.disabled = true
+    const originalText = label.textContent
+    label.textContent = 'Enviando...'
+    setTimeout(() => {
+      form.classList.add('hidden')
+      document.getElementById(successId).classList.remove('hidden')
+      document.getElementById(successId).classList.add('flex')
+      setTimeout(() => {
+        closeModal(modalId)
+        form.reset()
+        form.classList.remove('hidden')
+        document.getElementById(successId).classList.add('hidden')
+        document.getElementById(successId).classList.remove('flex')
+        btn.disabled = false
+        label.textContent = originalText
+        if (formId === 'form-absentismo') clearFile('absentismo')
+      }, 1800)
+    }, 700)
+  }
+
+  // ===================== Upload de archivo (modal Absentismo) =====================
+  function handleFileChange(input, prefix) {
+    const file = input.files && input.files[0]
+    if (!file) return
+    document.getElementById(prefix + '-file-idle').classList.add('hidden')
+    const done = document.getElementById(prefix + '-file-done')
+    done.classList.remove('hidden')
+    done.classList.add('flex')
+    document.getElementById(prefix + '-file-name').textContent = file.name
+  }
+  function clearFile(prefix) {
+    const input = document.getElementById(prefix + '-file-input')
+    input.value = ''
+    document.getElementById(prefix + '-file-idle').classList.remove('hidden')
+    const done = document.getElementById(prefix + '-file-done')
+    done.classList.add('hidden')
+    done.classList.remove('flex')
+  }
+
+  // ===================== Reveal-on-scroll (FAQ / Centro de Ayuda) =====================
+  const revealIo = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('translate-y-0', 'opacity-100')
+          entry.target.classList.remove('translate-y-8', 'opacity-0')
+          revealIo.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -60px 0px' },
+  )
+  document.querySelectorAll('.reveal').forEach((el) => {
+    el.classList.add('translate-y-8', 'opacity-0', 'transition-all', 'duration-700', 'ease-out')
+    revealIo.observe(el)
+  })
+
+  // ===================== Footer year =====================
+  const footerYear = document.getElementById('footer-year')
+  if (footerYear) footerYear.textContent = new Date().getFullYear()
+</script>

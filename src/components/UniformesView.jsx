@@ -2,9 +2,21 @@ import { useRef, useState } from 'react'
 import StepAccordion from './StepAccordion.jsx'
 import { TextField, TextareaField, RadioGroup, FileUploadField } from './fields/FormFields.jsx'
 import { IconShirt, IconIdCard, IconShieldCheck, IconArrowUpRight, IconSend, IconCheck } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
+
+// Lee un File del navegador y lo devuelve como base64 puro (sin el prefijo
+// "data:tipo;base64,"), listo para mandar a Apps Script y subir a Drive.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 // TODO: reemplazar con la URL real de la Plataforma Armario Latam.
-const ARMARIO_URL = '#'
+const ARMARIO_URL = 'https://armlt.appslatam.com/#/home'
 
 const CANALES = [
   {
@@ -32,6 +44,7 @@ export default function UniformesView() {
   const [motivo, setMotivo] = useState('')
   const [base, setBase] = useState('')
   const [calidadTipo, setCalidadTipo] = useState('')
+  const [calidadArchivo, setCalidadArchivo] = useState(null)
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
@@ -58,7 +71,7 @@ export default function UniformesView() {
     }
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -83,13 +96,35 @@ export default function UniformesView() {
       return
     }
 
+    const formData = new FormData(e.currentTarget)
     setInvalidFields(new Set())
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      const calidadFoto = calidadArchivo ? await fileToBase64(calidadArchivo) : ''
+      await submitTramite({
+        formType: 'cambio-uniforme',
+        correo: formData.get('correo'),
+        nombreColaborador: formData.get('nombreColaborador'),
+        canal,
+        lanyardBP: formData.get('lanyardBP'),
+        lanyardNombre: formData.get('lanyardNombre'),
+        motivo,
+        base,
+        calidadBP: formData.get('calidadBP'),
+        calidadNombre: formData.get('calidadNombre'),
+        calidadTipo,
+        calidadDetalle: formData.get('calidadDetalle'),
+        calidadFoto,
+        calidadFotoNombre: calidadArchivo?.name || '',
+        calidadFotoTipo: calidadArchivo?.type || '',
+      })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
-    }, 700)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const clearForm = () => {
@@ -98,6 +133,7 @@ export default function UniformesView() {
     setMotivo('')
     setBase('')
     setCalidadTipo('')
+    setCalidadArchivo(null)
     setInvalidFields(new Set())
     setError('')
   }
@@ -126,6 +162,8 @@ export default function UniformesView() {
             label="Correo electrónico Corporativo"
             required
             placeholder="nombre.apellido@latam.com"
+            pattern=".+@latam\.com$"
+            title="Debe ser un correo corporativo @latam.com"
             invalid={invalidFields.has('correo')}
           />
           <TextField
@@ -227,6 +265,7 @@ export default function UniformesView() {
                   maxSizeMB={10}
                   required
                   invalid={invalidFields.has('calidadArchivo')}
+                  onFileChange={setCalidadArchivo}
                 />
               </>
             )}
