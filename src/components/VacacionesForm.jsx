@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import StepAccordion from './StepAccordion.jsx'
 import { TextField, MonthField, TextareaField, SelectField, AnticipationAlert } from './fields/FormFields.jsx'
 import { IconCalendarCheck, IconRepeat, IconSend, IconCheck } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
 
 // TODO: ajustar a las categorías reales de tripulación cuando se confirmen.
 const CATEGORIAS = ['JSB - Jefe de Servicio a Bordo', 'TC - Tripulante de Cabina', 'Sobrecargo']
@@ -26,6 +27,7 @@ export default function VacacionesForm() {
   const [tipo, setTipo] = useState(null)
   const [tipoStepOpen, setTipoStepOpen] = useState(false)
   const [invalidFields, setInvalidFields] = useState(new Set())
+  const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
@@ -40,7 +42,7 @@ export default function VacacionesForm() {
     }
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -57,11 +59,34 @@ export default function VacacionesForm() {
       return
     }
 
-    // TODO: conectar a Google Sheets (mismo patrón que TramiteForm/submitTramite)
-    // cuando se confirmen los encabezados reales de la hoja para este trámite.
+    const formData = new FormData(e.currentTarget)
     setInvalidFields(new Set())
-    setSent(true)
-    setTimeout(() => setSent(false), 3500)
+    setSending(true)
+    try {
+      await submitTramite({
+        formType: 'vacaciones',
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        categoria: formData.get('categoria'),
+        tipo,
+        mesAdicionales: formData.get('mesAdicionales'),
+        diasAdicionales: formData.get('diasAdicionales'),
+        sustento: formData.get('sustento'),
+        companeroBP: formData.get('companeroBP'),
+        companeroNombre: formData.get('companeroNombre'),
+        mesCambio: formData.get('mesCambio'),
+        beneficiarioBP: formData.get('beneficiarioBP'),
+        beneficiarioNombre: formData.get('beneficiarioNombre'),
+        bloqueDias: formData.get('bloqueDias'),
+      })
+      setSent(true)
+      setTimeout(() => setSent(false), 3500)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const clearForm = () => {
@@ -94,6 +119,8 @@ export default function VacacionesForm() {
             label="Correo electrónico"
             required
             placeholder="nombre.apellido@latam.com"
+            pattern=".+@latam\.com$"
+            title="Debe ser un correo corporativo @latam.com"
             invalid={invalidFields.has('correo')}
           />
           <TextField name="bp" label="Ingresa tu BP" required invalid={invalidFields.has('bp')} />
@@ -209,10 +236,10 @@ export default function VacacionesForm() {
         </button>
         <button
           type="submit"
-          disabled={!tipo}
+          disabled={!tipo || sending}
           className="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Enviar Solicitud <IconSend className="h-4 w-4" />
+          {sending ? 'Enviando...' : 'Enviar Solicitud'} <IconSend className="h-4 w-4" />
         </button>
       </div>
 

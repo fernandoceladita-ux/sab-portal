@@ -56,6 +56,10 @@ function doPost(e) {
       return writeToSheet(DESCANSO_MEDICO_GID, buildDescansoMedicoRow(data, correo, documentoUrl))
     }
 
+    if (data.formType === 'vacaciones') {
+      return writeToSheet(VACACIONES_GID, buildVacacionesRow(data, correo))
+    }
+
     // Sin formType (o 'actualizacion-datos'): comportamiento original.
     return writeToSheet(ACTUALIZACION_DATOS_GID, buildActualizacionDatosRow(data, correo))
   } catch (err) {
@@ -70,6 +74,10 @@ const MES_SUBSIGUIENTE_GID = 1379865326
 // la URL al hacer click en esa pestaña).
 const DESCANSO_MEDICO_GID = 1801672376
 const DESCANSO_MEDICO_FOLDER_ID = '1GD46b5Zigv8wSKE2jdpNwJnJV3-JH4JW'
+// TODO: reemplazar por el GID real de la pestaña "Vacaciones" (créala con los
+// encabezados que te pasó Claude y pon aquí el número después de #gid= en la
+// URL al hacer click en esa pestaña).
+const VACACIONES_GID = 0
 
 function buildActualizacionDatosRow(data, correo) {
   // "licencia" no está acá: su única columna relevante es de archivo.
@@ -142,6 +150,26 @@ function buildDescansoMedicoRow(data, correo, documentoUrl) {
     'Fecha de Inicio DM': sanitizeValue(data.fechaInicio),
     'Fecha de Término DM': sanitizeValue(data.fechaFin),
     'Documento DM': documentoUrl || '',
+  }
+}
+
+function buildVacacionesRow(data, correo) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Categoría': sanitizeValue(data.categoria),
+    'Tipo de Solicitud': sanitizeValue(data.tipo),
+    'Mes Solicitado (Adicionales)': sanitizeValue(data.mesAdicionales),
+    'Días Solicitados': sanitizeValue(data.diasAdicionales),
+    'Sustento': sanitizeValue(data.sustento),
+    'BP Compañero (Cambio)': sanitizeValue(data.companeroBP),
+    'Nombre Compañero (Cambio)': sanitizeValue(data.companeroNombre),
+    'Mes Original (Cambio)': sanitizeValue(data.mesCambio),
+    'BP Beneficiario (Cesión)': sanitizeValue(data.beneficiarioBP),
+    'Nombre Beneficiario (Cesión)': sanitizeValue(data.beneficiarioNombre),
+    'Bloque de Días a Ceder (Cesión)': sanitizeValue(data.bloqueDias),
   }
 }
 
