@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IconUpload, IconCheck, IconArrowRight, IconClock, IconClose, IconAlertTriangle } from '../icons.jsx'
 
 const labelCls = 'block text-sm font-bold text-latam-estrellada mb-2'
@@ -94,11 +94,27 @@ export function FileUploadField({
   maxSizeMB = 10,
   invalid,
   onFileChange,
+  resetSignal,
 }) {
   const inputRef = useRef(null)
   const [file, setFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   const [fileError, setFileError] = useState('')
+
+  // El preview (nombre de archivo + check verde) vive en este estado interno,
+  // separado del <input type="file"> nativo — por eso un `form.reset()` o un
+  // reset manual de `value` desde el padre no lo hace desaparecer. Cambiar
+  // `resetSignal` (ej. un contador que el padre incrementa tras enviar o
+  // borrar el formulario) es la señal explícita para limpiarlo.
+  useEffect(() => {
+    if (resetSignal === undefined) return
+    setFile(null)
+    setFileError('')
+    if (inputRef.current) inputRef.current.value = ''
+    // Solo debe dispararse cuando el padre cambia la señal, no en cada
+    // render ni cuando cambia el propio archivo seleccionado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetSignal])
 
   const acceptExts = accept.split(',').map((s) => s.trim().toLowerCase())
 

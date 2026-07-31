@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
 import { TextField, DateField, SelectField } from './fields/FormFields.jsx'
 import { IconIdCard, IconCalendarCheck, IconClock, IconEdit, IconSend, IconCheck } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
 const INFO_CARDS = [
   {
@@ -42,7 +44,7 @@ export default function RegistroSunatView() {
     }
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
     setSent(false)
@@ -60,13 +62,36 @@ export default function RegistroSunatView() {
       return
     }
 
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      await submitTramite({
+        formType: 'registro-sunat',
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        fechaNacimiento: formData.get('fechaNacimiento'),
+        pasaporte: formData.get('pasaporte'),
+        tipoEquipo: formData.get('tipoEquipo'),
+        uso: formData.get('uso'),
+        marca: formData.get('marca'),
+        modelo: formData.get('modelo'),
+        serie: formData.get('serie'),
+      })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
-    }, 700)
+      // Limpia el registro recién enviado, pero conserva correo/BP/nombre
+      // por si va a registrar otro equipo a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre'])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const clearForm = () => {
@@ -115,6 +140,8 @@ export default function RegistroSunatView() {
                 label="Correo electrónico"
                 required
                 placeholder="nombre.apellido@latam.com"
+                pattern=".+@latam\.com$"
+                title="Debe ser un correo corporativo @latam.com"
                 invalid={invalidFields.has('correo')}
               />
             </div>

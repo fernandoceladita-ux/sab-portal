@@ -77,14 +77,45 @@ function doPost(e) {
       return writeToSheet(VACACIONES_GID, buildVacacionesRow(data, correo))
     }
 
-    // Sin formType (o 'actualizacion-datos'): comportamiento original.
-    return writeToSheet(ACTUALIZACION_DATOS_GID, buildActualizacionDatosRow(data, correo))
+    if (data.formType === 'registro-sunat') {
+      return writeToSheet(REGISTRO_SUNAT_GID, buildRegistroSunatRow(data, correo))
+    }
+
+    if (data.formType === 'domicilio-dgac') {
+      const licenciaUrl = data.licenciaArchivo
+        ? uploadFileToDrive(data.licenciaArchivo, data.licenciaArchivoNombre, data.licenciaArchivoTipo, DOMICILIO_DGAC_FOLDER_ID)
+        : ''
+      return writeToSheet(DOMICILIO_DGAC_GID, buildDomicilioDgacRow(data, correo, licenciaUrl))
+    }
+
+    // Sin formType (o 'actualizacion-datos'): comportamiento original, ahora
+    // subiendo a Drive el archivo del trámite seleccionado (solo uno viene
+    // relleno por envío, salvo VISA que puede traer Tripulante y/o Turista).
+    const dniUrl = data.dniArchivo ? uploadFileToDrive(data.dniArchivo, data.dniArchivoNombre, data.dniArchivoTipo, ACTUALIZACION_DNI_FOLDER_ID) : ''
+    const pasaporteUrl = data.pasaporteArchivo ? uploadFileToDrive(data.pasaporteArchivo, data.pasaporteArchivoNombre, data.pasaporteArchivoTipo, ACTUALIZACION_PASAPORTE_FOLDER_ID) : ''
+    const fiebreUrl = data.fiebreArchivo ? uploadFileToDrive(data.fiebreArchivo, data.fiebreArchivoNombre, data.fiebreArchivoTipo, ACTUALIZACION_FIEBRE_FOLDER_ID) : ''
+    const visaTripulanteUrl = data.visaTripulanteArchivo ? uploadFileToDrive(data.visaTripulanteArchivo, data.visaTripulanteArchivoNombre, data.visaTripulanteArchivoTipo, ACTUALIZACION_VISA_TRIPULANTE_FOLDER_ID) : ''
+    const visaTuristaUrl = data.visaTuristaArchivo ? uploadFileToDrive(data.visaTuristaArchivo, data.visaTuristaArchivoNombre, data.visaTuristaArchivoTipo, ACTUALIZACION_VISA_TURISTA_FOLDER_ID) : ''
+    const licenciaUrl = data.licenciaArchivo ? uploadFileToDrive(data.licenciaArchivo, data.licenciaArchivoNombre, data.licenciaArchivoTipo, ACTUALIZACION_LICENCIA_FOLDER_ID) : ''
+    return writeToSheet(
+      ACTUALIZACION_DATOS_GID,
+      buildActualizacionDatosRow(data, correo, { dniUrl, pasaporteUrl, fiebreUrl, visaTripulanteUrl, visaTuristaUrl, licenciaUrl }),
+    )
   } catch (err) {
     return jsonResponse({ status: 'error', message: err.message })
   }
 }
 
 const ACTUALIZACION_DATOS_GID = 2110233367
+// Subcarpetas dentro de tu carpeta de Drive "actualizacion de datos", una
+// por tipo de archivo, para que no se mezclen. Crea cada una, compártela
+// igual que las anteriores, y reemplaza estos 5 IDs.
+const ACTUALIZACION_DNI_FOLDER_ID = '1uDCbkzcOn8mja8t3GFGjpAoWLzzrAqIh'
+const ACTUALIZACION_PASAPORTE_FOLDER_ID = '1Rm0bG2HrXN5G1rtQh0Zrp-ZwELeFhilb'
+const ACTUALIZACION_VISA_TRIPULANTE_FOLDER_ID = '1b2HmUomJNp3Pa_6cEQg4DPI_4VaggrCP'
+const ACTUALIZACION_VISA_TURISTA_FOLDER_ID = '1CVaFg2hVhRqGTOKhAyi7mfhGmJohp6nC'
+const ACTUALIZACION_FIEBRE_FOLDER_ID = '1_ZfdWWM5_PP2eqcE6ULzIXIwT_SEc9ql'
+const ACTUALIZACION_LICENCIA_FOLDER_ID = '1_vfAxpYceoOUxkw5fXsBFtoAzwcDnfKQ'
 const MES_SUBSIGUIENTE_GID = 1379865326
 // TODO: reemplazar por el GID real de la pestaña "Descanso Médico" (créala
 // con los encabezados que te pasé y pon aquí el número después de #gid= en
@@ -100,9 +131,19 @@ const UNIFORMES_GID = 815933579
 // TODO: crea una carpeta en Drive para las fotos de prendas por problemas de
 // calidad (igual que hiciste con la de Descanso Médico) y pon aquí su ID.
 const UNIFORMES_FOLDER_ID = '1ivO-uXw8HWzFICk0w3RzPwUv7tnYHNDT'
+// TODO: reemplazar por el GID real de la pestaña "Registro SUNAT".
+const REGISTRO_SUNAT_GID = 1592932357
+// TODO: reemplazar por el GID real de la pestaña "Domicilio DGAC".
+const DOMICILIO_DGAC_GID = 1159770071
+// TODO: crea una carpeta en Drive para las fotos de la nueva licencia DGAC y
+// pon aquí su ID.
+const DOMICILIO_DGAC_FOLDER_ID = '1SAGqcibpIRcBgceY1y7D_GxalFzug4do'
 
-function buildActualizacionDatosRow(data, correo) {
-  // "licencia" no está acá: su única columna relevante es de archivo.
+function buildActualizacionDatosRow(data, correo, fileUrls) {
+  // Ojo con "Ingresa una foto de tu VISA": el encabezado está DUPLICADO en el
+  // Sheet (una vez para Tripulante, otra para Turista, mismo texto literal).
+  // `writeToSheet` distingue la 2da aparición agregando " (2)" al buscarla,
+  // así que aquí van las dos claves por separado.
   return {
     'Marca temporal': new Date(),
     'Dirección de correo electrónico': sanitizeValue(correo),
@@ -115,19 +156,26 @@ function buildActualizacionDatosRow(data, correo) {
     'Indícanos el distrito': sanitizeValue(data.distrito),
     'Agregar sus coordenadas': sanitizeValue(data.coordenadas),
     'Fecha vencimiento DNI': sanitizeValue(data.dniVencimiento),
+    'Ingresa una foto de tu DNI': fileUrls.dniUrl || '',
     'Ingresa el número de tu nuevo pasaporte': sanitizeValue(data.pasaporteNumero),
     'Fecha de Vencimiento del pasaporte': sanitizeValue(data.pasaporteVencimiento),
     'País emisor de pasaporte': sanitizeValue(data.pasaportePais),
+    'Adjunta una foto de tu pasaporte': fileUrls.pasaporteUrl || '',
     'Indícanos qué número de celular deseas que consideremos ahora': sanitizeValue(data.celular),
     'Indícanos qué número de teléfono fijo deseas que consideremos ahora': sanitizeValue(data.telefonoFijo),
     'Fecha de vacunación': sanitizeValue(data.fiebreFecha),
+    'Ingresa una foto de tu Certificado Internacional de Vacunación contra la Fiebre Amarilla': fileUrls.fiebreUrl || '',
     'Cuentas con tu pasaporte para ejercer funciones': sanitizeValue(data.rechazoPasaporte),
     'Ingresa el código alfanumérico de tu visa (código en rojo) Tripulante': sanitizeValue(data.visaTripulanteCodigo),
     'Fecha Emisión de VISA Tripulante': sanitizeValue(data.visaTripulanteEmision),
     'Fecha de Vencimiento de VISA Tripulante': sanitizeValue(data.visaTripulanteVencimiento),
+    'Ingresa una foto de tu VISA': fileUrls.visaTripulanteUrl || '',
     'Ingresa el código alfanumérico de tu visa (código en rojo) Turista': sanitizeValue(data.visaTuristaCodigo),
     'Fecha Emisión de VISA Turista': sanitizeValue(data.visaTuristaEmision),
     'Fecha de Vencimiento de VISA Turista': sanitizeValue(data.visaTuristaVencimiento),
+    'Ingresa una foto de tu VISA (2)': fileUrls.visaTuristaUrl || '',
+    'Ingresa el número de tu Licencia de Conducir MTC': sanitizeValue(data.licenciaNumero),
+    'Ingresa tu Licencia Peruana:': fileUrls.licenciaUrl || '',
   }
 }
 
@@ -213,6 +261,36 @@ function buildUniformesRow(data, correo, fotoUrl) {
   }
 }
 
+function buildRegistroSunatRow(data, correo) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Fecha de Nacimiento': sanitizeValue(data.fechaNacimiento),
+    'Pasaporte': sanitizeValue(data.pasaporte),
+    'Tipo de Equipo': sanitizeValue(data.tipoEquipo),
+    'Uso': sanitizeValue(data.uso),
+    'Marca': sanitizeValue(data.marca),
+    'Modelo': sanitizeValue(data.modelo),
+    'Serie': sanitizeValue(data.serie),
+  }
+}
+
+function buildDomicilioDgacRow(data, correo, licenciaUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Tipo de Actualización': sanitizeValue(data.tipo),
+    'Nueva Dirección': sanitizeValue(data.direccion),
+    'Distrito': sanitizeValue(data.distrito),
+    'Coordenadas': sanitizeValue(data.coordenadas),
+    'Foto Nueva Licencia DGAC': licenciaUrl || '',
+  }
+}
+
 // Decodifica el base64 recibido del formulario y sube el archivo a la
 // carpeta de Drive indicada. Hereda los permisos de esa carpeta — no lo hace
 // público, así que la carpeta debe estar compartida con quien deba revisar
@@ -236,7 +314,19 @@ function writeToSheet(targetGid, valuesByHeader) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
     .map((h) => h.toString().trim())
 
-  const row = headers.map((header) => (header in valuesByHeader ? valuesByHeader[header] : ''))
+  // Algunos Sheets viejos (ej. Actualización de Datos) tienen dos columnas
+  // con el MISMO texto de encabezado (ej. "Ingresa una foto de tu VISA"
+  // repetido para Tripulante y Turista). Para esos casos, la 2da aparición
+  // en adelante se busca como "Encabezado (2)", "Encabezado (3)", etc. — así
+  // el row-builder puede darle un valor distinto a cada una sin tocar el
+  // Sheet ni depender de la posición de columna.
+  const seen = {}
+  const row = headers.map((header) => {
+    seen[header] = (seen[header] || 0) + 1
+    const key = seen[header] > 1 ? `${header} (${seen[header]})` : header
+    if (key in valuesByHeader) return valuesByHeader[key]
+    return header in valuesByHeader ? valuesByHeader[header] : ''
+  })
   sheet.appendRow(row)
 
   return jsonResponse({ status: 'ok' })

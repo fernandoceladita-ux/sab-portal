@@ -120,7 +120,7 @@ export default function Home() {
       <div className="bg-[#FFF1F6]">
         <Reveal as="section" className="mx-auto max-w-6xl px-5 py-14 sm:py-16">
           <SectionHeading eyebrow="Soporte" title="Centro de Ayuda y Reportes" icon={IconLifeBuoy} />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <HelpCard
               icon={IconClipboard}
               title="Movimiento Diario"

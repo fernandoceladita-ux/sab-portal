@@ -6,6 +6,7 @@ import {
   IconSend, IconCheck,
 } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
 // TODO: ajustar a las filiales/rangos reales cuando se confirmen.
 const FILIALES = ['PE (LATAM Perú)', 'CL (LATAM Chile)', 'CO (LATAM Colombia)', 'EC (LATAM Ecuador)']
@@ -136,6 +137,8 @@ export default function DescansoMedicoView() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  // Fuerza a FileUploadField a limpiar su preview interno (ver FormFields.jsx).
+  const [resetKey, setResetKey] = useState(0)
 
   const syncState = (e) => {
     const name = e.target.name
@@ -166,7 +169,10 @@ export default function DescansoMedicoView() {
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
     try {
@@ -186,6 +192,12 @@ export default function DescansoMedicoView() {
       })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
+      // Limpia el registro recién enviado, pero conserva correo/BP/nombre
+      // por si va a registrar otro descanso a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre'])
+      setDocumentoFile(null)
+      setFormValid(false)
+      setResetKey((k) => k + 1)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -196,6 +208,7 @@ export default function DescansoMedicoView() {
   const cancel = () => {
     formRef.current?.reset()
     setDocumentoFile(null)
+    setResetKey((k) => k + 1)
     setInvalidFields(new Set())
     setFormValid(false)
     setError('')
@@ -298,6 +311,7 @@ export default function DescansoMedicoView() {
                 maxSizeMB={10}
                 invalid={invalidFields.has('documentoDM')}
                 onFileChange={setDocumentoFile}
+                resetSignal={resetKey}
               />
             </div>
           </div>

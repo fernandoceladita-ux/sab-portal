@@ -3,6 +3,7 @@ import StepAccordion from './StepAccordion.jsx'
 import { TextField, TextareaField, RadioGroup, FileUploadField } from './fields/FormFields.jsx'
 import { IconShirt, IconIdCard, IconShieldCheck, IconArrowUpRight, IconSend, IconCheck } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
 // Lee un File del navegador y lo devuelve como base64 puro (sin el prefijo
 // "data:tipo;base64,"), listo para mandar a Apps Script y subir a Drive.
@@ -49,6 +50,8 @@ export default function UniformesView() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  // Fuerza a FileUploadField a limpiar su preview interno (ver FormFields.jsx).
+  const [resetKey, setResetKey] = useState(0)
 
   const selectCanal = (c) => {
     if (c.external) {
@@ -56,6 +59,14 @@ export default function UniformesView() {
       return
     }
     setCanal(c.id)
+    // Igual que en Actualización de Datos: cambiar de canal no debe arrastrar
+    // radios/archivo del canal anterior — solo se veían "vacíos" porque el
+    // campo se remonta, pero el estado seguía vivo para el envío.
+    setMotivo('')
+    setBase('')
+    setCalidadTipo('')
+    setCalidadArchivo(null)
+    setResetKey((k) => k + 1)
     setInvalidFields(new Set())
     setError('')
   }
@@ -96,7 +107,10 @@ export default function UniformesView() {
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
     try {
@@ -120,6 +134,15 @@ export default function UniformesView() {
       })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
+      // Limpia el canal recién enviado (incluidos archivo/radios), pero
+      // conserva correo/nombre por si va a enviar otra solicitud a continuación.
+      resetFormExcept(formEl, ['correo', 'nombreColaborador'])
+      setCanal(null)
+      setMotivo('')
+      setBase('')
+      setCalidadTipo('')
+      setCalidadArchivo(null)
+      setResetKey((k) => k + 1)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -134,6 +157,7 @@ export default function UniformesView() {
     setBase('')
     setCalidadTipo('')
     setCalidadArchivo(null)
+    setResetKey((k) => k + 1)
     setInvalidFields(new Set())
     setError('')
   }
@@ -266,6 +290,7 @@ export default function UniformesView() {
                   required
                   invalid={invalidFields.has('calidadArchivo')}
                   onFileChange={setCalidadArchivo}
+                  resetSignal={resetKey}
                 />
               </>
             )}

@@ -10,10 +10,22 @@ import {
   IconSend, IconCheck,
 } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
-// Trámites conectados a Google Sheets. "licencia" queda afuera: su única
-// columna relevante en el Sheet es de archivo (ver Code.gs).
-const SHEET_CONNECTED_TRAMITES = ['emergencia', 'direccion', 'dni', 'pasaporte', 'telefono', 'fiebre', 'rechazo', 'visa']
+// Lee un File del navegador y lo devuelve como base64 puro (sin el prefijo
+// "data:tipo;base64,"), listo para mandar a Apps Script y subir a Drive.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+// Trámites conectados a Google Sheets, todos a la misma pestaña
+// "actualizacion de datos" (ver Code.gs).
+const SHEET_CONNECTED_TRAMITES = ['emergencia', 'direccion', 'dni', 'pasaporte', 'telefono', 'fiebre', 'rechazo', 'visa', 'licencia']
 
 // Cada tipo de VISA marcado en el checkbox tiene su propio bloque de campos
 // (código/fechas), porque el Sheet tiene columnas separadas para cada uno.
@@ -46,10 +58,44 @@ export default function TramiteForm() {
   const [tramiteStepOpen, setTramiteStepOpen] = useState(false)
   const [visaTypes, setVisaTypes] = useState([])
   const [passStatus, setPassStatus] = useState('')
+  const [files, setFiles] = useState({})
+  const setFile = (name) => (f) => setFiles((prev) => ({ ...prev, [name]: f }))
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [sent, setSent] = useState(false)
+  const [sentToSheets, setSentToSheets] = useState(true)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  // Sube cada vez que hay que forzar la limpieza visual de los
+  // FileUploadField (su preview vive en estado interno propio, ver
+  // FormFields.jsx) — al enviar con éxito o al "Borrar formulario".
+  const [resetKey, setResetKey] = useState(0)
+
+  // Cambiar de trámite no debe arrastrar archivos/checkboxes/radios del
+  // trámite anterior — solo se ven "vacíos" porque el campo se remonta, pero
+  // el estado seguía vivo y se colaba en el siguiente envío. Los datos de
+  // identificación (correo/BP/nombre) sí se conservan a propósito.
+  const selectTramite = (id) => {
+    setTramite(id)
+    setVisaTypes([])
+    setPassStatus('')
+    setFiles({})
+    setInvalidFields(new Set())
+    setError('')
+  }
+
+  // Al destildar un tipo de VISA su bloque de archivo se desmonta (se ve
+  // vacío), pero sin esto el File ya elegido se quedaba en `files` y viajaba
+  // igual en el siguiente envío.
+  const handleVisaTypesChange = (nextTypes) => {
+    setVisaTypes(nextTypes)
+    setFiles((prev) => {
+      const next = { ...prev }
+      for (const [label, cfg] of Object.entries(VISA_TYPE_FIELDS)) {
+        if (!nextTypes.includes(label)) delete next[`${cfg.prefix}Archivo`]
+      }
+      return next
+    })
+  }
 
   const clearInvalid = (e) => {
     const name = e.target.name
@@ -91,14 +137,26 @@ export default function TramiteForm() {
 
     if (!SHEET_CONNECTED_TRAMITES.includes(tramite)) {
       // Los demás trámites aún no están conectados a Google Sheets.
+      setSentToSheets(false)
       setSent(true)
       setTimeout(() => setSent(false), 3500)
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento, así que usarlo después de
+    // un `await` devuelve `null` — hay que guardar la referencia ya.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setSending(true)
     try {
+      const dniArchivo = files.dniArchivo ? await fileToBase64(files.dniArchivo) : ''
+      const pasaporteArchivo = files.pasaporteArchivo ? await fileToBase64(files.pasaporteArchivo) : ''
+      const fiebreArchivo = files.fiebreArchivo ? await fileToBase64(files.fiebreArchivo) : ''
+      const visaTripulanteArchivo = files.visaTripulanteArchivo ? await fileToBase64(files.visaTripulanteArchivo) : ''
+      const visaTuristaArchivo = files.visaTuristaArchivo ? await fileToBase64(files.visaTuristaArchivo) : ''
+      const licenciaArchivo = files.licenciaArchivo ? await fileToBase64(files.licenciaArchivo) : ''
+
       await submitTramite({
         correo: formData.get('correo'),
         bp: formData.get('bp'),
@@ -110,22 +168,50 @@ export default function TramiteForm() {
         distrito: formData.get('distrito'),
         coordenadas: formData.get('coordenadas'),
         dniVencimiento: formData.get('dniVencimiento'),
+        dniArchivo,
+        dniArchivoNombre: files.dniArchivo?.name || '',
+        dniArchivoTipo: files.dniArchivo?.type || '',
         pasaporteNumero: formData.get('pasaporteNumero'),
         pasaporteVencimiento: formData.get('pasaporteVencimiento'),
         pasaportePais: formData.get('pasaportePais'),
+        pasaporteArchivo,
+        pasaporteArchivoNombre: files.pasaporteArchivo?.name || '',
+        pasaporteArchivoTipo: files.pasaporteArchivo?.type || '',
         celular: formData.get('celular'),
         telefonoFijo: formData.get('telefonoFijo'),
         fiebreFecha: formData.get('fiebreFecha'),
+        fiebreArchivo,
+        fiebreArchivoNombre: files.fiebreArchivo?.name || '',
+        fiebreArchivoTipo: files.fiebreArchivo?.type || '',
         rechazoPasaporte: tramite === 'rechazo' ? passStatus : undefined,
         visaTripulanteCodigo: formData.get('visaTripulanteCodigo'),
         visaTripulanteEmision: formData.get('visaTripulanteEmision'),
         visaTripulanteVencimiento: formData.get('visaTripulanteVencimiento'),
+        visaTripulanteArchivo,
+        visaTripulanteArchivoNombre: files.visaTripulanteArchivo?.name || '',
+        visaTripulanteArchivoTipo: files.visaTripulanteArchivo?.type || '',
         visaTuristaCodigo: formData.get('visaTuristaCodigo'),
         visaTuristaEmision: formData.get('visaTuristaEmision'),
         visaTuristaVencimiento: formData.get('visaTuristaVencimiento'),
+        visaTuristaArchivo,
+        visaTuristaArchivoNombre: files.visaTuristaArchivo?.name || '',
+        visaTuristaArchivoTipo: files.visaTuristaArchivo?.type || '',
+        licenciaNumero: formData.get('licenciaNumero'),
+        licenciaArchivo,
+        licenciaArchivoNombre: files.licenciaArchivo?.name || '',
+        licenciaArchivoTipo: files.licenciaArchivo?.type || '',
       })
+      setSentToSheets(true)
       setSent(true)
       setTimeout(() => setSent(false), 3500)
+      // Limpia el trámite recién enviado (incluidos sus archivos/checkboxes),
+      // pero conserva correo/BP/nombre por si va a enviar otro a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre'])
+      setTramite(null)
+      setVisaTypes([])
+      setPassStatus('')
+      setFiles({})
+      setResetKey((k) => k + 1)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -137,8 +223,10 @@ export default function TramiteForm() {
     formRef.current?.reset()
     setVisaTypes([])
     setPassStatus('')
+    setFiles({})
     setInvalidFields(new Set())
     setError('')
+    setResetKey((k) => k + 1)
   }
 
   return (
@@ -188,7 +276,7 @@ export default function TramiteForm() {
               <button
                 type="button"
                 key={t.id}
-                onClick={() => setTramite(t.id)}
+                onClick={() => selectTramite(t.id)}
                 className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-bold transition ${
                   tramite === t.id
                     ? 'border-latam-coral bg-latam-coral/5 text-latam-estrellada shadow-sm'
@@ -314,7 +402,7 @@ export default function TramiteForm() {
                 <InfoNote>Es obligatorio adjuntar ambas caras del DNI de forma nítida.</InfoNote>
                 <ImageReference src={`${import.meta.env.BASE_URL}img/actualizacionDatos/referencia-dni.png`} alt="Referencia DNI" />
                 <DateField name="dniVencimiento" label="Fecha de vencimiento DNI" required invalid={invalidFields.has('dniVencimiento')} />
-                <FileUploadField name="dniArchivo" label="Ingresa una foto de tu DNI" required invalid={invalidFields.has('dniArchivo')} />
+                <FileUploadField name="dniArchivo" label="Ingresa una foto de tu DNI" required invalid={invalidFields.has('dniArchivo')} onFileChange={setFile('dniArchivo')} resetSignal={resetKey} />
               </>
             )}
 
@@ -345,6 +433,8 @@ export default function TramiteForm() {
                   label="Adjunta una foto de tu pasaporte"
                   required
                   invalid={invalidFields.has('pasaporteArchivo')}
+                  onFileChange={setFile('pasaporteArchivo')}
+                  resetSignal={resetKey}
                 />
               </>
             )}
@@ -380,6 +470,8 @@ export default function TramiteForm() {
                   label="Adjunta constancia de Vacuna Fiebre Amarilla"
                   required
                   invalid={invalidFields.has('fiebreArchivo')}
+                  onFileChange={setFile('fiebreArchivo')}
+                  resetSignal={resetKey}
                 />
               </>
             )}
@@ -391,7 +483,7 @@ export default function TramiteForm() {
                   required
                   options={['Actualización VISA Tripulante (Crew)', 'Actualización VISA Turista']}
                   value={visaTypes}
-                  onChange={setVisaTypes}
+                  onChange={handleVisaTypesChange}
                 />
                 {visaTypes.map((type) => {
                   const cfg = VISA_TYPE_FIELDS[type]
@@ -425,6 +517,8 @@ export default function TramiteForm() {
                         required
                         hint="Archivo nítido de la VISA seleccionada"
                         invalid={invalidFields.has(`${cfg.prefix}Archivo`)}
+                        onFileChange={setFile(`${cfg.prefix}Archivo`)}
+                        resetSignal={resetKey}
                       />
                     </div>
                   )
@@ -449,6 +543,8 @@ export default function TramiteForm() {
                   hint="Solo PDF · Máx 10 MB"
                   accept=".pdf"
                   invalid={invalidFields.has('licenciaArchivo')}
+                  onFileChange={setFile('licenciaArchivo')}
+                  resetSignal={resetKey}
                 />
               </>
             )}
@@ -495,7 +591,7 @@ export default function TramiteForm() {
       {sent && (
         <div className="mt-4 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
           <IconCheck className="h-5 w-5" />{' '}
-          {SHEET_CONNECTED_TRAMITES.includes(tramite)
+          {sentToSheets
             ? 'Solicitud guardada correctamente en Google Sheets.'
             : 'Solicitud enviada correctamente a los sistemas de soporte.'}
         </div>

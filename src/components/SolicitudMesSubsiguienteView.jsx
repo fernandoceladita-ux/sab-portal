@@ -7,6 +7,7 @@ import {
   IconClock, IconCalendarCheck, IconPlane, IconIdCard, IconSparkle, IconSend, IconCheck,
 } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
 const MESES_ROL = [
   'Agosto 2026 (Dentro de plazo reglamentario)',
@@ -102,7 +103,10 @@ export default function SolicitudMesSubsiguienteView() {
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
     try {
@@ -135,6 +139,11 @@ export default function SolicitudMesSubsiguienteView() {
       })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
+      // Limpia la novedad recién enviada, pero conserva los datos de
+      // identificación por si va a reportar otra a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre', 'mesRol'])
+      setNovedad(null)
+      setFormValid(false)
     } catch (err) {
       setError(err.message)
     } finally {

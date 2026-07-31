@@ -3,6 +3,7 @@ import StepAccordion from './StepAccordion.jsx'
 import { TextField, MonthField, TextareaField, SelectField, AnticipationAlert } from './fields/FormFields.jsx'
 import { IconCalendarCheck, IconRepeat, IconSend, IconCheck } from './icons.jsx'
 import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
 
 // TODO: ajustar a las categorías reales de tripulación cuando se confirmen.
 const CATEGORIAS = ['JSB - Jefe de Servicio a Bordo', 'TC - Tripulante de Cabina', 'Sobrecargo']
@@ -59,7 +60,10 @@ export default function VacacionesForm() {
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
     try {
@@ -82,6 +86,10 @@ export default function VacacionesForm() {
       })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
+      // Limpia la solicitud recién enviada, pero conserva los datos de
+      // identificación por si va a enviar otra a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre', 'categoria'])
+      setTipo(null)
     } catch (err) {
       setError(err.message)
     } finally {

@@ -5,6 +5,19 @@ import {
   IconAlertTriangle, IconDollar, IconCheck, IconSparkle, IconArrowUpRight, IconDownload,
   IconChevronDown, IconEdit, IconSend,
 } from './icons.jsx'
+import { submitTramite } from '../lib/submitTramite.js'
+import { resetFormExcept } from '../lib/resetFormFields.js'
+
+// Lee un File del navegador y lo devuelve como base64 puro (sin el prefijo
+// "data:tipo;base64,"), listo para mandar a Apps Script y subir a Drive.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 const DISTRITOS = [
   'Ancón',
@@ -108,11 +121,14 @@ function CoordsGuide() {
 
 export default function DomicilioDgacView() {
   const formRef = useRef(null)
-  const [tipo, setTipo] = useState('Actualización Dirección')
+  const [tipo, setTipo] = useState(null)
+  const [licenciaFile, setLicenciaFile] = useState(null)
   const [invalidFields, setInvalidFields] = useState(new Set())
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  // Fuerza a FileUploadField a limpiar su preview interno (ver FormFields.jsx).
+  const [resetKey, setResetKey] = useState(0)
 
   const clearInvalid = (e) => {
     const name = e.target.name
@@ -125,7 +141,7 @@ export default function DomicilioDgacView() {
     }
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -136,24 +152,53 @@ export default function DomicilioDgacView() {
       }
     }
 
-    if (invalid.size > 0) {
+    if (invalid.size > 0 || !tipo) {
       setInvalidFields(invalid)
-      setError('Revisa los campos marcados: son obligatorios.')
+      setError(!tipo ? 'Completa los campos obligatorios: selecciona qué actualización deseas realizar.' : 'Revisa los campos marcados: son obligatorios.')
       return
     }
 
+    // Se captura antes de los `await`: React limpia `e.currentTarget` en
+    // cuanto termina la parte síncrona del evento.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setInvalidFields(new Set())
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      const licenciaArchivo = licenciaFile ? await fileToBase64(licenciaFile) : ''
+      await submitTramite({
+        formType: 'domicilio-dgac',
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        tipo,
+        direccion: formData.get('direccion'),
+        distrito: formData.get('distrito'),
+        coordenadas: formData.get('coordenadas'),
+        licenciaArchivo,
+        licenciaArchivoNombre: licenciaFile?.name || '',
+        licenciaArchivoTipo: licenciaFile?.type || '',
+      })
       setSent(true)
       setTimeout(() => setSent(false), 3500)
-    }, 700)
+      // Limpia lo recién enviado (incluida la foto), pero conserva
+      // correo/BP/nombre por si va a enviar otro registro a continuación.
+      resetFormExcept(formEl, ['correo', 'bp', 'nombre'])
+      setTipo(null)
+      setLicenciaFile(null)
+      setResetKey((k) => k + 1)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   const cancel = () => {
     formRef.current?.reset()
-    setTipo('Actualización Dirección')
+    setTipo(null)
+    setLicenciaFile(null)
+    setResetKey((k) => k + 1)
     setInvalidFields(new Set())
     setError('')
   }
@@ -254,6 +299,16 @@ export default function DomicilioDgacView() {
 
           <form ref={formRef} noValidate onSubmit={submit} onInput={clearInvalid} onChange={clearInvalid} className="bg-[#fafbfc] px-5 py-6">
             <TextField
+              name="correo"
+              type="email"
+              label="Correo electrónico"
+              hint="(@latam.com)"
+              required
+              pattern=".+@latam\.com$"
+              title="Debe ser un correo corporativo @latam.com"
+              invalid={invalidFields.has('correo')}
+            />
+            <TextField
               name="bp"
               label="Ingresa tu BP"
               hint="(Código de empleado de 7 dígitos sin tildes)"
@@ -297,41 +352,41 @@ export default function DomicilioDgacView() {
               </div>
             </div>
 
-            {tipo === 'Actualización Dirección' && (
-              <div className="animate-fadeUp">
-                <TextField
-                  name="direccion"
-                  label="Indícanos tu nueva dirección"
-                  required
-                  placeholder="Calle, Avenida, Mza y Lote, Nro..."
-                  invalid={invalidFields.has('direccion')}
-                />
-                <SelectField
-                  name="distrito"
-                  label="Indícanos el distrito"
-                  required
-                  options={DISTRITOS}
-                  invalid={invalidFields.has('distrito')}
-                />
-                <TextField
-                  name="coordenadas"
-                  label="Agregar sus coordenadas"
-                  hint="(Formato numérico, ej: -12.0459, -77.0308)"
-                  required
-                  invalid={invalidFields.has('coordenadas')}
-                />
-                <CoordsGuide />
-                <FileUploadField
-                  name="licenciaArchivo"
-                  label="Adjuntar foto de tu nueva Licencia emitida por DGAC"
-                  hint="(Formato JPG o PNG legible)"
-                  accept=".pdf,.png,.jpg,.jpeg"
-                  maxSizeMB={10}
-                  required
-                  invalid={invalidFields.has('licenciaArchivo')}
-                />
-              </div>
-            )}
+            <div className="animate-fadeUp">
+              <TextField
+                name="direccion"
+                label="Indícanos tu nueva dirección"
+                required
+                placeholder="Calle, Avenida, Mza y Lote, Nro..."
+                invalid={invalidFields.has('direccion')}
+              />
+              <SelectField
+                name="distrito"
+                label="Indícanos el distrito"
+                required
+                options={DISTRITOS}
+                invalid={invalidFields.has('distrito')}
+              />
+              <TextField
+                name="coordenadas"
+                label="Agregar sus coordenadas"
+                hint="(Formato numérico, ej: -12.0459, -77.0308)"
+                required
+                invalid={invalidFields.has('coordenadas')}
+              />
+              <CoordsGuide />
+              <FileUploadField
+                name="licenciaArchivo"
+                label="Adjuntar foto de tu nueva Licencia emitida por DGAC"
+                hint="(Formato JPG o PNG legible)"
+                accept=".pdf,.png,.jpg,.jpeg"
+                maxSizeMB={10}
+                required
+                invalid={invalidFields.has('licenciaArchivo')}
+                onFileChange={setLicenciaFile}
+                resetSignal={resetKey}
+              />
+            </div>
 
             <div className="mt-2 flex flex-col-reverse justify-end gap-3 sm:flex-row">
               <button
