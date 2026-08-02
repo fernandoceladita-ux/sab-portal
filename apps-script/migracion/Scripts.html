@@ -268,7 +268,120 @@
     revealIo.observe(el)
   })
 
+  // ===================== Botón "atrás" del teléfono =====================
+  // Si el navegador restaura esta página desde su caché de retroceso
+  // (bfcache), el DOM vuelve exactamente como quedó al salir — y si salimos
+  // en medio de un pageWipeTo() (cobertura a pantalla completa, a punto de
+  // navegar), el overlay queda congelado visible. `pageshow` con
+  // `event.persisted` detecta ese caso (no pasa en una carga normal) y
+  // oculta el overlay directo por JS — sin recargar ni navegar, para no
+  // arriesgar colgar el iframe sandbox de Apps Script.
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return
+    const colorEl = document.getElementById('page-wipe-color')
+    const wrap = document.getElementById('page-wipe-icon-wrap')
+    if (colorEl) colorEl.className = 'pointer-events-none fixed inset-0 z-[200] opacity-0'
+    if (wrap) { wrap.classList.add('hidden'); wrap.classList.remove('flex') }
+  })
+
   // ===================== Footer year =====================
   const footerYear = document.getElementById('footer-year')
   if (footerYear) footerYear.textContent = new Date().getFullYear()
+
+  // ===================== Page wipe (transición de color al navegar en móvil) =====================
+  // Espeja PageWipe.jsx + OptionCard.jsx de React: al tocar una tarjeta de
+  // módulo en móvil, cubre la pantalla con el color e ícono del módulo,
+  // navega, y en la página destino se desvanece. Como aquí cada `?page=`
+  // es una carga de página nueva (no un SPA), la continuidad entre la
+  // cobertura (página origen) y el desvanecido (página destino) se pasa
+  // por sessionStorage; el "cubrir de entrada, sin animar" ya lo hace el
+  // script inline al inicio del <body> (evita el parpadeo del contenido
+  // real antes de que este script, al final del <body>, llegue a correr).
+  const PAGE_WIPE_KEY = 'sabPageWipe'
+  const PAGE_WIPE_COVER_MS = 1050
+  const PAGE_WIPE_REVEAL_MS = 380
+
+  function pageWipeIsMobile() {
+    // DESACTIVADO TEMPORALMENTE para descartar si el wipe es la causa del
+    // pantallazo blanco al usar el botón atrás del teléfono. Para reactivar,
+    // vuelve a: return window.matchMedia('(max-width: 639px)').matches
+    return false
+  }
+
+  function pageWipeTo(to, color, label, icon) {
+    if (!pageWipeIsMobile()) {
+      window.location.href = to
+      return
+    }
+    try {
+      sessionStorage.setItem(PAGE_WIPE_KEY, JSON.stringify({ color, label, icon }))
+    } catch (e) {}
+
+    const colorEl = document.getElementById('page-wipe-color')
+    const wrap = document.getElementById('page-wipe-icon-wrap')
+    const img = document.getElementById('page-wipe-icon')
+    if (colorEl && wrap && img) {
+      img.src = icon || ''
+      img.alt = label || ''
+      colorEl.className = `pointer-events-none fixed inset-0 z-[200] ease-out ${color} opacity-0`
+      wrap.className = 'pointer-events-none fixed inset-0 z-[210] flex flex-col items-center justify-center sm:hidden'
+      img.className = 'w-56 max-w-[70vw] object-contain scale-50 opacity-0 transition-all duration-300 ease-out'
+      // Fuerza reflow para que el cambio a opacity-100 sí dispare la transición.
+      void colorEl.offsetHeight
+      requestAnimationFrame(() => {
+        colorEl.className = `pointer-events-none fixed inset-0 z-[200] ease-out ${color} opacity-100 transition-opacity duration-[320ms]`
+        img.className = 'w-56 max-w-[70vw] object-contain scale-100 opacity-100 transition-all duration-300 ease-out'
+      })
+    }
+
+    setTimeout(() => {
+      window.location.href = to
+    }, PAGE_WIPE_COVER_MS)
+  }
+
+  // Color de portada por módulo (mismos hex que MODULE_COLORS en Code.gs).
+  // Cualquier link interno no listado aquí (ej. "Inicio") usa el color por
+  // defecto de pageWipeTo.
+  const PAGE_WIPE_COLORS = {
+    'gestion-personal': 'bg-latam-diavivo',
+    'mi-rol': 'bg-latam-estrellada',
+    'gestion-operacional': 'bg-latam-profunda',
+  }
+
+  // Intercepta TODOS los links internos `href="?page=..."` del sitio (Home,
+  // Header desktop/móvil, dropdowns, botones "volver al inicio", etc.) desde
+  // un solo lugar — así ningún link nuevo se queda sin la animación por
+  // olvido, que fue justo lo que pasó con "Inicio" al cablear tarjeta por
+  // tarjeta. En desktop no hace nada (deja la navegación normal del <a>).
+  document.addEventListener('click', (e) => {
+    if (!pageWipeIsMobile()) return
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
+    const a = e.target.closest('a[href]')
+    if (!a || a.target === '_blank' || a.hasAttribute('data-no-wipe')) return
+    const href = a.getAttribute('href')
+    if (!href || href.charAt(0) !== '?') return
+    e.preventDefault()
+    const page = (new URLSearchParams(href.slice(1)).get('page') || 'home').toLowerCase()
+    const color = PAGE_WIPE_COLORS[page] || 'bg-latam-estrellada'
+    const img = a.querySelector('img')
+    const label = (a.querySelector('h3') || a).textContent.trim()
+    pageWipeTo(href, color, label, img ? img.src : '')
+  })
+
+  // Si llegamos a esta página por un pageWipeTo() de la anterior, el script
+  // inline del <body> ya dejó la cobertura visible de entrada (sin parpadeo).
+  // Aquí solo la desvanecemos una vez que la página terminó de cargar.
+  if (window.__pageWipeData) {
+    const color = window.__pageWipeData.color || 'bg-latam-estrellada'
+    const colorEl = document.getElementById('page-wipe-color')
+    const wrap = document.getElementById('page-wipe-icon-wrap')
+    const img = document.getElementById('page-wipe-icon')
+    setTimeout(() => {
+      if (colorEl) colorEl.className = `pointer-events-none fixed inset-0 z-[200] ease-out ${color} opacity-0 transition-opacity duration-[380ms]`
+      if (img) img.className = 'w-56 max-w-[70vw] object-contain scale-0 opacity-0 transition-all duration-[380ms] ease-in'
+      setTimeout(() => {
+        if (wrap) { wrap.classList.add('hidden'); wrap.classList.remove('flex') }
+      }, PAGE_WIPE_REVEAL_MS)
+    }, 60)
+  }
 </script>

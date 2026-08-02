@@ -86,7 +86,8 @@ export default function ReporteDiarioModal({ onClose }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border-2 border-white/20 bg-transparent px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 sm:w-auto"
+                disabled={sending}
+                className="rounded-xl border-2 border-white/20 bg-transparent px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 Cancelar
               </button>

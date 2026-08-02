@@ -1,0 +1,449 @@
+<script>
+  // ============================================================================
+  // Actualización de Datos — mismo comportamiento que TramiteForm.jsx del
+  // proyecto React: un solo trámite seleccionable a la vez, limpieza de
+  // archivos/checkboxes al cambiar de trámite, validación nativa (los campos
+  // de trámites no seleccionados quedan con `display:none` vía `.hidden`, y
+  // por spec HTML5 esos campos quedan "barred from constraint validation" —
+  // por eso basta con checkValidity() por elemento, igual que en React).
+  // ============================================================================
+
+  var tramiteState = {
+    selected: null,
+    stepOpen: false, // espeja `tramiteStepOpen` de TramiteForm.jsx: el panel de
+                      // detalle solo se muestra si HAY trámite Y el acordeón
+                      // "Selección de Trámite a Realizar" está abierto.
+    visaTypes: {},   // { tripulante: true, turista: true }
+    passStatus: '',
+    files: {},       // { fieldName: File }
+    sending: false,
+  }
+
+  var TRAMITE_LABELS = {
+    emergencia: 'Actualización Contacto Emergencia',
+    direccion: 'Actualización Dirección',
+    dni: 'Actualización DNI',
+    pasaporte: 'Actualización Pasaporte',
+    telefono: 'Actualización de Número Telefónico',
+    fiebre: 'Vacuna Fiebre Amarilla',
+    visa: 'Actualización de VISA',
+    licencia: 'Actualización Licencia de Manejo',
+    rechazo: 'Notificación de Visa Rechazada',
+  }
+
+  var FILE_FIELDS = ['dniArchivo', 'pasaporteArchivo', 'fiebreArchivo', 'visaTripulanteArchivo', 'visaTuristaArchivo', 'licenciaArchivo']
+
+  function runServer(fnName) {
+    var args = Array.prototype.slice.call(arguments, 1)
+    return new Promise(function (resolve, reject) {
+      var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+      runner[fnName].apply(runner, args)
+    })
+  }
+
+  function fileToBase64(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader()
+      reader.onload = function () { resolve(String(reader.result).split(',')[1] || '') }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  function formatFileSize(bytes) {
+    return bytes < 1024 * 1024 ? Math.round(bytes / 1024) + ' KB' : (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  // ===================== Acordeón pasos 1/2 =====================
+  function toggleStep(n) {
+    var body = document.getElementById('step-' + n + '-body')
+    var chevron = document.getElementById('step-' + n + '-chevron')
+    var isOpen = body.style.gridTemplateRows === '1fr'
+    var willOpen = !isOpen
+    body.style.gridTemplateRows = willOpen ? '1fr' : '0fr'
+    chevron.classList.toggle('rotate-180', willOpen)
+
+    if (n === 2) {
+      tramiteState.stepOpen = willOpen
+      if (!willOpen) clearTramiteFieldsKeepSelection()
+      updateTramitePanelVisibility()
+    }
+  }
+
+  // Al comprimir el paso 2: limpia todo lo llenado (texto/fecha/select del
+  // panel activo, archivos, checkboxes VISA, SI/NO de rechazo) pero conserva
+  // cuál trámite quedó seleccionado (el botón se ve resaltado igual).
+  function clearTramiteFieldsKeepSelection() {
+    if (tramiteState.selected) {
+      var panel = document.querySelector('[data-tramite-panel="' + tramiteState.selected + '"]')
+      if (panel) {
+        panel.querySelectorAll('input, select, textarea').forEach(function (el) {
+          if (el.type === 'checkbox' || el.type === 'radio') el.checked = false
+          else el.value = ''
+        })
+      }
+    }
+    tramiteState.visaTypes = {}
+    tramiteState.passStatus = ''
+    tramiteState.files = {}
+    FILE_FIELDS.forEach(clearFilePreview)
+    resetVisaUI()
+    resetRechazoUI()
+    clearInvalidStyles()
+  }
+
+  // Igual que `{tramite && tramiteStepOpen && (...)}` en TramiteForm.jsx: el
+  // panel de detalle (y sus botones) solo se ve si hay trámite seleccionado
+  // Y el acordeón del paso 2 está abierto.
+  function updateTramitePanelVisibility() {
+    var show = !!tramiteState.selected && !!tramiteState.stepOpen
+    document.getElementById('tramite-panel').classList.toggle('hidden', !show)
+    var buttons = document.getElementById('tramite-buttons')
+    buttons.classList.toggle('hidden', !show)
+    buttons.classList.toggle('flex', show)
+  }
+
+  // ===================== Selección de trámite =====================
+  function styleTramiteButton(btn, active) {
+    btn.classList.toggle('border-latam-coral', active)
+    btn.classList.toggle('bg-latam-coral/5', active)
+    btn.classList.toggle('shadow-sm', active)
+    btn.classList.toggle('text-latam-estrellada', active)
+    btn.classList.toggle('border-slate-200', !active)
+    btn.classList.toggle('bg-slate-50', !active)
+    btn.classList.toggle('text-slate-600', !active)
+    var dot = btn.querySelector('.tramite-dot')
+    dot.classList.toggle('border-latam-estrellada', active)
+    dot.classList.toggle('border-slate-300', !active)
+    dot.innerHTML = active ? '<span class="h-2 w-2 rounded-full bg-latam-coral"></span>' : ''
+  }
+
+  // Los inputs de los otros 8 paneles quedan en el DOM (solo ocultos), así
+  // que si no se limpian a mano conservan lo tecleado. En React esto pasa
+  // gratis: al cambiar `tramite` los paneles no seleccionados se desmontan
+  // (JSX condicional), así que sus campos siempre nacen vacíos de nuevo.
+  function clearOtherTramitePanels(exceptId) {
+    document.querySelectorAll('[data-tramite-panel]').forEach(function (panel) {
+      if (panel.getAttribute('data-tramite-panel') === exceptId) return
+      panel.querySelectorAll('input, select, textarea').forEach(function (el) {
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = false
+        else el.value = ''
+      })
+    })
+  }
+
+  function selectTramite(id) {
+    clearOtherTramitePanels(id)
+    tramiteState.selected = id
+    tramiteState.visaTypes = {}
+    tramiteState.passStatus = ''
+    tramiteState.files = {}
+    FILE_FIELDS.forEach(clearFilePreview)
+
+    document.querySelectorAll('[data-tramite-btn]').forEach(function (btn) {
+      styleTramiteButton(btn, btn.getAttribute('data-tramite-btn') === id)
+    })
+    document.querySelectorAll('[data-tramite-panel]').forEach(function (p) {
+      p.classList.toggle('hidden', p.getAttribute('data-tramite-panel') !== id)
+    })
+
+    document.getElementById('tramite-panel-title').textContent = TRAMITE_LABELS[id] || ''
+    updateTramitePanelVisibility()
+
+    resetVisaUI()
+    resetRechazoUI()
+    clearInvalidStyles()
+    hideError()
+  }
+
+  // ===================== VISA: checkboxes + sub-bloques =====================
+  function toggleVisaType(key) {
+    tramiteState.visaTypes[key] = !tramiteState.visaTypes[key]
+    updateVisaUI()
+  }
+
+  function updateVisaUI() {
+    ['tripulante', 'turista'].forEach(function (key) {
+      var active = !!tramiteState.visaTypes[key]
+      var box = document.getElementById('visa-check-' + key)
+      box.classList.toggle('border-latam-estrellada', active)
+      box.classList.toggle('bg-latam-estrellada', active)
+      box.classList.toggle('border-slate-300', !active)
+      box.classList.toggle('bg-white', !active)
+      box.innerHTML = active
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-3.5 w-3.5 text-white"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : ''
+      var block = document.getElementById('visa-block-' + key)
+      block.classList.toggle('hidden', !active)
+      if (!active) clearFilePreview(key === 'tripulante' ? 'visaTripulanteArchivo' : 'visaTuristaArchivo')
+    })
+  }
+
+  function resetVisaUI() {
+    tramiteState.visaTypes = {}
+    updateVisaUI()
+  }
+
+  // ===================== Rechazo: SI/NO =====================
+  function selectPassStatus(val) {
+    tramiteState.passStatus = val
+    document.querySelectorAll('[data-rechazo-btn]').forEach(function (btn) {
+      var active = btn.getAttribute('data-rechazo-btn') === val
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/10', active)
+      btn.classList.toggle('text-latam-coral', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('bg-white', !active)
+      btn.classList.toggle('text-slate-600', !active)
+    })
+  }
+
+  function resetRechazoUI() {
+    tramiteState.passStatus = ''
+    document.querySelectorAll('[data-rechazo-btn]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-latam-coral')
+      btn.classList.add('border-slate-200', 'bg-white', 'text-slate-600')
+    })
+  }
+
+  // ===================== Archivos (drag&drop + preview) =====================
+  function handleFileSelect(input, name) {
+    var f = input.files && input.files[0]
+    if (!f) return
+    tramiteState.files[name] = f
+    document.getElementById('fu-idle-' + name).classList.add('hidden')
+    var done = document.getElementById('fu-done-' + name)
+    done.classList.remove('hidden')
+    done.classList.add('flex')
+    document.getElementById('fu-name-' + name).textContent = f.name
+    document.getElementById('fu-size-' + name).textContent = formatFileSize(f.size)
+  }
+
+  function clearFilePreview(name) {
+    delete tramiteState.files[name]
+    var input = document.getElementById('fu-input-' + name)
+    if (input) input.value = ''
+    var idle = document.getElementById('fu-idle-' + name)
+    var done = document.getElementById('fu-done-' + name)
+    if (idle) idle.classList.remove('hidden')
+    if (done) { done.classList.add('hidden'); done.classList.remove('flex') }
+  }
+
+  function fileDragOver(e, btn) {
+    e.preventDefault()
+    btn.classList.add('scale-[1.01]', 'border-latam-estrellada', 'bg-latam-estrellada/10')
+  }
+  function fileDragLeave(btn) {
+    btn.classList.remove('scale-[1.01]', 'border-latam-estrellada', 'bg-latam-estrellada/10')
+  }
+  function fileDrop(e, btn, name) {
+    e.preventDefault()
+    fileDragLeave(btn)
+    var f = e.dataTransfer.files && e.dataTransfer.files[0]
+    if (!f) return
+    var input = document.getElementById('fu-input-' + name)
+    var dt = new DataTransfer()
+    dt.items.add(f)
+    input.files = dt.files
+    handleFileSelect(input, name)
+  }
+
+  // ===================== Validación / estilos de error =====================
+  function markInvalid(name) {
+    var el = document.querySelector('#tramite-form [name="' + name + '"]')
+    if (!el) return
+    el.classList.add('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+    el.classList.remove('border-slate-200', 'bg-slate-50')
+  }
+
+  function clearInvalidStyles() {
+    document.querySelectorAll('#tramite-form .fld').forEach(function (el) {
+      el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+      el.classList.add('border-slate-200', 'bg-slate-50')
+    })
+  }
+
+  function clearFieldInvalidOnInput(e) {
+    var el = e.target
+    if (el.classList && el.classList.contains('fld')) {
+      el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+      el.classList.add('border-slate-200', 'bg-slate-50')
+    }
+  }
+
+  function validateTramiteForm() {
+    var form = document.getElementById('tramite-form')
+    var invalidNames = []
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      // A diferencia de React (que desmonta los paneles de trámites no
+      // seleccionados), aquí los 9 paneles siguen en el DOM y solo se ocultan
+      // con `.hidden` — así que hay que saltar los campos no visibles
+      // (offsetParent es null si el elemento o algún ancestro tiene
+      // display:none), o sus `required` vacíos siempre marcarían error.
+      if (el.offsetParent === null) continue
+      if (el.name && typeof el.checkValidity === 'function' && !el.checkValidity()) invalidNames.push(el.name)
+    }
+    return invalidNames
+  }
+
+  // ===================== Error / éxito / estado de envío =====================
+  function showError(msg) {
+    var el = document.getElementById('tramite-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function hideError() {
+    document.getElementById('tramite-error').classList.add('hidden')
+  }
+  function showSuccess() {
+    var el = document.getElementById('tramite-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function setSending(val) {
+    tramiteState.sending = val
+    document.getElementById('btn-enviar').disabled = val
+    document.getElementById('btn-borrar').disabled = val
+    document.getElementById('btn-enviar-label').textContent = val ? 'Enviando...' : 'Enviar Solicitud'
+  }
+
+  // ===================== Borrar / resetear =====================
+  function collapseTramitePanel() {
+    document.querySelectorAll('[data-tramite-btn]').forEach(function (btn) { styleTramiteButton(btn, false) })
+    document.querySelectorAll('[data-tramite-panel]').forEach(function (p) { p.classList.add('hidden') })
+    document.getElementById('tramite-panel').classList.add('hidden')
+    var buttons = document.getElementById('tramite-buttons')
+    buttons.classList.add('hidden')
+    buttons.classList.remove('flex')
+    resetVisaUI()
+    resetRechazoUI()
+  }
+
+  function clearTramiteForm() {
+    document.getElementById('tramite-form').reset()
+    tramiteState.selected = null
+    tramiteState.files = {}
+    FILE_FIELDS.forEach(clearFilePreview)
+    collapseTramitePanel()
+    clearInvalidStyles()
+    hideError()
+  }
+
+  // Tras un envío exitoso: limpia el trámite (con sus archivos/checkboxes)
+  // pero conserva correo/BP/nombre, por si va a enviar otro a continuación.
+  function resetAfterSubmit() {
+    var form = document.getElementById('tramite-form')
+    var keep = { correo: true, bp: true, nombre: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      if (el.type === 'checkbox' || el.type === 'radio') el.checked = false
+      else el.value = ''
+    }
+    tramiteState.selected = null
+    tramiteState.files = {}
+    FILE_FIELDS.forEach(clearFilePreview)
+    collapseTramitePanel()
+  }
+
+  // ===================== Envío =====================
+  async function submitTramiteForm() {
+    hideError()
+    clearInvalidStyles()
+
+    var invalidNames = validateTramiteForm()
+    var customError = ''
+    if (!tramiteState.selected) {
+      customError = 'Completa los campos obligatorios: selecciona un trámite.'
+    } else if (tramiteState.selected === 'rechazo' && !tramiteState.passStatus) {
+      customError = 'Completa los campos obligatorios: selecciona si cuentas con tu pasaporte.'
+    } else if (tramiteState.selected === 'visa' && !tramiteState.visaTypes.tripulante && !tramiteState.visaTypes.turista) {
+      customError = 'Completa los campos obligatorios: selecciona al menos un tipo de VISA.'
+    }
+
+    if (invalidNames.length > 0 || customError) {
+      invalidNames.forEach(markInvalid)
+      showError(customError || 'Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var form = document.getElementById('tramite-form')
+    var formData = new FormData(form)
+    setSending(true)
+    try {
+      var files = tramiteState.files
+      var dniArchivo = files.dniArchivo ? await fileToBase64(files.dniArchivo) : ''
+      var pasaporteArchivo = files.pasaporteArchivo ? await fileToBase64(files.pasaporteArchivo) : ''
+      var fiebreArchivo = files.fiebreArchivo ? await fileToBase64(files.fiebreArchivo) : ''
+      var visaTripulanteArchivo = files.visaTripulanteArchivo ? await fileToBase64(files.visaTripulanteArchivo) : ''
+      var visaTuristaArchivo = files.visaTuristaArchivo ? await fileToBase64(files.visaTuristaArchivo) : ''
+      var licenciaArchivo = files.licenciaArchivo ? await fileToBase64(files.licenciaArchivo) : ''
+
+      var payload = {
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        tramite: TRAMITE_LABELS[tramiteState.selected],
+        contactoNombre: formData.get('contactoNombre'),
+        contactoTelefono: formData.get('contactoTelefono'),
+        direccion: formData.get('direccion'),
+        distrito: formData.get('distrito'),
+        coordenadas: formData.get('coordenadas'),
+        dniVencimiento: formData.get('dniVencimiento'),
+        dniArchivo: dniArchivo,
+        dniArchivoNombre: files.dniArchivo ? files.dniArchivo.name : '',
+        dniArchivoTipo: files.dniArchivo ? files.dniArchivo.type : '',
+        pasaporteNumero: formData.get('pasaporteNumero'),
+        pasaporteVencimiento: formData.get('pasaporteVencimiento'),
+        pasaportePais: formData.get('pasaportePais'),
+        pasaporteArchivo: pasaporteArchivo,
+        pasaporteArchivoNombre: files.pasaporteArchivo ? files.pasaporteArchivo.name : '',
+        pasaporteArchivoTipo: files.pasaporteArchivo ? files.pasaporteArchivo.type : '',
+        celular: formData.get('celular'),
+        telefonoFijo: formData.get('telefonoFijo'),
+        fiebreFecha: formData.get('fiebreFecha'),
+        fiebreArchivo: fiebreArchivo,
+        fiebreArchivoNombre: files.fiebreArchivo ? files.fiebreArchivo.name : '',
+        fiebreArchivoTipo: files.fiebreArchivo ? files.fiebreArchivo.type : '',
+        rechazoPasaporte: tramiteState.selected === 'rechazo' ? tramiteState.passStatus : '',
+        visaTripulanteCodigo: formData.get('visaTripulanteCodigo'),
+        visaTripulanteEmision: formData.get('visaTripulanteEmision'),
+        visaTripulanteVencimiento: formData.get('visaTripulanteVencimiento'),
+        visaTripulanteArchivo: visaTripulanteArchivo,
+        visaTripulanteArchivoNombre: files.visaTripulanteArchivo ? files.visaTripulanteArchivo.name : '',
+        visaTripulanteArchivoTipo: files.visaTripulanteArchivo ? files.visaTripulanteArchivo.type : '',
+        visaTuristaCodigo: formData.get('visaTuristaCodigo'),
+        visaTuristaEmision: formData.get('visaTuristaEmision'),
+        visaTuristaVencimiento: formData.get('visaTuristaVencimiento'),
+        visaTuristaArchivo: visaTuristaArchivo,
+        visaTuristaArchivoNombre: files.visaTuristaArchivo ? files.visaTuristaArchivo.name : '',
+        visaTuristaArchivoTipo: files.visaTuristaArchivo ? files.visaTuristaArchivo.type : '',
+        licenciaNumero: formData.get('licenciaNumero'),
+        licenciaArchivo: licenciaArchivo,
+        licenciaArchivoNombre: files.licenciaArchivo ? files.licenciaArchivo.name : '',
+        licenciaArchivoTipo: files.licenciaArchivo ? files.licenciaArchivo.type : '',
+      }
+
+      await runServer('submitActualizacionDatos', payload)
+      showSuccess()
+      resetAfterSubmit()
+    } catch (err) {
+      showError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('tramite-form')
+    if (!form) return
+    form.addEventListener('input', clearFieldInvalidOnInput)
+    form.addEventListener('change', clearFieldInvalidOnInput)
+  })
+</script>

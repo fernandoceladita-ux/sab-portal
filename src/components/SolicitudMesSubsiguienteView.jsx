@@ -353,9 +353,10 @@ export default function SolicitudMesSubsiguienteView() {
           <button
             type="button"
             onClick={cancel}
-            className="w-full rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada sm:w-auto"
+            disabled={sending}
+            className="w-full rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada sm:w-auto disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Cancelar
+            Borrar formulario
           </button>
           <button
             type="submit"

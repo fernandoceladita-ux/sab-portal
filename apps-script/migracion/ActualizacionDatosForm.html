@@ -1,0 +1,419 @@
+<form id="tramite-form" novalidate class="mx-auto max-w-3xl animate-fadeUp">
+  <div class="flex items-center gap-3 rounded-r-lg border-l-4 border-latam-estrellada bg-latam-estrellada/5 px-4 py-3 text-sm font-bold text-latam-estrellada">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <span>Ingresar solicitud con <strong>4 días hábiles de anticipación</strong> para su correcto procesamiento.</span>
+  </div>
+
+  <div class="mt-6">
+    <!-- Paso 1: Identificación -->
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleStep(1)" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">1</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Identificación del Tripulante</span>
+          <svg id="step-1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="step-1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico corporativo <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(@latam.com)</span></label>
+                <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa tu BP <span class="text-latam-coral">*</span></label>
+                <input type="text" name="bp" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa tus nombres y apellidos completos <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(No colocar tildes)</span></label>
+                <input type="text" name="nombre" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 2: Selección de trámite -->
+    <div class="relative">
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleStep(2)" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">2</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Selección de Trámite a Realizar</span>
+          <svg id="step-2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="step-2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <button type="button" data-tramite-btn="emergencia" onclick="selectTramite('emergencia')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización Contacto Emergencia</span>
+                </button>
+                <button type="button" data-tramite-btn="direccion" onclick="selectTramite('direccion')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización Dirección</span>
+                </button>
+                <button type="button" data-tramite-btn="dni" onclick="selectTramite('dni')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización DNI</span>
+                </button>
+                <button type="button" data-tramite-btn="pasaporte" onclick="selectTramite('pasaporte')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización Pasaporte</span>
+                </button>
+                <button type="button" data-tramite-btn="telefono" onclick="selectTramite('telefono')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización de Número Telefónico</span>
+                </button>
+                <button type="button" data-tramite-btn="fiebre" onclick="selectTramite('fiebre')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Vacuna Fiebre Amarilla</span>
+                </button>
+                <button type="button" data-tramite-btn="visa" onclick="selectTramite('visa')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización de VISA</span>
+                </button>
+                <button type="button" data-tramite-btn="licencia" onclick="selectTramite('licencia')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span>Actualización Licencia de Manejo</span>
+                </button>
+                <button type="button" data-tramite-btn="rechazo" onclick="selectTramite('rechazo')" class="flex items-center gap-3 rounded-xl border border-l-4 !border-l-latam-coral border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="tramite-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  <span class="text-latam-coral">Notificación de Visa Rechazada</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel dinámico por trámite -->
+  <div id="tramite-panel" class="hidden animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+    <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <span id="tramite-panel-title"></span>
+    </div>
+    <div class="bg-[#fafbfc] px-5 py-6">
+
+      <div data-tramite-panel="emergencia" class="hidden">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombre del Contacto de Emergencia <span class="text-latam-coral">*</span></label>
+          <input type="text" name="contactoNombre" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Teléfono <span class="text-latam-coral">*</span></label>
+          <input type="text" name="contactoTelefono" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+      </div>
+
+      <div data-tramite-panel="direccion" class="hidden">
+        <p class="mb-4 text-sm leading-relaxed text-slate-500"><strong>IMPORTANTE:</strong> ingresar dirección sin tildes, puntos ni caracteres especiales (#, $, &amp;, -, etc).</p>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Indícanos tu nueva dirección <span class="text-latam-coral">*</span></label>
+          <input type="text" name="direccion" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Indícanos el distrito <span class="text-latam-coral">*</span></label>
+          <select name="distrito" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+            <option value="" disabled selected>Elegir una opción...</option>
+            <?!= districtOptionsHtml() ?>
+          </select>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Agregar sus coordenadas <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Formato Google Maps Ej. -12.0459, -77.0308)</span></label>
+          <input type="text" name="coordenadas" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mt-2 border-t border-slate-200 pt-5">
+          <p class="mb-3 text-sm text-slate-500">Recuerda replicar la actualización de tu domicilio en los sistemas maestros siguiendo la ruta interna:</p>
+          <div class="flex flex-wrap items-center gap-2 rounded-lg bg-[#f1f0f7] p-3.5 font-mono text-[13px] font-bold text-latam-estrellada">
+            <span class="flex items-center gap-2">PORTAL <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">PEOPLE MANAGER <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">MY PROFILE <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">PERSONAL DATA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">CONTACT INFORMATION</span>
+            <span class="inline-flex items-center justify-center rounded border border-slate-200 bg-white p-1">
+              <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-latam-coral" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="dni" class="hidden">
+        <p class="mb-4 text-sm leading-relaxed text-slate-500">Es obligatorio adjuntar ambas caras del DNI de forma nítida.</p>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de vencimiento DNI <span class="text-latam-coral">*</span></label>
+          <input type="date" name="dniVencimiento" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+            <div id="fu-idle-dniArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-dniArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'dniArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF PNG JPG JPEG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-dniArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-dniArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-dniArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('dniArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-dniArchivo" name="dniArchivo" type="file" accept=".pdf,.png,.jpg,.jpeg" required class="sr-only" onchange="handleFileSelect(this, 'dniArchivo')" />
+          </div>
+      </div>
+
+      <div data-tramite-panel="pasaporte" class="hidden">
+        <p class="mb-4 text-sm leading-relaxed text-slate-500">Verificar que la información registrada sea idéntica al documento físico.</p>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa el número de tu nuevo pasaporte <span class="text-latam-coral">*</span></label>
+          <input type="text" name="pasaporteNumero" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Vencimiento del pasaporte <span class="text-latam-coral">*</span></label>
+          <input type="date" name="pasaporteVencimiento" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">País emisor del pasaporte <span class="text-latam-coral">*</span></label>
+          <select name="pasaportePais" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+            <option value="" disabled selected>Elegir una opción...</option>
+            <option value="PE (Perú)">PE (Perú)</option>
+            <option value="Otros países">Otros países</option>
+          </select>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Adjunta una foto de tu pasaporte <span class="text-latam-coral">*</span></label>
+          <div class="mb-5">
+            <div id="fu-idle-pasaporteArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-pasaporteArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'pasaporteArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF PNG JPG JPEG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-pasaporteArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-pasaporteArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-pasaporteArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('pasaporteArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-pasaporteArchivo" name="pasaporteArchivo" type="file" accept=".pdf,.png,.jpg,.jpeg" required class="sr-only" onchange="handleFileSelect(this, 'pasaporteArchivo')" />
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="telefono" class="hidden">
+        <p class="mb-4 text-sm leading-relaxed text-slate-500">Puedes actualizar uno o ambos números telefónicos de forma simultánea.</p>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Indícanos qué número de celular deseas que consideremos ahora <span class="text-latam-coral">*</span></label>
+          <input type="text" name="celular" required placeholder="Ej. 999888777" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Indícanos qué número de teléfono fijo deseas que consideremos</label>
+          <input type="text" name="telefonoFijo" placeholder="Ej. 014445555 (Opcional)" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mt-2 border-t border-slate-200 pt-5">
+          <p class="mb-3 text-sm text-slate-500">Recuerda replicar la actualización de tus números telefónicos en los sistemas maestros siguiendo la ruta interna:</p>
+          <div class="flex flex-wrap items-center gap-2 rounded-lg bg-[#f1f0f7] p-3.5 font-mono text-[13px] font-bold text-latam-estrellada">
+            <span class="flex items-center gap-2">PORTAL <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">PEOPLE MANAGER <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">MY PROFILE <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">PERSONAL DATA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 text-slate-400"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+            <span class="flex items-center gap-2">CONTACT INFORMATION</span>
+            <span class="inline-flex items-center justify-center rounded border border-slate-200 bg-white p-1">
+              <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-latam-coral" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="fiebre" class="hidden">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de colocación de la vacuna <span class="text-latam-coral">*</span></label>
+          <input type="date" name="fiebreFecha" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Adjunta constancia de Vacuna Fiebre Amarilla <span class="text-latam-coral">*</span></label>
+          <div class="mb-5">
+            <div id="fu-idle-fiebreArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-fiebreArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'fiebreArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF PNG JPG JPEG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-fiebreArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-fiebreArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-fiebreArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('fiebreArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-fiebreArchivo" name="fiebreArchivo" type="file" accept=".pdf,.png,.jpg,.jpeg" required class="sr-only" onchange="handleFileSelect(this, 'fiebreArchivo')" />
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="visa" class="hidden">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona los tipos de VISA que deseas registrar a la vez <span class="text-latam-coral">*</span></label>
+          <div class="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5 text-sm font-semibold text-slate-700 active:bg-slate-100">
+              <span id="visa-check-tripulante" onclick="toggleVisaType('tripulante')" class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 border-slate-300 bg-white transition"></span>
+              <span onclick="toggleVisaType('tripulante')">Actualización VISA Tripulante (Crew)</span>
+            </label>
+            <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5 text-sm font-semibold text-slate-700 active:bg-slate-100">
+              <span id="visa-check-turista" onclick="toggleVisaType('turista')" class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 border-slate-300 bg-white transition"></span>
+              <span onclick="toggleVisaType('turista')">Actualización VISA Turista</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="visa-block-tripulante" class="hidden animate-fadeUp mb-5 rounded-xl border border-slate-200 bg-white p-4">
+          <p class="mb-3 text-sm font-extrabold uppercase tracking-wide text-latam-estrellada">VISA Tripulante</p>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa el código alfanumérico de tu visa <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Código en rojo)</span></label>
+            <input type="text" name="visaTripulanteCodigo" required placeholder="Ej. E00000000" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha Emisión de VISA <span class="text-latam-coral">*</span></label>
+            <input type="date" name="visaTripulanteEmision" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Vencimiento de VISA <span class="text-latam-coral">*</span></label>
+            <input type="date" name="visaTripulanteVencimiento" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa una foto de tu VISA <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">Archivo nítido de la VISA seleccionada</span></label>
+            <div class="mb-5">
+            <div id="fu-idle-visaTripulanteArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-visaTripulanteArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'visaTripulanteArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF PNG JPG JPEG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-visaTripulanteArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-visaTripulanteArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-visaTripulanteArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('visaTripulanteArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-visaTripulanteArchivo" name="visaTripulanteArchivo" type="file" accept=".pdf,.png,.jpg,.jpeg" required class="sr-only" onchange="handleFileSelect(this, 'visaTripulanteArchivo')" />
+          </div>
+          </div>
+        </div>
+
+        <div id="visa-block-turista" class="hidden animate-fadeUp mb-5 rounded-xl border border-slate-200 bg-white p-4">
+          <p class="mb-3 text-sm font-extrabold uppercase tracking-wide text-latam-estrellada">VISA Turista</p>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa el código alfanumérico de tu visa <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Código en rojo)</span></label>
+            <input type="text" name="visaTuristaCodigo" required placeholder="Ej. E00000000" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha Emisión de VISA <span class="text-latam-coral">*</span></label>
+            <input type="date" name="visaTuristaEmision" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Vencimiento de VISA <span class="text-latam-coral">*</span></label>
+            <input type="date" name="visaTuristaVencimiento" required class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa una foto de tu VISA <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">Archivo nítido de la VISA seleccionada</span></label>
+            <div class="mb-5">
+            <div id="fu-idle-visaTuristaArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-visaTuristaArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'visaTuristaArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF PNG JPG JPEG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-visaTuristaArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-visaTuristaArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-visaTuristaArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('visaTuristaArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-visaTuristaArchivo" name="visaTuristaArchivo" type="file" accept=".pdf,.png,.jpg,.jpeg" required class="sr-only" onchange="handleFileSelect(this, 'visaTuristaArchivo')" />
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="licencia" class="hidden">
+        <p class="mb-4 text-sm leading-relaxed text-slate-500">Es obligatorio escanear la licencia de manejo completa (ambas caras en un solo archivo PDF legible).</p>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa el número de tu Licencia de Conducir MTC <span class="text-latam-coral">*</span></label>
+          <input type="text" name="licenciaNumero" required placeholder="Ej. Q00000000" class="fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa tu Licencia de Manejo en PDF <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">Solo PDF · Máx 10 MB</span></label>
+          <div class="mb-5">
+            <div id="fu-idle-licenciaArchivo">
+              <button type="button" onclick="document.getElementById('fu-input-licenciaArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="fileDrop(event, this, 'licenciaArchivo')" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+                <span class="text-xs text-slate-400">Formatos permitidos: PDF (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="fu-done-licenciaArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <div class="min-w-0"><p id="fu-name-licenciaArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="fu-size-licenciaArchivo" class="text-xs text-slate-400"></p></div>
+              </div>
+              <button type="button" onclick="clearFilePreview('licenciaArchivo')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="fu-input-licenciaArchivo" name="licenciaArchivo" type="file" accept=".pdf" required class="sr-only" onchange="handleFileSelect(this, 'licenciaArchivo')" />
+          </div>
+        </div>
+      </div>
+
+      <div data-tramite-panel="rechazo" class="hidden">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">¿Cuentas con tu pasaporte para ejercer funciones? <span class="text-latam-coral">*</span></label>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" data-rechazo-btn="SI" onclick="selectPassStatus('SI')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">SI</button>
+            <button type="button" data-rechazo-btn="NO" onclick="selectPassStatus('NO')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">NO</button>
+          </div>
+        </div>
+        <p class="text-sm font-bold text-latam-coral">Se enviará una copia de tus respuestas por correo electrónico de soporte priorizado.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="tramite-buttons" class="mt-7 hidden flex-col-reverse justify-end gap-3 sm:flex-row">
+    <button type="button" onclick="clearTramiteForm()" id="btn-borrar" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50">
+      Borrar formulario
+    </button>
+    <button type="button" onclick="submitTramiteForm()" id="btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50">
+      <span id="btn-enviar-label">Enviar Solicitud</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div id="tramite-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="tramite-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Solicitud guardada correctamente en Google Sheets.
+  </div>
+</form>

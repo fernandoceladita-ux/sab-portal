@@ -320,9 +320,10 @@ export default function DescansoMedicoView() {
             <button
               type="button"
               onClick={cancel}
-              className="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada"
+              disabled={sending}
+              className="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Cancelar
+              Borrar formulario
             </button>
             <button
               type="submit"
