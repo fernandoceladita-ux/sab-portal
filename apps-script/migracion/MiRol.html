@@ -172,6 +172,18 @@
       track && track.scrollBy({ left: dir * 300, behavior: 'smooth' })
     }
 
+    // Llamado desde showView() (ver Scripts.html) cada vez que se abandona
+    // esta sección por completo (ej. ir a Gestión Personal, Gestión
+    // Operacional o Inicio) — limpia todos los ítems y olvida cuál estaba
+    // activo, para que al volver (aunque sea por un link sin "&item=") no
+    // se arrastre nada de la visita anterior.
+    window.resetMiRolHub = function () {
+      currentHubItemMiRol = null
+      HUB_IDS_MIROL.forEach(function (hid) {
+        resetHubItemPanel('detalle-mirol-' + hid, hid)
+      })
+    }
+
     window.selectHubItemMiRol = function (id) {
       // Re-clickear la tarjeta YA activa no debe reventar lo que el
       // usuario esté llenando ahí mismo — solo se limpia al cambiar

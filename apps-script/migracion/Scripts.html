@@ -477,11 +477,30 @@
   // teléfono (en la práctica, se probó y el resultado era inconsistente).
   // Para volver a Home se usa la navegación normal dentro de la app (el
   // logo/"Inicio"), no el botón de atrás.
+  // Cada hub (Gestión Personal / Mi Rol / Gestión Operacional) expone su
+  // propia función "resetXHub" (ver GestionPersonal.html/MiRol.html/
+  // GestionOperacional.html) que limpia TODOS sus ítems y olvida cuál
+  // estaba activo. Se dispara desde showView() cada vez que se deja esa
+  // sección — así, aunque el usuario vuelva más tarde sin pasar por un
+  // link con "&item=" (ej. el logo/"Inicio" o una pestaña sin ítem), el
+  // hub ya no arrastra formularios llenos ni acordeones abiertos de la
+  // visita anterior.
+  const VIEW_HUB_RESET_FN = {
+    'view-gestion-personal': 'resetGestionPersonalHub',
+    'view-mi-rol': 'resetMiRolHub',
+    'view-gestion-operacional': 'resetGestionOperacionalHub',
+  }
+
   function showView(name) {
     const target = document.getElementById('view-' + name)
     if (!target) return false
+    const leaving = document.querySelector('[id^="view-"]:not(.hidden)')
     document.querySelectorAll('[id^="view-"]').forEach((el) => el.classList.add('hidden'))
     target.classList.remove('hidden')
+    if (leaving && leaving !== target) {
+      const fnName = VIEW_HUB_RESET_FN[leaving.id]
+      if (fnName && typeof window[fnName] === 'function') window[fnName]()
+    }
     window.scrollTo(0, 0)
     return true
   }

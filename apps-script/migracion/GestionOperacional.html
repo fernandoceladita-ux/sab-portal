@@ -115,6 +115,18 @@
       track && track.scrollBy({ left: dir * 300, behavior: 'smooth' })
     }
 
+    // Llamado desde showView() (ver Scripts.html) cada vez que se abandona
+    // esta sección por completo (ej. ir a Gestión Personal, Mi Rol o
+    // Inicio) — limpia todos los ítems y olvida cuál estaba activo, para
+    // que al volver (aunque sea por un link sin "&item=") no se arrastre
+    // nada de la visita anterior.
+    window.resetGestionOperacionalHub = function () {
+      currentHubItemGO = null
+      HUB_IDS_GO.forEach(function (hid) {
+        resetHubItemPanel('detalle-go-' + hid, hid)
+      })
+    }
+
     window.selectHubItemGestionOperacional = function (id) {
       // Re-clickear la tarjeta YA activa no debe reventar lo que el
       // usuario esté llenando ahí mismo — solo se limpia al cambiar
