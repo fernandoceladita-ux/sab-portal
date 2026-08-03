@@ -104,7 +104,17 @@
       p.classList.remove('grid-rows-[1fr]')
       p.classList.add('grid-rows-[0fr]')
     })
-    document.querySelectorAll('[data-mobile-module] .chevron').forEach((c) => c.classList.remove('rotate-180'))
+    // El chevron usa su propio color de módulo (text-latam-*) para verse
+    // sobre fondo blanco cuando está cerrado — pero al abrirse el botón
+    // toma ESE MISMO color como fondo, así que si no se cambia el chevron a
+    // blanco queda invisible (mismo color sobre sí mismo). Por eso se
+    // intercambia con la clase guardada en data-color-class en vez de solo
+    // rotarlo.
+    document.querySelectorAll('[data-mobile-module] .chevron').forEach((c) => {
+      c.classList.remove('rotate-180', 'text-white')
+      const colorClass = c.getAttribute('data-color-class')
+      if (colorClass) c.classList.add(colorClass)
+    })
     document.querySelectorAll('[data-mobile-module]').forEach((b) => {
       b.classList.remove('text-white', ...Object.values(MOBILE_MODULE_BG))
       b.classList.add('text-slate-800')
@@ -113,7 +123,10 @@
       panel.classList.remove('grid-rows-[0fr]')
       panel.classList.add('grid-rows-[1fr]')
       const btn = document.querySelector('[data-mobile-module="' + key + '"]')
-      btn.querySelector('.chevron').classList.add('rotate-180')
+      const chevron = btn.querySelector('.chevron')
+      chevron.classList.add('rotate-180', 'text-white')
+      const colorClass = chevron.getAttribute('data-color-class')
+      if (colorClass) chevron.classList.remove(colorClass)
       btn.classList.remove('text-slate-800')
       btn.classList.add('text-white', MOBILE_MODULE_BG[key] || 'bg-latam-estrellada')
     }

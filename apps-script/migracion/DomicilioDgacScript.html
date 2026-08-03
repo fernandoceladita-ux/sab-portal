@@ -11,6 +11,24 @@
     file: null,
   }
 
+  // El formulario digital vive fuera de la caja del Paso 5 (ver
+  // DomicilioDgacView.html: #domicilio-form-panel es hermano de
+  // #domicilio-step-5-body, no hijo) para que visualmente no quede metido
+  // dentro del recuadro gris del acordeón — pero sigue colapsando junto con
+  // el Paso 5, así que este wrapper hace ambas cosas a la vez.
+  function toggleDomicilioStep5() {
+    toggleAccordion('domicilio-step-5-body', 'domicilio-step-5-chevron')
+    var body = document.getElementById('domicilio-step-5-body')
+    var isOpen = body.style.gridTemplateRows === '1fr'
+    document.getElementById('domicilio-form-panel').classList.toggle('hidden', !isOpen)
+    if (!isOpen) {
+      domicilioHideError()
+      var success = document.getElementById('domicilio-success')
+      success.classList.add('hidden')
+      success.classList.remove('flex')
+    }
+  }
+
   function selectDomicilioTipo(tipo) {
     domicilioState.tipo = tipo
     document.querySelectorAll('[data-domicilio-tipo]').forEach(function (btn) {

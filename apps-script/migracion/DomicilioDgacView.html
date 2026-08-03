@@ -125,7 +125,7 @@
 
   <div class="relative">
     <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <button type="button" onclick="toggleAccordion('domicilio-step-5-body','domicilio-step-5-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+      <button type="button" onclick="toggleDomicilioStep5()" class="flex w-full items-center gap-3 px-5 py-4 text-left">
         <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">5</span>
         <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Formulario Digital de Reporte Interno</span>
         <svg id="domicilio-step-5-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
@@ -133,18 +133,23 @@
       <div id="domicilio-step-5-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
         <div class="overflow-hidden">
           <div class="border-t border-slate-100 px-5 py-5">
-            <p class="mb-5 text-sm leading-relaxed text-slate-600">
+            <p class="text-sm leading-relaxed text-slate-600">
               Una vez que la DGAC te haga entrega formal de tu nueva licencia física corregida, debes reportarlo
               de inmediato en los sistemas de la aerolínea completando la siguiente ficha digital:
             </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
-              <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                Formulario Digital
-              </div>
+    <div id="domicilio-form-panel" class="hidden animate-fadeUp">
+      <div class="overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+        <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          Formulario Digital
+        </div>
 
-              <form id="domicilio-form" novalidate class="bg-[#fafbfc] px-5 py-6">
+        <form id="domicilio-form" novalidate class="bg-[#fafbfc] px-5 py-6">
                 <div class="mb-5">
                   <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(@latam.com)</span></label>
                   <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" class="domicilio-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
@@ -247,15 +252,12 @@
                   </button>
                 </div>
               </form>
-            </div>
+      </div>
 
-            <div id="domicilio-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
-            <div id="domicilio-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-              Registro enviado correctamente a los sistemas de soporte.
-            </div>
-          </div>
-        </div>
+      <div id="domicilio-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+      <div id="domicilio-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Registro enviado correctamente a los sistemas de soporte.
       </div>
     </div>
   </div>
