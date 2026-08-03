@@ -73,6 +73,11 @@
     mobileDrawer.classList.toggle('grid-rows-[1fr]', mobileOpen)
     mobileDrawer.classList.toggle('border-t', mobileOpen)
     mobileDrawer.classList.toggle('border-slate-100', mobileOpen)
+    // Al cerrar, colapsa cualquier grupo (Gestión Personal / Mi Rol /
+    // Gestión Operacional) que hubiera quedado expandido — si no, la
+    // próxima vez que se abra el drawer aparece tal como se dejó la vez
+    // anterior en lugar de arrancar siempre colapsado.
+    if (!mobileOpen) resetMobileGroups()
     applyHeaderSkin()
   }
   function closeMobileMenu() {
@@ -97,9 +102,10 @@
     'gestion-operacional': 'bg-latam-profunda',
   }
 
-  function toggleMobileGroup(key) {
-    const panel = document.getElementById('mobile-panel-' + key)
-    const isOpen = panel.classList.contains('grid-rows-[1fr]')
+  // Colapsa todos los grupos del drawer mobile y restaura chevrons/botones a
+  // su estado por defecto — usado tanto al abrir/cerrar otro grupo como al
+  // cerrar el drawer entero (ver toggleMobileMenu).
+  function resetMobileGroups() {
     document.querySelectorAll('[id^="mobile-panel-"]').forEach((p) => {
       p.classList.remove('grid-rows-[1fr]')
       p.classList.add('grid-rows-[0fr]')
@@ -119,6 +125,16 @@
       b.classList.remove('text-white', ...Object.values(MOBILE_MODULE_BG))
       b.classList.add('text-slate-800')
     })
+  }
+
+  function toggleMobileGroup(key) {
+    const panel = document.getElementById('mobile-panel-' + key)
+    const isOpen = panel.classList.contains('grid-rows-[1fr]')
+    // resetMobileGroups() colapsa TODOS los grupos (incluido este) — si ya
+    // estaba abierto, con eso basta (es el comportamiento de "toggle": un
+    // segundo click sobre el mismo grupo lo cierra). Si estaba cerrado, se
+    // reabre explícitamente después.
+    resetMobileGroups()
     if (!isOpen) {
       panel.classList.remove('grid-rows-[0fr]')
       panel.classList.add('grid-rows-[1fr]')
@@ -333,6 +349,54 @@
     const isOpen = body.style.gridTemplateRows === '1fr'
     body.style.gridTemplateRows = isOpen ? '0fr' : '1fr'
     if (chevron) chevron.classList.toggle('rotate-180', !isOpen)
+  }
+
+  // ===================== Reset de subsecciones al cambiar de ítem =====================
+  // El sitio es una SPA: los paneles de cada ítem de un hub (Gestión
+  // Personal / Mi Rol / Gestión Operacional) nunca se destruyen, solo se
+  // ocultan con `hidden` — así que si no se limpian a mano, un formulario
+  // llenado o un acordeón abierto en "Domicilio DGAC" se queda exactamente
+  // así aunque el usuario navegue a otra subsección y vuelva. Por eso cada
+  // selectHubItem*() (ver GestionPersonal.html/MiRol.html/
+  // GestionOperacional.html) llama a resetHubItemPanel() para TODOS los
+  // ítems del hub en cada cambio, no solo el que se está por mostrar.
+  //
+  // 1) Colapsa cualquier acordeón dentro del panel (todo bodyId/chevronId
+  //    de este sitio sigue el patrón "X-body" / "X-chevron", así que basta
+  //    con buscarlos por sufijo — no hace falta conocer los ids exactos de
+  //    cada vista).
+  function collapseAccordionsIn(root) {
+    if (!root) return
+    root.querySelectorAll('[id$="-body"]').forEach((body) => {
+      body.style.gridTemplateRows = '0fr'
+      const chevron = document.getElementById(body.id.replace(/-body$/, '-chevron'))
+      if (chevron) chevron.classList.remove('rotate-180')
+    })
+  }
+
+  // 2) Además del acordeón, varias vistas guardan su propio estado JS
+  //    (trámite/novedad/tipo/canal elegido, archivo adjunto, panel de
+  //    detalle mostrado, tab activo) que un simple reset de <form> no
+  //    toca — cada una ya expone su propia función "clear*"/"reset*" para
+  //    esto (botón "Borrar formulario" o equivalente); este mapa solo
+  //    conecta el id del ítem con el nombre de esa función.
+  const HUB_ITEM_RESET_FN = {
+    'actualizacion-datos': 'clearTramiteForm',
+    'domicilio-dgac': 'clearDomicilioForm',
+    'solicitud-mes-subsiguiente': 'clearMesForm',
+    'descanso-medico': 'clearDmForm',
+    'cesion-vacaciones': 'clearVacForm',
+    'cambio-uniforme': 'clearUnForm',
+    'registro-sunat': 'clearRsForm',
+    'cambios-voluntarios': 'resetCambiosVoluntarios',
+    'cambios-web-sab': 'resetCambiosWebSab',
+    'instructivo-vales': 'resetInstructivoVales',
+  }
+
+  function resetHubItemPanel(panelId, itemId) {
+    collapseAccordionsIn(document.getElementById(panelId))
+    const fnName = HUB_ITEM_RESET_FN[itemId]
+    if (fnName && typeof window[fnName] === 'function') window[fnName]()
   }
 
   // ===================== Plantilla WhatsApp (Vacuna Fiebre Amarilla) =====================

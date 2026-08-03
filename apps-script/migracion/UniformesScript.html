@@ -78,19 +78,19 @@
   function updateUnPanelVisibility() {
     var metaPanel = document.getElementById('un-meta-panel')
     var buttons = document.getElementById('un-buttons')
+    // Igual que en Solicitud Mes Subsiguiente / Vacaciones: los botones
+    // Borrar/Enviar solo aparecen con un canal elegido Y el Paso 2 todavía
+    // expandido — si se colapsa el acordeón a mano, se ocultan con él
+    // aunque ya hubiera un canal seleccionado.
     var show = !!unState.canal && isUnStep2Open()
 
-    if (!unState.canal) {
+    if (!show) {
       metaPanel.classList.add('hidden')
       buttons.classList.add('hidden')
       buttons.classList.remove('flex')
       return
     }
 
-    // Los botones Borrar/Enviar dependen solo de que haya canal elegido
-    // (igual que React: {activeCanal && (...)}), el panel de detalle además
-    // exige que el Paso 2 esté expandido (igual que React: {activeCanal &&
-    // canalStepOpen && (...)}).
     buttons.classList.remove('hidden')
     buttons.classList.add('flex')
 
@@ -105,7 +105,7 @@
     document.querySelectorAll('[data-un-panel]').forEach(function (panel) {
       panel.classList.toggle('hidden', panel.getAttribute('data-un-panel') !== unState.canal)
     })
-    metaPanel.classList.toggle('hidden', !show)
+    metaPanel.classList.remove('hidden')
   }
 
   function unHandleFileSelect(input) {

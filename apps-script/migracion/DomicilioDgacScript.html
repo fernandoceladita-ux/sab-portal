@@ -133,6 +133,14 @@
     })
     domicilioClearInvalidStyles()
     domicilioHideError()
+    // El formulario digital vive fuera de la caja del Paso 5 (ver
+    // toggleDomicilioStep5 más arriba) — resetHubItemPanel() colapsa el
+    // acordeón del Paso 5 por su cuenta, pero no sabe de este panel hermano,
+    // así que hay que ocultarlo acá también.
+    document.getElementById('domicilio-form-panel').classList.add('hidden')
+    var success = document.getElementById('domicilio-success')
+    success.classList.add('hidden')
+    success.classList.remove('flex')
   }
 
   function domicilioResetAfterSubmit() {

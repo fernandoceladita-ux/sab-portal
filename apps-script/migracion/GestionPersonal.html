@@ -123,6 +123,7 @@
 <script>
   (function () {
     var HUB_IDS = ['actualizacion-datos', 'domicilio-dgac', 'vacuna-fiebre-amarilla', 'visa-pasaporte']
+    var currentHubItem = null
 
     window.hubScrollBy = function (dir) {
       var track = document.getElementById('hub-carousel-track')
@@ -130,9 +131,18 @@
     }
 
     window.selectHubItem = function (id) {
+      // Re-clickear la tarjeta YA activa no debe reventar lo que el
+      // usuario esté llenando ahí mismo — solo se limpia al cambiar
+      // realmente de ítem.
+      if (id === currentHubItem) return
+      currentHubItem = id
       HUB_IDS.forEach(function (hid) {
         var panel = document.getElementById('detalle-' + hid)
         if (panel) panel.classList.add('hidden')
+        // Restablece SIEMPRE, no solo el ítem que se deja: así, si el
+        // usuario ya lo había visitado antes y lo dejó con campos llenos o
+        // acordeones abiertos, lo vuelve a encontrar limpio la próxima vez.
+        resetHubItemPanel('detalle-' + hid, hid)
         var card = document.getElementById('carousel-item-' + hid)
         if (card) {
           var active = hid === id

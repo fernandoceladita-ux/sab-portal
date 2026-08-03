@@ -108,6 +108,7 @@
 <script>
   (function () {
     var HUB_IDS_GO = ['instructivo-vales', 'consultas-viaticos', 'cambio-uniforme', 'registro-sunat']
+    var currentHubItemGO = null
 
     window.hubScrollByGestionOperacional = function (dir) {
       var track = document.getElementById('hub-carousel-track-go')
@@ -115,9 +116,18 @@
     }
 
     window.selectHubItemGestionOperacional = function (id) {
+      // Re-clickear la tarjeta YA activa no debe reventar lo que el
+      // usuario esté llenando ahí mismo — solo se limpia al cambiar
+      // realmente de ítem.
+      if (id === currentHubItemGO) return
+      currentHubItemGO = id
       HUB_IDS_GO.forEach(function (hid) {
         var panel = document.getElementById('detalle-go-' + hid)
         if (panel) panel.classList.add('hidden')
+        // Restablece SIEMPRE, no solo el ítem que se deja: así, si el
+        // usuario ya lo había visitado antes y lo dejó con campos llenos o
+        // acordeones abiertos, lo vuelve a encontrar limpio la próxima vez.
+        resetHubItemPanel('detalle-go-' + hid, hid)
         var card = document.getElementById('carousel-item-go-' + hid)
         if (card) {
           var active = hid === id

@@ -89,4 +89,18 @@
     panelNo.classList.toggle('hidden', hasAccount !== false)
     panelSi.classList.toggle('hidden', hasAccount !== true)
   }
+
+  // Llamado desde resetHubItemPanel() (ver Scripts.html) cada vez que se
+  // cambia de ítem en el hub de Mi Rol, para que esta vista vuelva a su
+  // estado inicial (ningún botón elegido) si se vuelve a visitar.
+  window.resetCambiosVoluntarios = function () {
+    var btnNo = document.getElementById('cv-btn-no')
+    var btnSi = document.getElementById('cv-btn-si')
+    btnNo.classList.remove('bg-latam-coral/10', 'border-latam-coral')
+    btnNo.classList.add('border-latam-coral/40')
+    btnSi.classList.remove('bg-latam-coral')
+    btnSi.classList.add('bg-latam-estrellada')
+    document.getElementById('cv-panel-no').classList.add('hidden')
+    document.getElementById('cv-panel-si').classList.add('hidden')
+  }
 </script>

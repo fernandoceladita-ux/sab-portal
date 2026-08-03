@@ -30,6 +30,24 @@
       }
     }
 
+    // El botón "2" abre/cierra el acordeón y además sincroniza la
+    // visibilidad de #mes-buttons: si se cierra el Paso 2 a mano (aunque ya
+    // haya una novedad elegida), los botones deben ocultarse con él; si se
+    // reabre y ya había una novedad elegida, vuelven a aparecer.
+    window.toggleMesStep2 = function () {
+      toggleAccordion('mes-step-2-body', 'mes-step-2-chevron')
+      var body = document.getElementById('mes-step-2-body')
+      var isOpen = body.style.gridTemplateRows === '1fr'
+      var buttons = document.getElementById('mes-buttons')
+      if (!isOpen) {
+        buttons.classList.add('hidden')
+        buttons.classList.remove('flex')
+      } else if (mesState.novedad) {
+        buttons.classList.remove('hidden')
+        buttons.classList.add('flex')
+      }
+    }
+
     window.selectMesNovedad = function (id) {
       mesState.novedad = id
       var meta = MES_PANEL_META[id]
@@ -66,6 +84,10 @@
       metaPanel.classList.toggle('border-latam-coral', meta.color === 'coral')
       metaHeader.classList.toggle('bg-latam-estrellada', meta.color === 'estrellada')
       metaHeader.classList.toggle('bg-latam-coral', meta.color === 'coral')
+
+      var buttons = document.getElementById('mes-buttons')
+      buttons.classList.remove('hidden')
+      buttons.classList.add('flex')
 
       clearMesFieldErrors()
     }
@@ -148,6 +170,9 @@
             panel.classList.remove('grid')
           })
           document.getElementById('mes-meta-panel').classList.add('hidden')
+          var buttonsAfterSubmit = document.getElementById('mes-buttons')
+          buttonsAfterSubmit.classList.add('hidden')
+          buttonsAfterSubmit.classList.remove('flex')
           mesState.novedad = null
           successBox.classList.remove('hidden')
           successBox.classList.add('flex')
@@ -181,6 +206,9 @@
         panel.classList.remove('grid')
       })
       document.getElementById('mes-meta-panel').classList.add('hidden')
+      var buttonsOnClear = document.getElementById('mes-buttons')
+      buttonsOnClear.classList.add('hidden')
+      buttonsOnClear.classList.remove('flex')
       mesState.novedad = null
       document.getElementById('mes-error').classList.add('hidden')
       document.getElementById('mes-success').classList.add('hidden')

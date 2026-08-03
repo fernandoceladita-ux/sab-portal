@@ -52,4 +52,16 @@
     )
     cards.forEach(function (c) { io.observe(c) })
   })
+
+  // Llamado desde resetHubItemPanel() (ver Scripts.html) cada vez que se
+  // cambia de ítem en el hub de Gestión Operacional: vuelve a resaltar el
+  // paso 1 (estado inicial), cierra los modales de QR/restaurantes si
+  // hubieran quedado abiertos, y regresa el carrusel móvil al inicio.
+  window.resetInstructivoVales = function () {
+    selectIvalStep(1)
+    closeModal('ival-modal-qr')
+    closeModal('ival-modal-restaurantes')
+    var track = document.getElementById('ival-mobile-track')
+    if (track) track.scrollTo({ left: 0 })
+  }
 </script>

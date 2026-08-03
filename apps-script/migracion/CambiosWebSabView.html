@@ -232,4 +232,12 @@
       panel.classList.toggle('flex', show)
     })
   }
+
+  // Llamado desde resetHubItemPanel() (ver Scripts.html) cada vez que se
+  // cambia de ítem en el hub de Gestión Operacional, para que esta vista
+  // vuelva siempre al primer tab si se vuelve a visitar (las tarjetas de
+  // regla en sí las colapsa collapseAccordionsIn, no hace falta acá).
+  window.resetCambiosWebSab = function () {
+    selectCwsTab('tiempos')
+  }
 </script>

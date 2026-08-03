@@ -52,10 +52,17 @@
 
   function updateVacPanelVisibility() {
     var metaPanel = document.getElementById('vac-meta-panel')
+    var buttons = document.getElementById('vac-buttons')
+    // Igual que en Solicitud Mes Subsiguiente: los botones Borrar/Enviar
+    // solo aparecen una vez que hay un tipo elegido Y el Paso 2 sigue
+    // expandido — si se colapsa el acordeón a mano, se ocultan con él
+    // aunque ya hubiera un tipo seleccionado.
     var show = !!vacState.tipo && isVacStep2Open()
 
     if (!show) {
       metaPanel.classList.add('hidden')
+      buttons.classList.add('hidden')
+      buttons.classList.remove('flex')
       return
     }
 
@@ -67,6 +74,8 @@
       panel.classList.toggle('hidden', panel.getAttribute('data-vac-panel') !== vacState.tipo)
     })
     metaPanel.classList.remove('hidden')
+    buttons.classList.remove('hidden')
+    buttons.classList.add('flex')
   }
 
   function vacClearFieldErrors() {
