@@ -1,0 +1,125 @@
+<form id="vac-form" novalidate class="mx-auto max-w-3xl animate-fadeUp">
+  <div class="flex items-center gap-3 rounded-r-lg border-l-4 border-latam-estrellada bg-latam-estrellada/5 px-4 py-3 text-sm font-bold text-latam-estrellada">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <span>Revisa el detalle de cada tipo de solicitud: los plazos de anticipación varían según el caso.</span>
+  </div>
+
+  <div class="mt-6">
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('vac-step-1-body','vac-step-1-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">1</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Datos de Identificación</span>
+          <svg id="vac-step-1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="vac-step-1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico <span class="text-latam-coral">*</span></label>
+                <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" placeholder="nombre.apellido@latam.com" class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa tu BP <span class="text-latam-coral">*</span></label>
+                <input type="text" name="bp" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Apellidos y nombres <span class="text-latam-coral">*</span></label>
+                <input type="text" name="nombre" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Categoría <span class="text-latam-coral">*</span></label>
+                <select name="categoria" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+                  <option value="" disabled selected>Elegir una opción...</option>
+                  <option value="JSB - Jefe de Servicio a Bordo">JSB - Jefe de Servicio a Bordo</option>
+                  <option value="TC - Tripulante de Cabina">TC - Tripulante de Cabina</option>
+                  <option value="Sobrecargo">Sobrecargo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleVacStep2()" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">2</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Tipo de Solicitud</span>
+          <svg id="vac-step-2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="vac-step-2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <button type="button" data-vac-tipo="adicionales" onclick="selectVacTipo('adicionales')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="vac-tipo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Solicitud de vacaciones adicionales
+                </button>
+                <button type="button" data-vac-tipo="cambio" onclick="selectVacTipo('cambio')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="vac-tipo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Solicitud de cambio de vacaciones con un compañero
+                </button>
+                <button type="button" data-vac-tipo="cesion" onclick="selectVacTipo('cesion')" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="vac-tipo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Solicitud de cesión de vacaciones
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="vac-meta-panel" class="hidden animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+    <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+      <svg id="vac-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"></svg>
+      <span id="vac-meta-title"></span>
+    </div>
+    <div class="bg-[#fafbfc] px-5 py-6">
+      <div id="vac-meta-rule" class="flex items-center gap-3 rounded-r-lg border-l-4 border-latam-estrellada bg-latam-estrellada/5 px-4 py-3 text-sm font-bold text-latam-estrellada">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span id="vac-meta-rule-text"></span>
+      </div>
+
+      <div class="mt-5">
+        <div data-vac-panel="adicionales" class="hidden">
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Mes Solicitado de Adicionales <span class="text-latam-coral">*</span></label><input type="month" name="mesAdicionales" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Cantidad de Días Solicitados <span class="text-latam-coral">*</span></label><input type="number" name="diasAdicionales" min="1" required placeholder="Ej. 5" class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Sustento de la Solicitud <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span></label><textarea name="sustento" rows="4" placeholder="Cuéntanos el motivo de tu solicitud..." class="vac-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
+        </div>
+
+        <div data-vac-panel="cambio" class="hidden">
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">BP del Compañero de Permuta <span class="text-latam-coral">*</span></label><input type="text" name="companeroBP" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombres Completos del Compañero <span class="text-latam-coral">*</span></label><input type="text" name="companeroNombre" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Mes Original del Cambio <span class="text-latam-coral">*</span></label><input type="month" name="mesCambio" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+        </div>
+
+        <div data-vac-panel="cesion" class="hidden">
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">BP del Colaborador Beneficiario <span class="text-latam-coral">*</span></label><input type="text" name="beneficiarioBP" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombres Completos del Beneficiario <span class="text-latam-coral">*</span></label><input type="text" name="beneficiarioNombre" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Bloque de Días a Ceder <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Ej. 01/03/2026 al 15/03/2026)</span></label><input type="text" name="bloqueDias" required class="vac-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-7 flex flex-col-reverse justify-end gap-3 sm:flex-row">
+    <button type="button" onclick="clearVacForm()" id="vac-btn-borrar" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50">
+      Borrar formulario
+    </button>
+    <button type="button" onclick="submitVacForm()" id="vac-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50">
+      <span id="vac-btn-enviar-label">Enviar Solicitud</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div id="vac-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="vac-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Solicitud enviada correctamente a los sistemas de soporte.
+  </div>
+</form>

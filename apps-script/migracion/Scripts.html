@@ -78,6 +78,25 @@
   function closeMobileMenu() {
     if (mobileOpen) toggleMobileMenu()
   }
+
+  // Espeja el useEffect de Header.jsx que escucha `location.key`: en React,
+  // CUALQUIER navegación (incluido solo cambiar `?item=` dentro del mismo
+  // módulo) cierra el drawer móvil y el mega-menú desktop. Acá se llama a
+  // mano después de cada click que cambia de vista (ver showView más abajo),
+  // ya que no hay un cambio de "location" real que lo dispare solo.
+  function closeAllMenus() {
+    document.querySelectorAll('.mega-panel').forEach((p) => p.classList.add('hidden'))
+    document.querySelectorAll('.menu-trigger .chevron').forEach((c) => c.classList.remove('rotate-180'))
+    openMenuKey = null
+    closeMobileMenu()
+  }
+  // Mismo acento por módulo que MODULE_ACCENTS en Header.jsx.
+  const MOBILE_MODULE_BG = {
+    'gestion-personal': 'bg-latam-diavivo',
+    'mi-rol': 'bg-latam-estrellada',
+    'gestion-operacional': 'bg-latam-profunda',
+  }
+
   function toggleMobileGroup(key) {
     const panel = document.getElementById('mobile-panel-' + key)
     const isOpen = panel.classList.contains('grid-rows-[1fr]')
@@ -87,15 +106,16 @@
     })
     document.querySelectorAll('[data-mobile-module] .chevron').forEach((c) => c.classList.remove('rotate-180'))
     document.querySelectorAll('[data-mobile-module]').forEach((b) => {
-      b.classList.remove('text-white')
+      b.classList.remove('text-white', ...Object.values(MOBILE_MODULE_BG))
       b.classList.add('text-slate-800')
-      b.style.backgroundColor = ''
     })
     if (!isOpen) {
       panel.classList.remove('grid-rows-[0fr]')
       panel.classList.add('grid-rows-[1fr]')
       const btn = document.querySelector('[data-mobile-module="' + key + '"]')
       btn.querySelector('.chevron').classList.add('rotate-180')
+      btn.classList.remove('text-slate-800')
+      btn.classList.add('text-white', MOBILE_MODULE_BG[key] || 'bg-latam-estrellada')
     }
   }
 
@@ -288,6 +308,107 @@
   const footerYear = document.getElementById('footer-year')
   if (footerYear) footerYear.textContent = new Date().getFullYear()
 
+  // ===================== Acordeón genérico (Domicilio DGAC / Fiebre Amarilla / Visa-Pasaporte) =====================
+  // A diferencia de toggleStep(n) en ActualizacionDatosScript.html (que
+  // asume IDs "step-N-body"), estas 3 vistas nuevas conviven todas en el
+  // mismo documento con sus propios pasos numerados — así que reciben el id
+  // exacto en vez de armarlo a partir de un número.
+  function toggleAccordion(bodyId, chevronId) {
+    const body = document.getElementById(bodyId)
+    const chevron = document.getElementById(chevronId)
+    if (!body) return
+    const isOpen = body.style.gridTemplateRows === '1fr'
+    body.style.gridTemplateRows = isOpen ? '0fr' : '1fr'
+    if (chevron) chevron.classList.toggle('rotate-180', !isOpen)
+  }
+
+  // ===================== Plantilla WhatsApp (Vacuna Fiebre Amarilla) =====================
+  // navigator.clipboard.writeText() necesita el permiso "clipboard-write"
+  // delegado en cada capa de iframe anidado (Google Sites → wrapper de Apps
+  // Script → sandbox interno) — permiso que no controlamos, y que móvil
+  // suele exigir más estricto que escritorio (donde a veces igual deja
+  // pasar). document.execCommand('copy') es más antiguo pero no depende de
+  // ese permiso, así que sirve de respaldo cuando el moderno falla.
+  function legacyCopyToClipboard(text) {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.position = 'fixed'
+    ta.style.top = '-1000px'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.focus()
+    ta.select()
+    let ok = false
+    try { ok = document.execCommand('copy') } catch (e) { ok = false }
+    document.body.removeChild(ta)
+    return ok
+  }
+
+  async function copyFiebreTemplate() {
+    const text = 'Nombres y Apellidos:\nFecha de Nacimiento:\nEdad:\nEmail Corporativo:\nDocumento de Identidad:\nDirección de Domicilio: '
+    let copied = false
+    try {
+      await navigator.clipboard.writeText(text)
+      copied = true
+    } catch (e) {
+      copied = legacyCopyToClipboard(text)
+    }
+    if (!copied) return
+    const btn = document.getElementById('fiebre-copy-btn')
+    const label = document.getElementById('fiebre-copy-label')
+    const icon = document.getElementById('fiebre-copy-icon')
+    btn.classList.remove('bg-latam-estrellada')
+    btn.classList.add('bg-green-600')
+    label.textContent = '¡Copiado al portapapeles!'
+    icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    setTimeout(() => {
+      btn.classList.add('bg-latam-estrellada')
+      btn.classList.remove('bg-green-600')
+      label.textContent = 'Copiar Plantilla'
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9V4Z"/><path d="M8.5 12h7M8.5 15.5h4.5" stroke-linecap="round"/></svg>'
+    }, 2200)
+  }
+
+  // ===================== "Abrir Ficha de Actualización" (Fiebre/Visa → Actualización de Datos) =====================
+  // Espeja los <Link to="/gestion-personal?item=actualizacion-datos&tramite=X">
+  // de FiebreAmarillaView.jsx / VisaPasaporteView.jsx: abre el hub de
+  // Actualización de Datos con el trámite correspondiente ya seleccionado.
+  function openTramiteFromLink(tramiteId) {
+    if (typeof selectHubItem === 'function') selectHubItem('actualizacion-datos')
+    setTimeout(() => {
+      if (typeof selectTramite === 'function') selectTramite(tramiteId)
+      if (typeof toggleStep === 'function') {
+        const body = document.getElementById('step-2-body')
+        if (body && body.style.gridTemplateRows !== '1fr') toggleStep(2)
+      }
+    }, 60)
+  }
+
+  // ===================== Vistas embebidas (Home / Gestión Personal) =====================
+  // Home y Gestión Personal viven siempre las dos en el mismo documento (ver
+  // Index.html) — cambiar entre ellas es solo mostrar/ocultar un <div> por
+  // JS, nunca una navegación real. Por qué: Google Sites, al embeber esta
+  // Web App en un iframe, no le da permiso al sandbox interno de Apps
+  // Script para navegar nada por fuera de sí mismo — ni siquiera un nivel
+  // hacia arriba — así que cualquier navegación real (aunque sea dentro del
+  // mismo dominio) queda bloqueada o se rompe tras el primer clic. Al no
+  // navegar nunca, ese bloqueo deja de aplicar por completo.
+  //
+  // A propósito NO se toca el historial del navegador (nada de
+  // history.pushState) — dentro del sandbox anidado de Sites no podemos
+  // saber ni controlar cómo se integra con el botón físico de atrás del
+  // teléfono (en la práctica, se probó y el resultado era inconsistente).
+  // Para volver a Home se usa la navegación normal dentro de la app (el
+  // logo/"Inicio"), no el botón de atrás.
+  function showView(name) {
+    const target = document.getElementById('view-' + name)
+    if (!target) return false
+    document.querySelectorAll('[id^="view-"]').forEach((el) => el.classList.add('hidden'))
+    target.classList.remove('hidden')
+    window.scrollTo(0, 0)
+    return true
+  }
+
   // ===================== Page wipe (transición de color al navegar en móvil) =====================
   // Espeja PageWipe.jsx + OptionCard.jsx de React: al tocar una tarjeta de
   // módulo en móvil, cubre la pantalla con el color e ícono del módulo,
@@ -354,14 +475,36 @@
   // olvido, que fue justo lo que pasó con "Inicio" al cablear tarjeta por
   // tarjeta. En desktop no hace nada (deja la navegación normal del <a>).
   document.addEventListener('click', (e) => {
-    if (!pageWipeIsMobile()) return
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
     const a = e.target.closest('a[href]')
     if (!a || a.target === '_blank' || a.hasAttribute('data-no-wipe')) return
     const href = a.getAttribute('href')
     if (!href || href.charAt(0) !== '?') return
+    const params = new URLSearchParams(href.slice(1))
+    const page = (params.get('page') || 'home').toLowerCase()
+
+    // Home / Gestión Personal: nunca navegan, solo cambian de vista por JS.
+    if (document.getElementById('view-' + page)) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
+      e.preventDefault()
+      showView(page)
+      closeAllMenus()
+      const item = params.get('item')
+      if (page === 'gestion-personal' && item && typeof selectHubItem === 'function') {
+        setTimeout(() => selectHubItem(item), 50)
+      }
+      if (page === 'mi-rol' && item && typeof selectHubItemMiRol === 'function') {
+        setTimeout(() => selectHubItemMiRol(item), 50)
+      }
+      return
+    }
+
+    // Resto de módulos (Gestión Operacional — aún sin migrar, cae en
+    // Placeholder.html): siguen siendo navegación real de página, pero
+    // igual cierran el header antes de irse (misma lógica que React).
+    closeAllMenus()
+    if (!pageWipeIsMobile()) return
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
     e.preventDefault()
-    const page = (new URLSearchParams(href.slice(1)).get('page') || 'home').toLowerCase()
     const color = PAGE_WIPE_COLORS[page] || 'bg-latam-estrellada'
     const img = a.querySelector('img')
     const label = (a.querySelector('h3') || a).textContent.trim()

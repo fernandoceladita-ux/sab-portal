@@ -1,0 +1,188 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Este portal te permite postular de forma anticipada tus requerimientos, restricciones y preferencias
+    operacionales para la conformación del rol de vuelos.
+  </p>
+
+  <div class="mb-6 rounded-2xl border-l-4 border-latam-estrellada bg-latam-estrellada/5 p-5 sm:p-6">
+    <div class="mb-3 flex items-center gap-2 text-latam-estrellada">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <p class="text-sm font-extrabold uppercase tracking-wide">Plazo Máximo Improrrogable:</p>
+    </div>
+    <p class="mb-4 text-sm leading-relaxed text-slate-600">
+      Las solicitudes deben ingresarse con <strong class="text-slate-800">un mínimo de 2 meses de anticipación</strong>.
+      Por ejemplo, si requieres una solicitud para el rol de <strong class="text-slate-800">julio</strong>, la
+      fecha límite máxima de ingreso en el sistema es el <strong class="text-slate-800">31 de mayo</strong>.
+    </p>
+    <p class="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-700 sm:text-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Por favor, tomar en cuenta el empalme en las solicitudes para evitar impacto en las actividades ya
+      programadas por rol.
+    </p>
+  </div>
+
+  <form id="mes-form" novalidate>
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('mes-step-1-body','mes-step-1-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">1</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Identificación del Tripulante</span>
+          <svg id="mes-step-1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="mes-step-1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="grid grid-cols-1 gap-x-5 border-t border-slate-100 px-5 py-5 sm:grid-cols-2">
+              <div class="mb-5 sm:col-span-2">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico corporativo <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(@latam.com)</span></label>
+                <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresa tu BP <span class="text-latam-coral">*</span></label>
+                <input type="text" name="bp" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Apellidos y Nombres <span class="text-latam-coral">*</span></label>
+                <input type="text" name="nombre" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5 sm:col-span-2">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona el Mes del Rol a Postular <span class="text-latam-coral">*</span></label>
+                <select name="mesRol" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+                  <option value="" disabled selected>Elegir una opción...</option>
+                  <option value="Agosto 2026 (Dentro de plazo reglamentario)">Agosto 2026 (Dentro de plazo reglamentario)</option>
+                  <option value="Septiembre 2026 (Dentro de plazo reglamentario)">Septiembre 2026 (Dentro de plazo reglamentario)</option>
+                  <option value="Julio 2026 (FUERA DE PLAZO - Solicitud Rechazada)">Julio 2026 (FUERA DE PLAZO - Solicitud Rechazada)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('mes-step-2-body','mes-step-2-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">2</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Selecciona la novedad o excepción que deseas reportar</span>
+          <svg id="mes-step-2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="mes-step-2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-3 p-1 md:grid-cols-2 lg:grid-cols-3">
+                <button type="button" data-mes-novedad="afectacion" onclick="selectMesNovedad('afectacion')" class="flex min-h-[64px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="mes-novedad-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Libre compensado por afectación (&gt; 06:00 hrs)
+                </button>
+                <button type="button" data-mes-novedad="adicionales" onclick="selectMesNovedad('adicionales')" class="flex min-h-[64px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="mes-novedad-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Libre compensado por vuelos adicionales
+                </button>
+                <button type="button" data-mes-novedad="jefatura" onclick="selectMesNovedad('jefatura')" class="flex min-h-[64px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="mes-novedad-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Libre aprobado por jefatura directa
+                </button>
+                <button type="button" data-mes-novedad="documentacion" onclick="selectMesNovedad('documentacion')" class="flex min-h-[64px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="mes-novedad-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Trámites de Documentación Técnica (Visa/Pasaporte)
+                </button>
+                <button type="button" data-mes-novedad="permisos" onclick="selectMesNovedad('permisos')" class="flex min-h-[64px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left text-sm font-bold text-slate-600 transition hover:border-latam-estrellada/40">
+                  <span class="mes-novedad-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+                  Solicitud de Permisos Especiales
+                </button>
+              </div>
+
+              <div id="mes-meta-panel" class="mt-5 hidden animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+                <div id="mes-meta-header" class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+                  <svg id="mes-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"></svg>
+                  <span id="mes-meta-title"></span>
+                </div>
+                <div class="bg-[#fafbfc] px-5 py-6">
+
+                  <div data-mes-panel="afectacion" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de afectación de libre <span class="text-latam-coral">*</span></label><input type="date" name="fechaAfectacion" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Número de vuelo <span class="text-latam-coral">*</span></label><input type="text" name="numVuelo1" required placeholder="Ej. LA2456" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Ruta <span class="text-latam-coral">*</span></label><input type="text" name="ruta1" required placeholder="Ej. LIM - MIA" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Hora de llegada de vuelo <span class="text-latam-coral">*</span></label><input type="time" name="horaLlegada1" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Comentario adicional <span class="text-latam-coral">*</span></label><textarea name="comentario1" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
+                  </div>
+
+                  <div data-mes-panel="adicionales" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de afectación de vuelos adicionales <span class="text-latam-coral">*</span></label><input type="date" name="fechaVuelosAdicionales" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Número de vuelo <span class="text-latam-coral">*</span></label><input type="text" name="numVuelo2" required placeholder="Ej. LA2456" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Ruta <span class="text-latam-coral">*</span></label><input type="text" name="ruta2" required placeholder="Ej. LIM - MIA" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha que deseo mi libre (mes subsiguiente) <span class="text-latam-coral">*</span></label><input type="month" name="mesLibreDeseado" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Comentario adicional <span class="text-latam-coral">*</span></label><textarea name="comentario2" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
+                  </div>
+
+                  <div data-mes-panel="jefatura" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de libre <span class="text-latam-coral">*</span></label><input type="date" name="fechaLibreJefatura" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Motivo de la otorgación del libre <span class="text-latam-coral">*</span></label><textarea name="motivoJefatura" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
+                  </div>
+
+                  <div data-mes-panel="documentacion" class="hidden">
+                    <div class="mb-5 rounded-xl border border-latam-coral/25 bg-latam-coral/5 p-4 text-sm leading-relaxed text-slate-600">
+                      <strong class="text-latam-coral">Recordatorio de Restricción Operativa:</strong> No se aceptan citas en fechas de empalme (del 01 al 05 de cada mes). Se realizará la debida protección de Rol en el mes que coloque su fecha de cita desde el día 06.
+                    </div>
+                    <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                      <div class="mb-5 sm:col-span-2">
+                        <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona el documento técnico a tramitar <span class="text-latam-coral">*</span></label>
+                        <select name="documentoTecnico" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+                          <option value="" disabled selected>Elegir una opción...</option>
+                          <option value="Gestión Visa Crew y/o Turista">Gestión Visa Crew y/o Turista</option>
+                          <option value="Gestión Pasaporte">Gestión Pasaporte</option>
+                        </select>
+                      </div>
+                      <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de la cita <span class="text-latam-coral">*</span></label><input type="date" name="fechaCita" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                      <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Hora de la cita <span class="text-latam-coral">*</span></label><input type="time" name="horaCita" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                      <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Comentario adicional</label><textarea name="comentario4" rows="4" class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
+                    </div>
+                  </div>
+
+                  <div data-mes-panel="permisos" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                    <div class="mb-5 sm:col-span-2">
+                      <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona el tipo de permiso legal que requieres solicitar <span class="text-latam-coral">*</span></label>
+                      <select name="tipoPermiso" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+                        <option value="" disabled selected>Elegir una opción...</option>
+                        <option value="Permiso por matrimonio">Permiso por matrimonio</option>
+                        <option value="Permiso por mudanza">Permiso por mudanza</option>
+                        <option value="Permiso por paternidad">Permiso por paternidad</option>
+                        <option value="Permiso por boda de familiar directo">Permiso por boda de familiar directo</option>
+                      </select>
+                    </div>
+                    <div class="-mt-3 mb-5 sm:col-span-2">
+                      <p class="flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0"><path d="M12 3.5 2.5 20h19L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /><path d="M12 10v4.3" stroke-linecap="round" /><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none" /></svg>
+                        Recuerda que la fecha de matrimonio debe estar incluida dentro de los 5 días solicitados.
+                      </p>
+                    </div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de inicio <span class="text-latam-coral">*</span></label><input type="date" name="fechaInicioPermiso" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                    <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de fin <span class="text-latam-coral">*</span></label><input type="date" name="fechaFinPermiso" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2 flex flex-col-reverse justify-end gap-3 sm:flex-row">
+      <button type="button" onclick="clearMesForm()" id="mes-btn-borrar" class="w-full rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+        Borrar formulario
+      </button>
+      <button type="button" onclick="submitMesForm()" id="mes-btn-enviar" class="flex w-full items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+        <span id="mes-btn-enviar-label">Enviar Requerimiento a Roles</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+      </button>
+    </div>
+  </form>
+
+  <div id="mes-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="mes-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Requerimiento enviado correctamente a los sistemas de Roles.
+  </div>
+</div>

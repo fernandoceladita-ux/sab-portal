@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" style="background:<?= pageColor ?>">
   <head>
-    <base href="<?= scriptUrl ?>" target="_top">
+    <base href="<?= scriptUrl ?>" target="_self">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1B0088" />
@@ -47,8 +47,22 @@
     <?!= include('Header') ?>
 
     <main class="flex-1">
-      <? if (page === 'home') { ?>
-        <?!= include('Home') ?>
+      <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol') { ?>
+        <!-- Home, Gestión Personal y Mi Rol viven SIEMPRE juntas en el mismo
+             documento — showView() en Scripts.html alterna cuál se ve por
+             JS puro, sin navegar. Esto evita depender de que el navegador
+             navegue el iframe (Google Sites, al embeber la Web App, no lo
+             permite: ver conversación — el sandbox interno de Apps Script
+             no tiene permiso para navegar nada por fuera de sí mismo). -->
+        <div id="view-home" class="<?= page === 'home' ? '' : 'hidden' ?>">
+          <?!= include('Home') ?>
+        </div>
+        <div id="view-gestion-personal" class="<?= page === 'gestion-personal' ? '' : 'hidden' ?>">
+          <?!= include('GestionPersonal', { itemId: itemId }) ?>
+        </div>
+        <div id="view-mi-rol" class="<?= page === 'mi-rol' ? '' : 'hidden' ?>">
+          <?!= include('MiRol', { itemId: itemId }) ?>
+        </div>
       <? } else if (modulePageFile) { ?>
         <?!= include(modulePageFile, { itemId: itemId }) ?>
       <? } else { ?>
@@ -59,8 +73,12 @@
     <?!= include('Footer') ?>
     <?!= include('Modals') ?>
     <?!= include('Scripts') ?>
-    <? if (modulePageFile === 'GestionPersonal') { ?>
+    <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol') { ?>
       <?!= include('ActualizacionDatosScript') ?>
+      <?!= include('DomicilioDgacScript') ?>
+      <?!= include('SolicitudMesSubsiguienteScript') ?>
+      <?!= include('DescansoMedicoScript') ?>
+      <?!= include('VacacionesScript') ?>
     <? } ?>
   </body>
 </html>

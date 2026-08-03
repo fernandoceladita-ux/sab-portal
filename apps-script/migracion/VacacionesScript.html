@@ -1,0 +1,175 @@
+<script>
+  var vacState = { tipo: null }
+
+  var VAC_TIPO_META = {
+    adicionales: {
+      label: 'Solicitud de vacaciones adicionales',
+      rule: 'Regla de Plazo y Cupo: Estas solicitudes están estrictamente sujetas a disponibilidad de cupos en el mes requerido. Se dará respuesta formal en el mes previo al goce de vacaciones con un plazo mínimo de 15 días de anticipación.',
+      icon: '<circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />'
+    },
+    cambio: {
+      label: 'Solicitud de cambio de vacaciones con un compañero',
+      rule: 'Regla de Validación Doble: Para proceder con el intercambio de periodos, tanto tú como tu compañero deberán ingresar de forma individual su respectiva solicitud cruzada en este sitio. Tiempo de respuesta máximo: 10 días hábiles. Plazo Anticipación: Ingresar hasta el último día de 2 meses previos al mes deseado.',
+      icon: '<path d="M4 7h13l-3-3M20 17H7l3 3" stroke-linecap="round" stroke-linejoin="round" />'
+    },
+    cesion: {
+      label: 'Solicitud de cesión de vacaciones',
+      rule: 'Regla de Cesión Legal: Al igual que el intercambio, ambos colaboradores involucrados en el traspaso reglamentario del bloque de descanso deben registrar su formulario de forma independiente en un plazo no menor a 2 meses antes del goce.',
+      icon: '<path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" />'
+    }
+  }
+
+  function isVacStep2Open() {
+    var body = document.getElementById('vac-step-2-body')
+    return !!body && body.style.gridTemplateRows === '1fr'
+  }
+
+  function toggleVacStep2() {
+    toggleAccordion('vac-step-2-body', 'vac-step-2-chevron')
+    updateVacPanelVisibility()
+  }
+
+  function selectVacTipo(id) {
+    vacState.tipo = id
+    document.querySelectorAll('[data-vac-tipo]').forEach(function (btn) {
+      var active = btn.getAttribute('data-vac-tipo') === id
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/5', active)
+      btn.classList.toggle('shadow-sm', active)
+      btn.classList.toggle('text-latam-estrellada', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('bg-slate-50', !active)
+      btn.classList.toggle('text-slate-600', !active)
+      var dot = btn.querySelector('.vac-tipo-dot')
+      if (dot) {
+        dot.classList.toggle('border-latam-estrellada', active)
+        dot.classList.toggle('border-slate-300', !active)
+        dot.innerHTML = active ? '<span class="h-2 w-2 rounded-full bg-latam-coral"></span>' : ''
+      }
+    })
+    updateVacPanelVisibility()
+  }
+
+  function updateVacPanelVisibility() {
+    var metaPanel = document.getElementById('vac-meta-panel')
+    var show = !!vacState.tipo && isVacStep2Open()
+
+    if (!show) {
+      metaPanel.classList.add('hidden')
+      return
+    }
+
+    var meta = VAC_TIPO_META[vacState.tipo]
+    document.getElementById('vac-meta-title').textContent = meta.label
+    document.getElementById('vac-meta-icon').innerHTML = meta.icon
+    document.getElementById('vac-meta-rule-text').textContent = meta.rule
+    document.querySelectorAll('[data-vac-panel]').forEach(function (panel) {
+      panel.classList.toggle('hidden', panel.getAttribute('data-vac-panel') !== vacState.tipo)
+    })
+    metaPanel.classList.remove('hidden')
+  }
+
+  function vacClearFieldErrors() {
+    document.querySelectorAll('.vac-fld').forEach(function (el) {
+      el.classList.remove('border-red-400', 'ring-4', 'ring-red-100')
+    })
+  }
+
+  function vacShowError(msg) {
+    var el = document.getElementById('vac-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function vacHideError() {
+    document.getElementById('vac-error').classList.add('hidden')
+  }
+  function vacShowSuccess() {
+    var el = document.getElementById('vac-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function vacSetSending(val) {
+    document.getElementById('vac-btn-enviar').disabled = val
+    document.getElementById('vac-btn-borrar').disabled = val
+    document.getElementById('vac-btn-enviar-label').textContent = val ? 'Enviando...' : 'Enviar Solicitud'
+  }
+
+  function clearVacForm() {
+    document.getElementById('vac-form').reset()
+    vacClearFieldErrors()
+    vacHideError()
+    vacState.tipo = null
+    document.querySelectorAll('[data-vac-tipo]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'shadow-sm', 'text-latam-estrellada')
+      btn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-600')
+      var dot = btn.querySelector('.vac-tipo-dot')
+      if (dot) { dot.classList.remove('border-latam-estrellada'); dot.classList.add('border-slate-300'); dot.innerHTML = '' }
+    })
+    updateVacPanelVisibility()
+  }
+
+  function vacResetAfterSubmit() {
+    var form = document.getElementById('vac-form')
+    var keep = { correo: true, bp: true, nombre: true, categoria: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      el.value = ''
+    }
+    vacState.tipo = null
+    document.querySelectorAll('[data-vac-tipo]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'shadow-sm', 'text-latam-estrellada')
+      btn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-600')
+      var dot = btn.querySelector('.vac-tipo-dot')
+      if (dot) { dot.classList.remove('border-latam-estrellada'); dot.classList.add('border-slate-300'); dot.innerHTML = '' }
+    })
+    updateVacPanelVisibility()
+  }
+
+  async function submitVacForm() {
+    vacHideError()
+    vacClearFieldErrors()
+
+    var form = document.getElementById('vac-form')
+    var firstInvalid = null
+    var ok = true
+    form.querySelectorAll('.vac-fld[required]').forEach(function (el) {
+      if (el.offsetParent === null) return
+      if (!(el.value || '').trim()) {
+        ok = false
+        el.classList.add('border-red-400', 'ring-4', 'ring-red-100')
+        if (!firstInvalid) firstInvalid = el
+      }
+    })
+
+    if (!vacState.tipo) {
+      vacShowError('Completa los campos obligatorios: selecciona el tipo de solicitud.')
+      return
+    }
+    if (!ok) {
+      if (firstInvalid) firstInvalid.focus()
+      vacShowError('Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var fd = new FormData(form)
+    var payload = { tipo: vacState.tipo }
+    fd.forEach(function (value, key) { payload[key] = value })
+
+    vacSetSending(true)
+    try {
+      await runServer('submitVacaciones', payload)
+      vacShowSuccess()
+      vacResetAfterSubmit()
+    } catch (err) {
+      vacShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      vacSetSending(false)
+    }
+  }
+</script>

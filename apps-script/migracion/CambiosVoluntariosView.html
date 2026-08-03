@@ -1,0 +1,92 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Para gestionar una permuta voluntaria de tramos en la mesa de ayuda institucional, es un
+    <strong class="text-slate-800">requisito indispensable</strong> constar en la base de datos de
+    Solicitudes Web. Evita rechazos automáticos de tu ticket validando tu acceso a continuación.
+  </p>
+
+  <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center">
+    <p class="text-base font-extrabold text-latam-estrellada">¿Es la primera vez que vas a solicitar un cambio de vuelo?</p>
+    <p class="mx-auto mt-1.5 max-w-md text-sm text-slate-500">
+      Si nunca te has registrado en la plataforma de Solicitudes Web o cambiaste de One Device, necesitas
+      habilitar tu cuenta primero.
+    </p>
+    <div class="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+      <button type="button" id="cv-btn-no" onclick="selectCambiosVoluntariosAccount(false)" class="rounded-xl border-2 border-latam-coral/40 bg-white px-5 py-2.5 text-sm font-extrabold text-latam-coral transition hover:-translate-y-0.5 hover:bg-latam-coral/5">
+        No estoy registrado / Es mi primer cambio
+      </button>
+      <button type="button" id="cv-btn-si" onclick="selectCambiosVoluntariosAccount(true)" class="rounded-xl bg-latam-estrellada px-5 py-2.5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-latam-coral">
+        Sí, ya tengo cuenta activa
+      </button>
+    </div>
+  </div>
+
+  <div id="cv-panel-no" class="animate-fadeUp mt-5 hidden rounded-2xl border border-slate-200 bg-white p-5">
+    <div class="mb-3 flex items-center gap-2 border-b border-slate-100 pb-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-coral"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <p class="text-sm font-extrabold text-latam-estrellada">Paso Obligatorio: Habilitación en Base de Datos</p>
+    </div>
+    <ul class="mb-5 flex flex-col gap-2.5">
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Ingresa al enlace del Portal de Solicitudes Web provisto abajo.
+      </li>
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Inicia sesión con tus credenciales corporativas de la compañía (LAN / LATAM).
+      </li>
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Una vez dentro, el sistema indexará tu número de BP de forma automática y te dejará apto para el uso de formularios de cambios voluntarios.
+      </li>
+    </ul>
+    <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-xl bg-latam-coral px-6 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:shadow-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><circle cx="8" cy="15" r="3.5" /><path d="M10.5 12.5 18 5M18 5h-4M18 5v4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      1. Registrarse en Solicitudes Web Aquí
+    </a>
+  </div>
+
+  <div id="cv-panel-si" class="animate-fadeUp mt-5 hidden rounded-2xl border border-slate-200 bg-white p-5">
+    <div class="mb-3 flex items-center gap-2 border-b border-slate-100 pb-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-diavivo"><path d="M4 7h13l-3-3M20 17H7l3 3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <p class="text-sm font-extrabold text-latam-estrellada">Acceso Directo: Crear Ticket de Cambio Voluntario</p>
+    </div>
+    <ul class="mb-5 flex flex-col gap-2.5">
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Asegúrate de tener a la mano los datos exactos del vuelo original y del tramo por el que deseas permutar.
+      </li>
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Haz clic en el botón de abajo para ir directamente a la mesa de soporte de Project Management LATAM.
+      </li>
+      <li class="flex items-start gap-2 text-sm text-slate-600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Completa las casillas requeridas por el formulario de Jira Service Desk y realiza el seguimiento de tu aprobación.
+      </li>
+    </ul>
+    <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-xl bg-latam-diavivo px-6 py-3 text-sm font-extrabold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:shadow-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      2. Ingresar Solicitud en Jira Service Desk
+    </a>
+  </div>
+</div>
+
+<script>
+  window.selectCambiosVoluntariosAccount = function (hasAccount) {
+    var btnNo = document.getElementById('cv-btn-no')
+    var btnSi = document.getElementById('cv-btn-si')
+    var panelNo = document.getElementById('cv-panel-no')
+    var panelSi = document.getElementById('cv-panel-si')
+
+    btnNo.classList.toggle('bg-latam-coral/10', hasAccount === false)
+    btnNo.classList.toggle('border-latam-coral', hasAccount === false)
+    btnNo.classList.toggle('border-latam-coral/40', hasAccount !== false)
+
+    btnSi.classList.toggle('bg-latam-coral', hasAccount === true)
+    btnSi.classList.toggle('bg-latam-estrellada', hasAccount !== true)
+
+    panelNo.classList.toggle('hidden', hasAccount !== false)
+    panelSi.classList.toggle('hidden', hasAccount !== true)
+  }
+</script>

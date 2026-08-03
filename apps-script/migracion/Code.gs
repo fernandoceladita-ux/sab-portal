@@ -41,16 +41,17 @@
 // y reemplaza cada valor por el ID real (lo sacas de la URL para compartir
 // de cada archivo: .../d/ESTE_ES_EL_ID/view).
 const DRIVE_ASSETS = {
-  hero: 'REEMPLAZAR_ID_HERO_PNG',
-  tituloHero: 'REEMPLAZAR_ID_TITULO_HERO_PNG',
-  logoLatam: 'REEMPLAZAR_ID_LOGO_LATAM_PNG',
-  noticiaReembolso: 'REEMPLAZAR_ID_PLAZO_REEMBOLSO_PNG',
+  hero: '1naWRjC2mqaDFRO8Ii4_BmkU81gbbhFkk',
+  tituloHero: '1Ydays4nRyJBy_PZETHoUyss--2h-8YyL',
+  logoLatam: '11abTjcpbU5KzruNghEI1SdIHu9zNAVVQ',
+  noticiaReembolso: '1G0E9rbgM_f_s2mkjArcwe4hZsRFczoLN',
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no
 // están acá siguen cayendo en Placeholder.html.
 const MODULE_PAGES = {
   'gestion-personal': 'GestionPersonal',
+  'mi-rol': 'MiRol',
 }
 
 // Mismos hex que bg-latam-* en tailwind.config.js. Se inyectan como
@@ -128,6 +129,18 @@ const ACTUALIZACION_VISA_TURISTA_FOLDER_ID = '1CVaFg2hVhRqGTOKhAyi7mfhGmJohp6nC'
 const ACTUALIZACION_FIEBRE_FOLDER_ID = '1_ZfdWWM5_PP2eqcE6ULzIXIwT_SEc9ql'
 const ACTUALIZACION_LICENCIA_FOLDER_ID = '1_vfAxpYceoOUxkw5fXsBFtoAzwcDnfKQ'
 
+// Mismo GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
+// el trámite "Domicilio DGAC" — comparten el mismo Sheet y Drive reales.
+const DOMICILIO_DGAC_GID = 1159770071
+const DOMICILIO_DGAC_FOLDER_ID = '1SAGqcibpIRcBgceY1y7D_GxalFzug4do'
+
+// Mismos GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
+// los trámites del módulo "Mi Rol" — comparten el mismo Sheet y Drive reales.
+const MES_SUBSIGUIENTE_GID = 1379865326
+const DESCANSO_MEDICO_GID = 1801672376
+const DESCANSO_MEDICO_FOLDER_ID = '1GD46b5Zigv8wSKE2jdpNwJnJV3-JH4JW'
+const VACACIONES_GID = 1772728526
+
 // Máximo de envíos aceptados por minuto, contados globalmente.
 const RATE_LIMIT_PER_MINUTE = 20
 
@@ -199,6 +212,180 @@ function buildActualizacionDatosRow(data, correo, fileUrls) {
     'Ingresa una foto de tu VISA (2)': fileUrls.visaTuristaUrl || '',
     'Ingresa el número de tu Licencia de Conducir MTC': sanitizeValue(data.licenciaNumero),
     'Ingresa tu Licencia Peruana:': fileUrls.licenciaUrl || '',
+  }
+}
+
+// Llamada desde DomicilioDgacScript.html vía
+// `google.script.run.submitDomicilioDgac(payload)`.
+function submitDomicilioDgac(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const licenciaUrl = data.licenciaArchivo
+    ? uploadFileToDrive(data.licenciaArchivo, data.licenciaArchivoNombre, data.licenciaArchivoTipo, DOMICILIO_DGAC_FOLDER_ID)
+    : ''
+
+  writeToSheet(DOMICILIO_DGAC_GID, buildDomicilioDgacRow(data, correo, licenciaUrl))
+  return { status: 'ok' }
+}
+
+function buildDomicilioDgacRow(data, correo, licenciaUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Tipo de Actualización': sanitizeValue(data.tipo),
+    'Nueva Dirección': sanitizeValue(data.direccion),
+    'Distrito': sanitizeValue(data.distrito),
+    'Coordenadas': sanitizeValue(data.coordenadas),
+    'Foto Nueva Licencia DGAC': licenciaUrl || '',
+  }
+}
+
+// Llamada desde SolicitudMesSubsiguienteScript.html vía
+// `google.script.run.submitMesSubsiguiente(payload)`.
+function submitMesSubsiguiente(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  writeToSheet(MES_SUBSIGUIENTE_GID, buildMesSubsiguienteRow(data, correo))
+  return { status: 'ok' }
+}
+
+function buildMesSubsiguienteRow(data, correo) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Mes del Rol': sanitizeValue(data.mesRol),
+    'Novedad': sanitizeValue(data.novedad),
+    'Fecha Afectación': sanitizeValue(data.fechaAfectacion),
+    'N° Vuelo (Afectación)': sanitizeValue(data.numVuelo1),
+    'Ruta (Afectación)': sanitizeValue(data.ruta1),
+    'Hora Llegada (Afectación)': sanitizeValue(data.horaLlegada1),
+    'Comentario (Afectación)': sanitizeValue(data.comentario1),
+    'Fecha Vuelos Adicionales': sanitizeValue(data.fechaVuelosAdicionales),
+    'N° Vuelo (Adicionales)': sanitizeValue(data.numVuelo2),
+    'Ruta (Adicionales)': sanitizeValue(data.ruta2),
+    'Mes Libre Deseado': sanitizeValue(data.mesLibreDeseado),
+    'Comentario (Adicionales)': sanitizeValue(data.comentario2),
+    'Fecha Libre (Jefatura)': sanitizeValue(data.fechaLibreJefatura),
+    'Motivo (Jefatura)': sanitizeValue(data.motivoJefatura),
+    'Documento Técnico': sanitizeValue(data.documentoTecnico),
+    'Fecha de Cita': sanitizeValue(data.fechaCita),
+    'Hora de Cita': sanitizeValue(data.horaCita),
+    'Comentario (Documentación)': sanitizeValue(data.comentario4),
+    'Tipo de Permiso': sanitizeValue(data.tipoPermiso),
+    'Fecha Inicio Permiso': sanitizeValue(data.fechaInicioPermiso),
+    'Fecha Fin Permiso': sanitizeValue(data.fechaFinPermiso),
+  }
+}
+
+// Llamada desde DescansoMedicoScript.html vía
+// `google.script.run.submitDescansoMedico(payload)`.
+function submitDescansoMedico(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const documentoUrl = data.documentoDM
+    ? uploadFileToDrive(data.documentoDM, data.documentoDMNombre, data.documentoDMTipo, DESCANSO_MEDICO_FOLDER_ID)
+    : ''
+
+  writeToSheet(DESCANSO_MEDICO_GID, buildDescansoMedicoRow(data, correo, documentoUrl))
+  return { status: 'ok' }
+}
+
+function buildDescansoMedicoRow(data, correo, documentoUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Filial': sanitizeValue(data.filial),
+    'Rank': sanitizeValue(data.rank),
+    'Fecha de Inicio DM': sanitizeValue(data.fechaInicio),
+    'Fecha de Término DM': sanitizeValue(data.fechaFin),
+    'Documento DM': documentoUrl || '',
+  }
+}
+
+// Llamada desde VacacionesScript.html vía
+// `google.script.run.submitVacaciones(payload)`.
+function submitVacaciones(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  writeToSheet(VACACIONES_GID, buildVacacionesRow(data, correo))
+  return { status: 'ok' }
+}
+
+function buildVacacionesRow(data, correo) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Categoría': sanitizeValue(data.categoria),
+    'Tipo de Solicitud': sanitizeValue(data.tipo),
+    'Mes Solicitado (Adicionales)': sanitizeValue(data.mesAdicionales),
+    'Días Solicitados': sanitizeValue(data.diasAdicionales),
+    'Sustento': sanitizeValue(data.sustento),
+    'BP Compañero (Cambio)': sanitizeValue(data.companeroBP),
+    'Nombre Compañero (Cambio)': sanitizeValue(data.companeroNombre),
+    'Mes Original (Cambio)': sanitizeValue(data.mesCambio),
+    'BP Beneficiario (Cesión)': sanitizeValue(data.beneficiarioBP),
+    'Nombre Beneficiario (Cesión)': sanitizeValue(data.beneficiarioNombre),
+    'Bloque de Días a Ceder (Cesión)': sanitizeValue(data.bloqueDias),
   }
 }
 

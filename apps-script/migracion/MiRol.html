@@ -1,0 +1,208 @@
+<section
+  class="relative flex min-h-[200px] items-end bg-cover bg-center px-5 py-7 sm:min-h-[220px] sm:px-10"
+  style="background-image:url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&amp;fit=crop&amp;w=1400&amp;q=70')"
+>
+  <div class="absolute inset-0 bg-gradient-to-r from-latam-profunda/90 via-latam-profunda/70 to-latam-profunda/30"></div>
+  <div class="relative z-10 max-w-xl animate-fadeUp">
+    <h1 class="text-2xl font-extrabold text-white sm:text-3xl">MI ROL</h1>
+    <p class="mt-1.5 text-[17px] text-white sm:text-[20px]">Consulta y gestiona tu programación, tus tiempos de vuelo y tu habilitación operativa.</p>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl animate-fadeUp px-0 py-8 [animation-delay:120ms] sm:px-6">
+  <div class="relative">
+    <button onclick="hubScrollByMiRol(-1)" aria-label="Anterior" class="absolute -left-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 rotate-180"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+
+    <div id="hub-carousel-track-mirol" class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-[calc(50%-125px)] pb-16 pt-6 sm:px-0">
+      <button type="button" id="carousel-item-mirol-solicitud-mes-subsiguiente" data-hub-card-mirol onclick="selectHubItemMiRol('solicitud-mes-subsiguiente')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Solicitud Mes Subsiguiente</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Envía tu solicitud de preferencias de rol para el mes subsiguiente.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Gestión de Tiempos</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-cambios-voluntarios" data-hub-card-mirol onclick="selectHubItemMiRol('cambios-voluntarios')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Cambios Voluntarios</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Publica u ofrece cambios voluntarios de tramos con otros tripulantes.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Gestión de Tiempos</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>AppSheet</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-descanso-medico" data-hub-card-mirol onclick="selectHubItemMiRol('descanso-medico')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Descanso Médico</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Registra descansos médicos y adjunta tu documentación de sustento.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Gestión de Tiempos</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-seguro-medico" data-hub-card-mirol onclick="selectHubItemMiRol('seguro-medico')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Activa tu seguro Médico</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Activa o consulta el estado de tu seguro médico como tripulante.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Gestión de Tiempos</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Beneficio</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-cesion-vacaciones" data-hub-card-mirol onclick="selectHubItemMiRol('cesion-vacaciones')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Intercambio o Cesión de Vacaciones</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Solicita el intercambio, la cesión o un pedido adicional de tus días de vacaciones.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Gestión de Tiempos</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-grupos-pbs" data-hub-card-mirol onclick="selectHubItemMiRol('grupos-pbs')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Grupos PBS 2026</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Consulta los grupos PBS asignados para el periodo 2026.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>PBS, Visas y Habilitación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>PDF</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-mirol-cambios-web-sab" data-hub-card-mirol onclick="selectHubItemMiRol('cambios-web-sab')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Cambios Web SAB LP</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Historial y detalle de cambios publicados en la web SAB LP.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>PBS, Visas y Habilitación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Novedades</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+    </div>
+
+    <button onclick="hubScrollByMiRol(1)" aria-label="Siguiente" class="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+  </div>
+</section>
+
+<section id="detalle-seleccion-mirol" class="reveal mx-auto max-w-4xl scroll-mt-[84px] px-5 pb-16 sm:px-6">
+  <div id="detalle-empty-mirol" class="rounded-2xl bg-white p-8 text-center text-sm font-medium text-slate-400 shadow-sm">
+    Selecciona una opción del carrusel para ver más detalles aquí.
+  </div>
+
+  <div id="detalle-mirol-solicitud-mes-subsiguiente" class="hidden">
+    <?!= include('SolicitudMesSubsiguienteView') ?>
+  </div>
+
+  <div id="detalle-mirol-cambios-voluntarios" class="hidden">
+    <?!= include('CambiosVoluntariosView') ?>
+  </div>
+
+  <div id="detalle-mirol-descanso-medico" class="hidden">
+    <?!= include('DescansoMedicoView') ?>
+  </div>
+
+  <div id="detalle-mirol-seguro-medico" class="hidden">
+    <?!= include('SeguroMedicoView') ?>
+  </div>
+
+  <div id="detalle-mirol-cesion-vacaciones" class="hidden">
+    <?!= include('VacacionesView') ?>
+  </div>
+
+  <div id="detalle-mirol-grupos-pbs" class="hidden">
+    <?!= include('GruposPbsView') ?>
+  </div>
+
+  <div id="detalle-mirol-cambios-web-sab" class="hidden">
+    <?!= include('CambiosWebSabView') ?>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var HUB_IDS_MIROL = ['solicitud-mes-subsiguiente', 'cambios-voluntarios', 'descanso-medico', 'seguro-medico', 'cesion-vacaciones', 'grupos-pbs', 'cambios-web-sab']
+
+    window.hubScrollByMiRol = function (dir) {
+      var track = document.getElementById('hub-carousel-track-mirol')
+      track && track.scrollBy({ left: dir * 300, behavior: 'smooth' })
+    }
+
+    window.selectHubItemMiRol = function (id) {
+      HUB_IDS_MIROL.forEach(function (hid) {
+        var panel = document.getElementById('detalle-mirol-' + hid)
+        if (panel) panel.classList.add('hidden')
+        var card = document.getElementById('carousel-item-mirol-' + hid)
+        if (card) {
+          var active = hid === id
+          card.classList.toggle('scale-[1.04]', active)
+          card.classList.toggle('border-latam-estrellada', active)
+          card.classList.toggle('shadow-card', active)
+          card.classList.toggle('border-slate-200', !active)
+          card.classList.toggle('shadow-sm', !active)
+          var title = card.querySelector('.hub-card-title')
+          var cta = card.querySelector('.hub-card-cta')
+          if (title) { title.classList.toggle('text-latam-coral', active); title.classList.toggle('text-latam-estrellada', !active) }
+          if (cta) { cta.classList.toggle('bg-latam-estrellada', active); cta.classList.toggle('text-white', active); cta.classList.toggle('bg-slate-100', !active) }
+        }
+      })
+      document.getElementById('detalle-empty-mirol').classList.add('hidden')
+      var target = document.getElementById('detalle-mirol-' + id)
+      if (target) target.classList.remove('hidden')
+
+      var cardEl = document.getElementById('carousel-item-mirol-' + id)
+      if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+      requestAnimationFrame(function () {
+        document.getElementById('detalle-seleccion-mirol').scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+
+    var initialItemMiRol = '<?= itemId ?>'
+    if (initialItemMiRol && HUB_IDS_MIROL.indexOf(initialItemMiRol) !== -1) {
+      setTimeout(function () { selectHubItemMiRol(initialItemMiRol) }, 350)
+    }
+  })()
+</script>

@@ -1,0 +1,155 @@
+<script>
+  var dmState = { file: null }
+
+  function dmHandleFileSelect(input) {
+    var f = input.files && input.files[0]
+    if (!f) return
+    dmState.file = f
+    document.getElementById('dm-fu-idle-documentoDM').classList.add('hidden')
+    var done = document.getElementById('dm-fu-done-documentoDM')
+    done.classList.remove('hidden')
+    done.classList.add('flex')
+    document.getElementById('dm-fu-name-documentoDM').textContent = f.name
+    document.getElementById('dm-fu-size-documentoDM').textContent = formatFileSize(f.size)
+  }
+
+  function dmClearFilePreview() {
+    dmState.file = null
+    var input = document.getElementById('dm-fu-input-documentoDM')
+    if (input) input.value = ''
+    var idle = document.getElementById('dm-fu-idle-documentoDM')
+    var done = document.getElementById('dm-fu-done-documentoDM')
+    if (idle) idle.classList.remove('hidden')
+    if (done) { done.classList.add('hidden'); done.classList.remove('flex') }
+  }
+
+  function dmFileDrop(e, btn) {
+    e.preventDefault()
+    fileDragLeave(btn)
+    var f = e.dataTransfer.files && e.dataTransfer.files[0]
+    if (!f) return
+    var input = document.getElementById('dm-fu-input-documentoDM')
+    var dt = new DataTransfer()
+    dt.items.add(f)
+    input.files = dt.files
+    dmHandleFileSelect(input)
+  }
+
+  function dmMarkInvalid(name) {
+    var el = document.querySelector('#dm-form [name="' + name + '"]')
+    if (!el) return
+    el.classList.add('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+    el.classList.remove('border-slate-200', 'bg-slate-50')
+  }
+
+  function dmClearInvalidStyles() {
+    document.querySelectorAll('#dm-form .dm-fld').forEach(function (el) {
+      el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+      el.classList.add('border-slate-200', 'bg-slate-50')
+    })
+  }
+
+  function dmShowError(msg) {
+    var el = document.getElementById('dm-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function dmHideError() {
+    document.getElementById('dm-error').classList.add('hidden')
+  }
+  function dmShowSuccess() {
+    var el = document.getElementById('dm-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function dmSetSending(val) {
+    document.getElementById('dm-btn-enviar').disabled = val
+    document.getElementById('dm-btn-borrar').disabled = val
+    document.getElementById('dm-btn-enviar-label').textContent = val ? 'Enviando...' : 'Enviar Notificación'
+  }
+
+  function clearDmForm() {
+    document.getElementById('dm-form').reset()
+    dmClearFilePreview()
+    dmClearInvalidStyles()
+    dmHideError()
+  }
+
+  function dmResetAfterSubmit() {
+    var form = document.getElementById('dm-form')
+    var keep = { correo: true, bp: true, nombre: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      el.value = ''
+    }
+    dmClearFilePreview()
+  }
+
+  async function submitDmForm() {
+    dmHideError()
+    dmClearInvalidStyles()
+
+    var form = document.getElementById('dm-form')
+    var invalidNames = []
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (el.offsetParent === null) continue
+      if (el.name && typeof el.checkValidity === 'function' && !el.checkValidity()) invalidNames.push(el.name)
+    }
+
+    if (invalidNames.length > 0) {
+      invalidNames.forEach(dmMarkInvalid)
+      dmShowError('Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var formData = new FormData(form)
+    dmSetSending(true)
+    try {
+      var documentoDM = dmState.file ? await fileToBase64(dmState.file) : ''
+      await runServer('submitDescansoMedico', {
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        filial: formData.get('filial'),
+        rank: formData.get('rank'),
+        fechaInicio: formData.get('fechaInicio'),
+        fechaFin: formData.get('fechaFin'),
+        documentoDM: documentoDM,
+        documentoDMNombre: dmState.file ? dmState.file.name : '',
+        documentoDMTipo: dmState.file ? dmState.file.type : '',
+      })
+      dmShowSuccess()
+      dmResetAfterSubmit()
+    } catch (err) {
+      dmShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      dmSetSending(false)
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('dm-form')
+    if (!form) return
+    form.addEventListener('input', function (e) {
+      var el = e.target
+      if (el.classList && el.classList.contains('dm-fld')) {
+        el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+        el.classList.add('border-slate-200', 'bg-slate-50')
+      }
+    })
+    form.addEventListener('change', function (e) {
+      var el = e.target
+      if (el.classList && el.classList.contains('dm-fld')) {
+        el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+        el.classList.add('border-slate-200', 'bg-slate-50')
+      }
+    })
+  })
+</script>

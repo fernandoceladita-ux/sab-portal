@@ -1,0 +1,207 @@
+<script>
+  // ============================================================================
+  // Domicilio DGAC — mismo comportamiento que DomicilioDgacView.jsx del
+  // proyecto React. Reutiliza fileDragOver/fileDragLeave/toggleAccordion
+  // (definidos en ActualizacionDatosScript.html/Scripts.html, siempre
+  // presentes junto a esta vista).
+  // ============================================================================
+
+  var domicilioState = {
+    tipo: null,
+    file: null,
+  }
+
+  function selectDomicilioTipo(tipo) {
+    domicilioState.tipo = tipo
+    document.querySelectorAll('[data-domicilio-tipo]').forEach(function (btn) {
+      var active = btn.getAttribute('data-domicilio-tipo') === tipo
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/5', active)
+      btn.classList.toggle('shadow-sm', active)
+      btn.classList.toggle('text-latam-estrellada', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('text-slate-600', !active)
+      var dot = btn.querySelector('.domicilio-tipo-dot')
+      dot.classList.toggle('border-latam-estrellada', active)
+      dot.classList.toggle('border-slate-300', !active)
+      dot.innerHTML = active ? '<span class="h-2 w-2 rounded-full bg-latam-coral"></span>' : ''
+    })
+  }
+
+  function domicilioHandleFileSelect(input) {
+    var f = input.files && input.files[0]
+    if (!f) return
+    domicilioState.file = f
+    document.getElementById('domicilio-fu-idle-licenciaArchivo').classList.add('hidden')
+    var done = document.getElementById('domicilio-fu-done-licenciaArchivo')
+    done.classList.remove('hidden')
+    done.classList.add('flex')
+    document.getElementById('domicilio-fu-name-licenciaArchivo').textContent = f.name
+    document.getElementById('domicilio-fu-size-licenciaArchivo').textContent = formatFileSize(f.size)
+  }
+
+  function domicilioClearFilePreview() {
+    domicilioState.file = null
+    var input = document.getElementById('domicilio-fu-input-licenciaArchivo')
+    if (input) input.value = ''
+    var idle = document.getElementById('domicilio-fu-idle-licenciaArchivo')
+    var done = document.getElementById('domicilio-fu-done-licenciaArchivo')
+    if (idle) idle.classList.remove('hidden')
+    if (done) { done.classList.add('hidden'); done.classList.remove('flex') }
+  }
+
+  function domicilioFileDrop(e, btn) {
+    e.preventDefault()
+    fileDragLeave(btn)
+    var f = e.dataTransfer.files && e.dataTransfer.files[0]
+    if (!f) return
+    var input = document.getElementById('domicilio-fu-input-licenciaArchivo')
+    var dt = new DataTransfer()
+    dt.items.add(f)
+    input.files = dt.files
+    domicilioHandleFileSelect(input)
+  }
+
+  function domicilioMarkInvalid(name) {
+    var el = document.querySelector('#domicilio-form [name="' + name + '"]')
+    if (!el) return
+    el.classList.add('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+    el.classList.remove('border-slate-200', 'bg-slate-50')
+  }
+
+  function domicilioClearInvalidStyles() {
+    document.querySelectorAll('#domicilio-form .domicilio-fld').forEach(function (el) {
+      el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+      el.classList.add('border-slate-200', 'bg-slate-50')
+    })
+  }
+
+  function domicilioShowError(msg) {
+    var el = document.getElementById('domicilio-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function domicilioHideError() {
+    document.getElementById('domicilio-error').classList.add('hidden')
+  }
+  function domicilioShowSuccess() {
+    var el = document.getElementById('domicilio-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function domicilioSetSending(val) {
+    document.getElementById('domicilio-btn-enviar').disabled = val
+    document.getElementById('domicilio-btn-borrar').disabled = val
+    document.getElementById('domicilio-btn-enviar-label').textContent = val ? 'Guardando...' : 'Guardar Registro'
+  }
+
+  function clearDomicilioForm() {
+    document.getElementById('domicilio-form').reset()
+    domicilioState.tipo = null
+    domicilioState.file = null
+    domicilioClearFilePreview()
+    document.querySelectorAll('[data-domicilio-tipo]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'shadow-sm', 'text-latam-estrellada')
+      btn.classList.add('border-slate-200', 'text-slate-600')
+      var dot = btn.querySelector('.domicilio-tipo-dot')
+      dot.classList.remove('border-latam-estrellada')
+      dot.classList.add('border-slate-300')
+      dot.innerHTML = ''
+    })
+    domicilioClearInvalidStyles()
+    domicilioHideError()
+  }
+
+  function domicilioResetAfterSubmit() {
+    var form = document.getElementById('domicilio-form')
+    var keep = { correo: true, bp: true, nombre: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      el.value = ''
+    }
+    domicilioState.tipo = null
+    domicilioState.file = null
+    domicilioClearFilePreview()
+    document.querySelectorAll('[data-domicilio-tipo]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'shadow-sm', 'text-latam-estrellada')
+      btn.classList.add('border-slate-200', 'text-slate-600')
+      var dot = btn.querySelector('.domicilio-tipo-dot')
+      dot.classList.remove('border-latam-estrellada')
+      dot.classList.add('border-slate-300')
+      dot.innerHTML = ''
+    })
+  }
+
+  async function submitDomicilioForm() {
+    domicilioHideError()
+    domicilioClearInvalidStyles()
+
+    var form = document.getElementById('domicilio-form')
+    var invalidNames = []
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (el.offsetParent === null) continue
+      if (el.name && typeof el.checkValidity === 'function' && !el.checkValidity()) invalidNames.push(el.name)
+    }
+
+    var customError = ''
+    if (!domicilioState.tipo) {
+      customError = 'Completa los campos obligatorios: selecciona qué actualización deseas realizar.'
+    }
+
+    if (invalidNames.length > 0 || customError) {
+      invalidNames.forEach(domicilioMarkInvalid)
+      domicilioShowError(customError || 'Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var formData = new FormData(form)
+    domicilioSetSending(true)
+    try {
+      var licenciaArchivo = domicilioState.file ? await fileToBase64(domicilioState.file) : ''
+      await runServer('submitDomicilioDgac', {
+        correo: formData.get('correo'),
+        bp: formData.get('bp'),
+        nombre: formData.get('nombre'),
+        tipo: domicilioState.tipo,
+        direccion: formData.get('direccion'),
+        distrito: formData.get('distrito'),
+        coordenadas: formData.get('coordenadas'),
+        licenciaArchivo: licenciaArchivo,
+        licenciaArchivoNombre: domicilioState.file ? domicilioState.file.name : '',
+        licenciaArchivoTipo: domicilioState.file ? domicilioState.file.type : '',
+      })
+      domicilioShowSuccess()
+      domicilioResetAfterSubmit()
+    } catch (err) {
+      domicilioShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      domicilioSetSending(false)
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('domicilio-form')
+    if (!form) return
+    form.addEventListener('input', function (e) {
+      var el = e.target
+      if (el.classList && el.classList.contains('domicilio-fld')) {
+        el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+        el.classList.add('border-slate-200', 'bg-slate-50')
+      }
+    })
+    form.addEventListener('change', function (e) {
+      var el = e.target
+      if (el.classList && el.classList.contains('domicilio-fld')) {
+        el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+        el.classList.add('border-slate-200', 'bg-slate-50')
+      }
+    })
+  })
+</script>

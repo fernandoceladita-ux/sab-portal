@@ -1,0 +1,235 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Antes de coordinar o procesar un cambio voluntario de tramos en la plataforma, revisa estas normativas e
+    indicaciones mandatorias. El sistema web validará automáticamente que no vulnere ninguno de estos límites de
+    regulaciones de descanso y seguridad.
+  </p>
+
+  <div class="grid grid-cols-3 border-b border-slate-200">
+    <button type="button" data-cws-tabbtn="tiempos" onclick="selectCwsTab('tiempos')" class="relative flex flex-wrap items-center justify-center gap-1.5 px-1.5 py-3 text-center text-[13px] font-bold leading-tight transition sm:text-sm text-latam-coral">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Tiempos y Descansos
+      <span class="cws-tab-underline absolute -bottom-[1px] left-0 right-0 h-[2px] rounded-full bg-latam-coral"></span>
+    </button>
+    <button type="button" data-cws-tabbtn="limites" onclick="selectCwsTab('limites')" class="relative flex flex-wrap items-center justify-center gap-1.5 px-1.5 py-3 text-center text-[13px] font-bold leading-tight transition sm:text-sm text-slate-500 hover:text-latam-estrellada">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="4" y="4.5" width="16" height="16" rx="2.3" /><path d="M8 3v3M16 3v3M4 10h16M9 15l5-5" stroke-linecap="round" /></svg>
+      Límites de Horas y Libres
+      <span class="cws-tab-underline absolute -bottom-[1px] left-0 right-0 h-[2px] rounded-full bg-latam-coral hidden"></span>
+    </button>
+    <button type="button" data-cws-tabbtn="operacion" onclick="selectCwsTab('operacion')" class="relative flex flex-wrap items-center justify-center gap-1.5 px-1.5 py-3 text-center text-[13px] font-bold leading-tight transition sm:text-sm text-slate-500 hover:text-latam-estrellada">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+      Operación y Fechas Límite
+      <span class="cws-tab-underline absolute -bottom-[1px] left-0 right-0 h-[2px] rounded-full bg-latam-coral hidden"></span>
+    </button>
+  </div>
+
+  <div id="cws-tab-tiempos" data-cws-tabpanel="tiempos" class="animate-fadeIn mt-5 flex flex-col gap-3">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-t1-body','cws-r-t1-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Tiempo extra posterior al PDR</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Protección Activa</span>
+        <svg id="cws-r-t1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-t1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Como medida de protección frente a demoras operacionales, se añade automáticamente <strong class="text-slate-800">01:00 hora de descanso adicional</strong> por encima del mínimo requerido por ley.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Protección Activa</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-t2-body','cws-r-t2-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><rect x="4" y="4.5" width="16" height="16" rx="2.3" /><path d="M8 3v3M16 3v3M4 10h16M9.5 14.5l5 5M14.5 14.5l-5 5" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Reserva tarde seguida de libre</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">No Permitido</span>
+        <svg id="cws-r-t2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-t2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Por límites estrictos de activación de seguridad, <strong class="text-slate-800">se restringe</strong> realizar permutas de turnos de Reserva Tarde (HSB2 y ASB2) si están pegados inmediatamente a un día libre.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">No Permitido</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-t3-body','cws-r-t3-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><rect x="4" y="4.5" width="16" height="16" rx="2.3" /><path d="M8 3v3M16 3v3M4 10h16" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">ETA previo a libre (Llegadas de Noche)</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Restringido</span>
+        <svg id="cws-r-t3-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-t3-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Se restringen los cambios con hora estimada de arribo (ETA) <strong class="text-slate-800">posterior a las 22:30 horas</strong> si vas seguido de un día libre. Esto asegura tu holgura y protege el disfrute de tu libre. La única excepción es si toda tu tripulación tiene el vuelo programado igual.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Restringido</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-t4-body','cws-r-t4-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Block time 8 en 24 (Tiempo de Vuelo)</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Límite Estricto</span>
+        <svg id="cws-r-t4-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-t4-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Se considera una holgura técnica de 35 minutos en periodos de 24 horas consecutivas. Esto significa que cualquier cambio aprobado debe dejarte con un <strong class="text-slate-800">máximo de 07:25 horas de tiempo de vuelo (TV)</strong> en ese rango.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Límite Estricto</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cws-tab-limites" data-cws-tabpanel="limites" class="animate-fadeIn mt-5 hidden flex-col gap-3">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-l1-body','cws-r-l1-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><path d="M5 20V10M11 20V4M17 20v-7" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Limitación mensual y trimestral de horas block</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Cómputo Técnico</span>
+        <svg id="cws-r-l1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-l1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Cada asignación de reserva programada computa automáticamente <strong class="text-slate-800">5 horas de vuelo</strong> para tu acumulado. Adicionalmente, el sistema aplica un margen de protección de 03 horas respecto a los topes mensuales (<strong class="text-slate-800">100 horas</strong>) y trimestrales (<strong class="text-slate-800">270 horas</strong>).</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Cómputo Técnico</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-l2-body','cws-r-l2-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><rect x="4" y="4.5" width="16" height="16" rx="2.3" /><path d="M8 3v3M16 3v3M4 10h16M9 14.5l1.8 1.8L15.5 12" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Mínimo de Libres legales</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Mínimo Obligatorio</span>
+        <svg id="cws-r-l2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-l2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Ningún tripulante debe quedar con <strong class="text-slate-800">menos de 8 días libres al mes</strong>. Esto solo cambia si tienes más de 5 días seguidos bajo vacaciones, descanso médico, permisos de jefatura, licencias sin goce de haber o pedidos especiales.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Mínimo Obligatorio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-l3-body','cws-r-l3-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Secuencias reglamentarias RAP</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Validado por RAP</span>
+        <svg id="cws-r-l3-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-l3-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Las secuencias de bloques permitidos según la RAP son <strong class="text-slate-800">4x1, 5x2 o de 6 a 10 trabajados por 4 libres</strong>. Al salir de un periodo de vacaciones, estás obligado a terminar tu secuencia con los libres correspondientes.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Validado por RAP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cws-tab-operacion" data-cws-tabpanel="operacion" class="animate-fadeIn mt-5 hidden flex-col gap-3">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-o1-body','cws-r-o1-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><rect x="4" y="4.5" width="16" height="16" rx="2.3" /><path d="M8 3v3M16 3v3M4 10h16M9.5 14.5l5 5M14.5 14.5l-5 5" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Empalme programación mes siguiente (Freeze de Roster)</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Tope: Día 13 del mes</span>
+        <svg id="cws-r-o1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-o1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Todo cambio web que involucre modificaciones en las secuencias de trabajo de la <strong class="text-slate-800">última semana del mes</strong>, solo se aceptará <strong class="text-slate-800">hasta el día 13 del mes actual</strong> debido al cierre de sistemas del equipo de Roster.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Tope: Día 13 del mes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-o2-body','cws-r-o2-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><circle cx="12" cy="9" r="3.3" /><path d="M5.5 20c1-3.6 3.8-5.5 6.5-5.5s5.5 1.9 6.5 5.5" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Cambio entre HRK</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Exclusivo HRK</span>
+        <svg id="cws-r-o2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-o2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Los tripulantes que se encuentren bajo la modalidad de <strong class="text-slate-800">HRK mensual</strong>, están facultados para intercambiar vuelos únicamente con un Jefe de Servicio a Bordo (JSB) o con otro compañero con su mismo HRK mensual.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Exclusivo HRK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-o3-body','cws-r-o3-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><path d="M12 3.5l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Curva de Experiencia en Vuelo</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Bloqueado Automático</span>
+        <svg id="cws-r-o3-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-o3-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Por altos estándares de seguridad y balance de cabina, en un mismo vuelo <strong class="text-slate-800">no podrá quedar asignado más de 1 tripulante nuevo</strong> (con menos de 3 meses cumplidos en la compañía).</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Bloqueado Automático</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-latam-estrellada/30">
+      <button type="button" onclick="toggleAccordion('cws-r-o4-body','cws-r-o4-chevron')" class="flex w-full items-center gap-3 p-4 text-left">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-estrellada/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg></span>
+        <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Arribo en décimo día</span>
+        <span class="hidden flex-shrink-0 items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:inline-flex">Tope: 20:00 hrs LIM</span>
+        <svg id="cws-r-o4-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+      </button>
+      <div id="cws-r-o4-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+        <div class="overflow-hidden">
+          <div class="border-t border-slate-100 px-4 pb-4 pt-3">
+            <p class="text-sm leading-relaxed text-slate-600">Los tripulantes que se encuentren cumpliendo el <strong class="text-slate-800">décimo día de su secuencia de trabajo</strong>, deberán tener horario de aterrizaje máximo en Lima (LIM) las <strong class="text-slate-800">20:00 horas</strong>.</p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white sm:hidden">Tope: 20:00 hrs LIM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.selectCwsTab = function (id) {
+    document.querySelectorAll('[data-cws-tabbtn]').forEach(function (btn) {
+      var active = btn.getAttribute('data-cws-tabbtn') === id
+      btn.classList.toggle('text-latam-coral', active)
+      btn.classList.toggle('text-slate-500', !active)
+      var underline = btn.querySelector('.cws-tab-underline')
+      if (underline) underline.classList.toggle('hidden', !active)
+    })
+    document.querySelectorAll('[data-cws-tabpanel]').forEach(function (panel) {
+      var show = panel.getAttribute('data-cws-tabpanel') === id
+      panel.classList.toggle('hidden', !show)
+      panel.classList.toggle('flex', show)
+    })
+  }
+</script>

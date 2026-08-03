@@ -1,0 +1,190 @@
+<script>
+  (function () {
+    var mesState = { novedad: null }
+
+    var MES_PANEL_META = {
+      afectacion: {
+        title: 'Libre compensado por afectación',
+        color: 'estrellada',
+        icon: '<circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />'
+      },
+      adicionales: {
+        title: 'Libre compensado por vuelos adicionales',
+        color: 'estrellada',
+        icon: '<path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" />'
+      },
+      jefatura: {
+        title: 'Libre aprobado por jefatura directa',
+        color: 'estrellada',
+        icon: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5" /><path d="M3.5 9.5h17M8 3v3M16 3v3" stroke-linecap="round" />'
+      },
+      documentacion: {
+        title: 'Trámites de Documentación Técnica',
+        color: 'estrellada',
+        icon: '<rect x="3" y="5" width="18" height="14" rx="2.5" /><circle cx="9" cy="12" r="2" /><path d="M14 10h4M14 14h4M6 16.5c.5-1.6 1.8-2.5 3-2.5s2.5.9 3 2.5" stroke-linecap="round" />'
+      },
+      permisos: {
+        title: 'Solicitud de Permisos Especiales',
+        color: 'coral',
+        icon: '<path d="M12 3.5l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" />'
+      }
+    }
+
+    window.selectMesNovedad = function (id) {
+      mesState.novedad = id
+      var meta = MES_PANEL_META[id]
+
+      document.querySelectorAll('[data-mes-novedad]').forEach(function (btn) {
+        var active = btn.getAttribute('data-mes-novedad') === id
+        btn.classList.toggle('border-latam-estrellada', active)
+        btn.classList.toggle('bg-latam-estrellada/5', active)
+        btn.classList.toggle('text-latam-estrellada', active)
+        btn.classList.toggle('border-slate-200', !active)
+        btn.classList.toggle('text-slate-600', !active)
+        var dot = btn.querySelector('.mes-novedad-dot')
+        if (dot) {
+          dot.classList.toggle('border-latam-estrellada', active)
+          dot.classList.toggle('bg-latam-estrellada', active)
+          dot.classList.toggle('border-slate-300', !active)
+        }
+      })
+
+      document.querySelectorAll('[data-mes-panel]').forEach(function (panel) {
+        var show = panel.getAttribute('data-mes-panel') === id
+        panel.classList.toggle('hidden', !show)
+        panel.classList.toggle('grid', show)
+      })
+
+      var metaPanel = document.getElementById('mes-meta-panel')
+      var metaHeader = document.getElementById('mes-meta-header')
+      var metaIcon = document.getElementById('mes-meta-icon')
+      var metaTitle = document.getElementById('mes-meta-title')
+      metaPanel.classList.remove('hidden')
+      metaTitle.textContent = meta.title
+      metaIcon.innerHTML = meta.icon
+      metaPanel.classList.toggle('border-latam-estrellada', meta.color === 'estrellada')
+      metaPanel.classList.toggle('border-latam-coral', meta.color === 'coral')
+      metaHeader.classList.toggle('bg-latam-estrellada', meta.color === 'estrellada')
+      metaHeader.classList.toggle('bg-latam-coral', meta.color === 'coral')
+
+      clearMesFieldErrors()
+    }
+
+    function clearMesFieldErrors() {
+      document.querySelectorAll('.mes-fld').forEach(function (el) {
+        el.classList.remove('border-red-400', 'ring-4', 'ring-red-100')
+      })
+    }
+
+    function validateMesForm() {
+      clearMesFieldErrors()
+      var form = document.getElementById('mes-form')
+      var firstInvalid = null
+      var ok = true
+
+      form.querySelectorAll('.mes-fld[required]').forEach(function (el) {
+        if (el.offsetParent === null) return
+        var val = (el.value || '').trim()
+        var invalid = !val
+        if (!invalid && el.type === 'email') {
+          invalid = !/.+@latam\.com$/i.test(val)
+        }
+        if (invalid) {
+          ok = false
+          el.classList.add('border-red-400', 'ring-4', 'ring-red-100')
+          if (!firstInvalid) firstInvalid = el
+        }
+      })
+
+      if (!mesState.novedad) {
+        ok = false
+      }
+
+      if (firstInvalid) firstInvalid.focus()
+      return ok
+    }
+
+    window.submitMesForm = function () {
+      var errorBox = document.getElementById('mes-error')
+      var successBox = document.getElementById('mes-success')
+      errorBox.classList.add('hidden')
+      successBox.classList.add('hidden')
+      successBox.classList.remove('flex')
+
+      if (!validateMesForm()) {
+        errorBox.textContent = mesState.novedad
+          ? 'Por favor completa todos los campos obligatorios.'
+          : 'Por favor selecciona una novedad o excepción antes de continuar.'
+        errorBox.classList.remove('hidden')
+        return
+      }
+
+      var form = document.getElementById('mes-form')
+      var fd = new FormData(form)
+      var payload = { novedad: mesState.novedad }
+      fd.forEach(function (value, key) { payload[key] = value })
+
+      var btnEnviar = document.getElementById('mes-btn-enviar')
+      var btnBorrar = document.getElementById('mes-btn-borrar')
+      var label = document.getElementById('mes-btn-enviar-label')
+      btnEnviar.disabled = true
+      btnBorrar.disabled = true
+      label.textContent = 'Enviando...'
+
+      runServer('submitMesSubsiguiente', payload)
+        .then(function () {
+          form.reset()
+          document.querySelectorAll('[data-mes-novedad]').forEach(function (btn) {
+            btn.classList.remove('border-latam-estrellada', 'bg-latam-estrellada/5', 'text-latam-estrellada')
+            btn.classList.add('border-slate-200', 'text-slate-600')
+            var dot = btn.querySelector('.mes-novedad-dot')
+            if (dot) {
+              dot.classList.remove('border-latam-estrellada', 'bg-latam-estrellada')
+              dot.classList.add('border-slate-300')
+            }
+          })
+          document.querySelectorAll('[data-mes-panel]').forEach(function (panel) {
+            panel.classList.add('hidden')
+            panel.classList.remove('grid')
+          })
+          document.getElementById('mes-meta-panel').classList.add('hidden')
+          mesState.novedad = null
+          successBox.classList.remove('hidden')
+          successBox.classList.add('flex')
+        })
+        .catch(function (err) {
+          errorBox.textContent = 'Ocurrió un error al enviar tu requerimiento. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
+          errorBox.classList.remove('hidden')
+        })
+        .finally(function () {
+          btnEnviar.disabled = false
+          btnBorrar.disabled = false
+          label.textContent = 'Enviar Requerimiento a Roles'
+        })
+    }
+
+    window.clearMesForm = function () {
+      var form = document.getElementById('mes-form')
+      form.reset()
+      clearMesFieldErrors()
+      document.querySelectorAll('[data-mes-novedad]').forEach(function (btn) {
+        btn.classList.remove('border-latam-estrellada', 'bg-latam-estrellada/5', 'text-latam-estrellada')
+        btn.classList.add('border-slate-200', 'text-slate-600')
+        var dot = btn.querySelector('.mes-novedad-dot')
+        if (dot) {
+          dot.classList.remove('border-latam-estrellada', 'bg-latam-estrellada')
+          dot.classList.add('border-slate-300')
+        }
+      })
+      document.querySelectorAll('[data-mes-panel]').forEach(function (panel) {
+        panel.classList.add('hidden')
+        panel.classList.remove('grid')
+      })
+      document.getElementById('mes-meta-panel').classList.add('hidden')
+      mesState.novedad = null
+      document.getElementById('mes-error').classList.add('hidden')
+      document.getElementById('mes-success').classList.add('hidden')
+      document.getElementById('mes-success').classList.remove('flex')
+    }
+  })()
+</script>
