@@ -495,12 +495,16 @@
       if (page === 'mi-rol' && item && typeof selectHubItemMiRol === 'function') {
         setTimeout(() => selectHubItemMiRol(item), 50)
       }
+      if (page === 'gestion-operacional' && item && typeof selectHubItemGestionOperacional === 'function') {
+        setTimeout(() => selectHubItemGestionOperacional(item), 50)
+      }
       return
     }
 
-    // Resto de módulos (Gestión Operacional — aún sin migrar, cae en
-    // Placeholder.html): siguen siendo navegación real de página, pero
-    // igual cierran el header antes de irse (misma lógica que React).
+    // Cualquier otro link interno (hoy no debería quedar ningún módulo sin
+    // migrar, pero se deja como red de seguridad para uno nuevo que caiga en
+    // Placeholder.html): sigue siendo navegación real de página, pero igual
+    // cierra el header antes de irse (misma lógica que React).
     closeAllMenus()
     if (!pageWipeIsMobile()) return
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return

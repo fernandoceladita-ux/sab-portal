@@ -1,0 +1,151 @@
+<section
+  class="relative flex min-h-[200px] items-end bg-cover bg-center px-5 py-7 sm:min-h-[220px] sm:px-10"
+  style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=1400&amp;q=70')"
+>
+  <div class="absolute inset-0 bg-gradient-to-r from-latam-profunda/90 via-latam-profunda/70 to-latam-profunda/30"></div>
+  <div class="relative z-10 max-w-xl animate-fadeUp">
+    <h1 class="text-2xl font-extrabold text-white sm:text-3xl">GESTIÓN OPERACIONAL</h1>
+    <p class="mt-1.5 text-[17px] text-white sm:text-[20px]">Todo sobre viáticos, alimentación y presentación personal para tus operaciones diarias.</p>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl animate-fadeUp px-0 py-8 [animation-delay:120ms] sm:px-6">
+  <div class="relative">
+    <button onclick="hubScrollByGestionOperacional(-1)" aria-label="Anterior" class="absolute -left-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 rotate-180"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+
+    <div id="hub-carousel-track-go" class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-[calc(50%-125px)] pb-16 pt-6 sm:px-0">
+      <button type="button" id="carousel-item-go-instructivo-vales" data-hub-card-go onclick="selectHubItemGestionOperacional('instructivo-vales')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Instructivo de Vales</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Guía paso a paso para el uso correcto de tus vales de alimentación.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Viáticos y Alimentación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>PDF</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-go-consultas-viaticos" data-hub-card-go onclick="selectHubItemGestionOperacional('consultas-viaticos')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Consultas Viáticos y Horas de Vuelo</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Revisa el cálculo de tus viáticos según tus horas de vuelo del periodo.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Viáticos y Alimentación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Consulta</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-go-cambio-uniforme" data-hub-card-go onclick="selectHubItemGestionOperacional('cambio-uniforme')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Cambio de Uniforme</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Solicita el cambio o reposición de piezas de tu uniforme.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Presentación Personal</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-go-registro-sunat" data-hub-card-go onclick="selectHubItemGestionOperacional('registro-sunat')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Registro de Equipos SUNAT</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Declaración obligatoria de dispositivos tecnológicos personales ante aduanas.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Entidades y Legal</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Registro de Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+    </div>
+
+    <button onclick="hubScrollByGestionOperacional(1)" aria-label="Siguiente" class="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+  </div>
+</section>
+
+<section id="detalle-seleccion-go" class="reveal mx-auto max-w-4xl scroll-mt-[84px] px-5 pb-16 sm:px-6">
+  <div id="detalle-empty-go" class="rounded-2xl bg-white p-8 text-center text-sm font-medium text-slate-400 shadow-sm">
+    Selecciona una opción del carrusel para ver más detalles aquí.
+  </div>
+
+  <div id="detalle-go-instructivo-vales" class="hidden">
+    <?!= include('InstructivoValesView') ?>
+  </div>
+
+  <div id="detalle-go-consultas-viaticos" class="hidden">
+    <?!= include('ConsultasViaticosView') ?>
+  </div>
+
+  <div id="detalle-go-cambio-uniforme" class="hidden">
+    <?!= include('UniformesView') ?>
+  </div>
+
+  <div id="detalle-go-registro-sunat" class="hidden">
+    <?!= include('RegistroSunatView') ?>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var HUB_IDS_GO = ['instructivo-vales', 'consultas-viaticos', 'cambio-uniforme', 'registro-sunat']
+
+    window.hubScrollByGestionOperacional = function (dir) {
+      var track = document.getElementById('hub-carousel-track-go')
+      track && track.scrollBy({ left: dir * 300, behavior: 'smooth' })
+    }
+
+    window.selectHubItemGestionOperacional = function (id) {
+      HUB_IDS_GO.forEach(function (hid) {
+        var panel = document.getElementById('detalle-go-' + hid)
+        if (panel) panel.classList.add('hidden')
+        var card = document.getElementById('carousel-item-go-' + hid)
+        if (card) {
+          var active = hid === id
+          card.classList.toggle('scale-[1.04]', active)
+          card.classList.toggle('border-latam-estrellada', active)
+          card.classList.toggle('shadow-card', active)
+          card.classList.toggle('border-slate-200', !active)
+          card.classList.toggle('shadow-sm', !active)
+          var title = card.querySelector('.hub-card-title')
+          var cta = card.querySelector('.hub-card-cta')
+          if (title) { title.classList.toggle('text-latam-coral', active); title.classList.toggle('text-latam-estrellada', !active) }
+          if (cta) { cta.classList.toggle('bg-latam-estrellada', active); cta.classList.toggle('text-white', active); cta.classList.toggle('bg-slate-100', !active) }
+        }
+      })
+      document.getElementById('detalle-empty-go').classList.add('hidden')
+      var target = document.getElementById('detalle-go-' + id)
+      if (target) target.classList.remove('hidden')
+
+      var cardEl = document.getElementById('carousel-item-go-' + id)
+      if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+      requestAnimationFrame(function () {
+        document.getElementById('detalle-seleccion-go').scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+
+    var initialItemGO = '<?= itemId ?>'
+    if (initialItemGO && HUB_IDS_GO.indexOf(initialItemGO) !== -1) {
+      setTimeout(function () { selectHubItemGestionOperacional(initialItemGO) }, 350)
+    }
+  })()
+</script>

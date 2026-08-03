@@ -1,0 +1,265 @@
+<script>
+  var ARMARIO_URL = 'https://armlt.appslatam.com/#/home'
+
+  var unState = { canal: null, radios: {}, file: null }
+
+  var UN_META = {
+    lanyard: {
+      title: 'Solicitud de Lanyards Región Andina',
+      btnLabel: 'Enviar Solicitud de Lanyard',
+      btnColor: 'estrellada',
+      icon: '<rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9V4Z" /><path d="M8.5 12h7M8.5 15.5h4.5" stroke-linecap="round" />'
+    },
+    calidad: {
+      title: 'Formulario de Reclamos de Calidad de Prendas LP',
+      btnLabel: 'Enviar Reporte de Calidad',
+      btnColor: 'coral',
+      icon: '<path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />'
+    }
+  }
+
+  function isUnStep2Open() {
+    var body = document.getElementById('un-step-2-body')
+    return !!body && body.style.gridTemplateRows === '1fr'
+  }
+
+  function toggleUnStep2() {
+    toggleAccordion('un-step-2-body', 'un-step-2-chevron')
+    updateUnPanelVisibility()
+  }
+
+  function selectUnCanal(id, external) {
+    if (external) {
+      window.open(ARMARIO_URL, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    unState.canal = id
+    unState.radios = {}
+    unState.file = null
+    unClearFilePreview()
+    unClearFieldErrors()
+    unHideError()
+
+    document.querySelectorAll('[data-un-canal]').forEach(function (btn) {
+      var active = btn.getAttribute('data-un-canal') === id
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/5', active)
+      btn.classList.toggle('text-latam-estrellada', active)
+      btn.classList.toggle('shadow-sm', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('bg-slate-50', !active)
+      btn.classList.toggle('text-slate-600', !active)
+      var icon = btn.querySelector('.un-canal-icon')
+      if (icon) { icon.classList.toggle('text-latam-coral', active); icon.classList.toggle('text-slate-400', !active) }
+    })
+
+    document.querySelectorAll('[data-un-radio]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-latam-coral')
+      btn.classList.add('border-slate-200', 'bg-white', 'text-slate-600')
+    })
+
+    updateUnPanelVisibility()
+  }
+
+  function selectUnRadio(group, value) {
+    unState.radios[group] = value
+    document.querySelectorAll('[data-un-radio="' + group + '"]').forEach(function (btn) {
+      var active = btn.getAttribute('data-un-radio-value') === value
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/10', active)
+      btn.classList.toggle('text-latam-coral', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('bg-white', !active)
+      btn.classList.toggle('text-slate-600', !active)
+    })
+  }
+
+  function updateUnPanelVisibility() {
+    var metaPanel = document.getElementById('un-meta-panel')
+    var buttons = document.getElementById('un-buttons')
+    var show = !!unState.canal && isUnStep2Open()
+
+    if (!unState.canal) {
+      metaPanel.classList.add('hidden')
+      buttons.classList.add('hidden')
+      buttons.classList.remove('flex')
+      return
+    }
+
+    // Los botones Borrar/Enviar dependen solo de que haya canal elegido
+    // (igual que React: {activeCanal && (...)}), el panel de detalle además
+    // exige que el Paso 2 esté expandido (igual que React: {activeCanal &&
+    // canalStepOpen && (...)}).
+    buttons.classList.remove('hidden')
+    buttons.classList.add('flex')
+
+    var meta = UN_META[unState.canal]
+    document.getElementById('un-meta-title').textContent = meta.title
+    document.getElementById('un-meta-icon').innerHTML = meta.icon
+    document.getElementById('un-btn-enviar-label').textContent = meta.btnLabel
+    var btnEnviar = document.getElementById('un-btn-enviar')
+    btnEnviar.classList.toggle('bg-latam-coral', meta.btnColor === 'coral')
+    btnEnviar.classList.toggle('bg-latam-estrellada', meta.btnColor !== 'coral')
+
+    document.querySelectorAll('[data-un-panel]').forEach(function (panel) {
+      panel.classList.toggle('hidden', panel.getAttribute('data-un-panel') !== unState.canal)
+    })
+    metaPanel.classList.toggle('hidden', !show)
+  }
+
+  function unHandleFileSelect(input) {
+    var f = input.files && input.files[0]
+    if (!f) return
+    unState.file = f
+    document.getElementById('un-fu-idle-calidadArchivo').classList.add('hidden')
+    var done = document.getElementById('un-fu-done-calidadArchivo')
+    done.classList.remove('hidden')
+    done.classList.add('flex')
+    document.getElementById('un-fu-name-calidadArchivo').textContent = f.name
+    document.getElementById('un-fu-size-calidadArchivo').textContent = formatFileSize(f.size)
+  }
+
+  function unClearFilePreview() {
+    var input = document.getElementById('un-fu-input-calidadArchivo')
+    if (input) input.value = ''
+    var idle = document.getElementById('un-fu-idle-calidadArchivo')
+    var done = document.getElementById('un-fu-done-calidadArchivo')
+    if (idle) idle.classList.remove('hidden')
+    if (done) { done.classList.add('hidden'); done.classList.remove('flex') }
+  }
+
+  function unFileDrop(e, btn) {
+    e.preventDefault()
+    fileDragLeave(btn)
+    var f = e.dataTransfer.files && e.dataTransfer.files[0]
+    if (!f) return
+    var input = document.getElementById('un-fu-input-calidadArchivo')
+    var dt = new DataTransfer()
+    dt.items.add(f)
+    input.files = dt.files
+    unHandleFileSelect(input)
+  }
+
+  function unClearFieldErrors() {
+    document.querySelectorAll('.un-fld').forEach(function (el) {
+      el.classList.remove('border-red-400', 'ring-4', 'ring-red-100')
+    })
+  }
+
+  function unShowError(msg) {
+    var el = document.getElementById('un-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function unHideError() {
+    document.getElementById('un-error').classList.add('hidden')
+  }
+  function unShowSuccess() {
+    var el = document.getElementById('un-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function unSetSending(val) {
+    document.getElementById('un-btn-enviar').disabled = val
+    document.getElementById('un-btn-borrar').disabled = val
+    if (!val) document.getElementById('un-btn-enviar-label').textContent = UN_META[unState.canal] ? UN_META[unState.canal].btnLabel : ''
+    else document.getElementById('un-btn-enviar-label').textContent = 'Enviando...'
+  }
+
+  function unResetCanalState() {
+    unState.canal = null
+    unState.radios = {}
+    unState.file = null
+    unClearFilePreview()
+    document.querySelectorAll('[data-un-canal]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'text-latam-estrellada', 'shadow-sm')
+      btn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-600')
+      var icon = btn.querySelector('.un-canal-icon')
+      if (icon) { icon.classList.remove('text-latam-coral'); icon.classList.add('text-slate-400') }
+    })
+    document.querySelectorAll('[data-un-radio]').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-latam-coral')
+      btn.classList.add('border-slate-200', 'bg-white', 'text-slate-600')
+    })
+    updateUnPanelVisibility()
+  }
+
+  function clearUnForm() {
+    document.getElementById('un-form').reset()
+    unClearFieldErrors()
+    unHideError()
+    unResetCanalState()
+  }
+
+  function unResetAfterSubmit() {
+    var form = document.getElementById('un-form')
+    var keep = { correo: true, nombreColaborador: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      el.value = ''
+    }
+    unResetCanalState()
+  }
+
+  async function submitUnForm() {
+    unHideError()
+    unClearFieldErrors()
+
+    var form = document.getElementById('un-form')
+    var firstInvalid = null
+    var ok = true
+    form.querySelectorAll('.un-fld[required]').forEach(function (el) {
+      if (el.offsetParent === null) return
+      if (!(el.value || '').trim()) {
+        ok = false
+        el.classList.add('border-red-400', 'ring-4', 'ring-red-100')
+        if (!firstInvalid) firstInvalid = el
+      }
+    })
+
+    var customError = ''
+    if (unState.canal === 'lanyard' && (!unState.radios.motivo || !unState.radios.base)) {
+      customError = 'Completa los campos obligatorios: selecciona el motivo y la base.'
+    }
+    if (unState.canal === 'calidad' && !unState.radios.calidadTipo) {
+      customError = 'Completa los campos obligatorios: selecciona el tipo de solicitud por calidad.'
+    }
+
+    if (!ok || customError) {
+      if (firstInvalid) firstInvalid.focus()
+      unShowError(customError || 'Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var fd = new FormData(form)
+    var payload = {
+      canal: unState.canal,
+      motivo: unState.radios.motivo || '',
+      base: unState.radios.base || '',
+      calidadTipo: unState.radios.calidadTipo || '',
+    }
+    fd.forEach(function (value, key) { if (key !== 'calidadArchivo') payload[key] = value })
+
+    unSetSending(true)
+    try {
+      var calidadFoto = unState.file ? await fileToBase64(unState.file) : ''
+      payload.calidadFoto = calidadFoto
+      payload.calidadFotoNombre = unState.file ? unState.file.name : ''
+      payload.calidadFotoTipo = unState.file ? unState.file.type : ''
+      await runServer('submitCambioUniforme', payload)
+      unShowSuccess()
+      unResetAfterSubmit()
+    } catch (err) {
+      unShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      unSetSending(false)
+    }
+  }
+</script>

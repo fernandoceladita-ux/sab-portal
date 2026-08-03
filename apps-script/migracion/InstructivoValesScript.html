@@ -1,0 +1,55 @@
+<script>
+  window.selectIvalStep = function (id) {
+    document.querySelectorAll('[data-ival-step]').forEach(function (card) {
+      var active = card.getAttribute('data-ival-step') === String(id)
+      card.classList.toggle('border-latam-coral', active)
+      card.classList.toggle('bg-latam-coral/5', active)
+      card.classList.toggle('shadow-sm', active)
+      card.classList.toggle('border-slate-200', !active)
+      card.classList.toggle('bg-white', !active)
+
+      var num = card.querySelector('.ival-step-num')
+      if (num) { num.classList.toggle('bg-latam-coral', active); num.classList.toggle('text-white', active); num.classList.toggle('bg-slate-100', !active); num.classList.toggle('text-slate-400', !active) }
+      var title = card.querySelector('.ival-step-title')
+      if (title) { title.classList.toggle('text-latam-coral', active); title.classList.toggle('text-latam-estrellada', !active) }
+    })
+    // driveImg() ya resolvió las URLs en el servidor al construir la página;
+    // reutilizamos el <img> ya renderizado en el carrusel móvil (misma
+    // imagen) como fuente para el mockup de escritorio en vez de recalcularla.
+    var desktopImg = document.getElementById('ival-desktop-phone-img')
+    var mobileImg = document.querySelector('img[data-ival-step-img="' + id + '"]')
+    if (desktopImg && mobileImg) desktopImg.src = mobileImg.src
+  }
+
+  window.ivalScrollToIndex = function (i) {
+    var track = document.getElementById('ival-mobile-track')
+    if (!track || !track.children[i]) return
+    track.children[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var track = document.getElementById('ival-mobile-track')
+    if (!track) return
+    var cards = Array.prototype.slice.call(track.children)
+    if (!('IntersectionObserver' in window)) return
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        var visible = entries.filter(function (e) { return e.isIntersecting })
+          .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio })[0]
+        if (!visible) return
+        var idx = cards.indexOf(visible.target)
+        if (idx === -1) return
+        document.querySelectorAll('[data-ival-dot]').forEach(function (dot, i) {
+          var active = i === idx
+          dot.classList.toggle('w-6', active)
+          dot.classList.toggle('bg-latam-coral', active)
+          dot.classList.toggle('w-1.5', !active)
+          dot.classList.toggle('bg-slate-300', !active)
+        })
+      },
+      { root: track, threshold: [0.5, 0.75, 1] }
+    )
+    cards.forEach(function (c) { io.observe(c) })
+  })
+</script>

@@ -47,13 +47,14 @@
     <?!= include('Header') ?>
 
     <main class="flex-1">
-      <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol') { ?>
-        <!-- Home, Gestión Personal y Mi Rol viven SIEMPRE juntas en el mismo
-             documento — showView() en Scripts.html alterna cuál se ve por
-             JS puro, sin navegar. Esto evita depender de que el navegador
-             navegue el iframe (Google Sites, al embeber la Web App, no lo
-             permite: ver conversación — el sandbox interno de Apps Script
-             no tiene permiso para navegar nada por fuera de sí mismo). -->
+      <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol' || modulePageFile === 'GestionOperacional') { ?>
+        <!-- Home, Gestión Personal, Mi Rol y Gestión Operacional viven
+             SIEMPRE juntas en el mismo documento — showView() en
+             Scripts.html alterna cuál se ve por JS puro, sin navegar. Esto
+             evita depender de que el navegador navegue el iframe (Google
+             Sites, al embeber la Web App, no lo permite: ver conversación —
+             el sandbox interno de Apps Script no tiene permiso para navegar
+             nada por fuera de sí mismo). -->
         <div id="view-home" class="<?= page === 'home' ? '' : 'hidden' ?>">
           <?!= include('Home') ?>
         </div>
@@ -62,6 +63,9 @@
         </div>
         <div id="view-mi-rol" class="<?= page === 'mi-rol' ? '' : 'hidden' ?>">
           <?!= include('MiRol', { itemId: itemId }) ?>
+        </div>
+        <div id="view-gestion-operacional" class="<?= page === 'gestion-operacional' ? '' : 'hidden' ?>">
+          <?!= include('GestionOperacional', { itemId: itemId }) ?>
         </div>
       <? } else if (modulePageFile) { ?>
         <?!= include(modulePageFile, { itemId: itemId }) ?>
@@ -73,12 +77,15 @@
     <?!= include('Footer') ?>
     <?!= include('Modals') ?>
     <?!= include('Scripts') ?>
-    <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol') { ?>
+    <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol' || modulePageFile === 'GestionOperacional') { ?>
       <?!= include('ActualizacionDatosScript') ?>
       <?!= include('DomicilioDgacScript') ?>
       <?!= include('SolicitudMesSubsiguienteScript') ?>
       <?!= include('DescansoMedicoScript') ?>
       <?!= include('VacacionesScript') ?>
+      <?!= include('UniformesScript') ?>
+      <?!= include('RegistroSunatScript') ?>
+      <?!= include('InstructivoValesScript') ?>
     <? } ?>
   </body>
 </html>

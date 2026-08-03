@@ -237,3 +237,47 @@
     </div>
   </div>
 </div>
+
+<!-- ============ Modal: QR de Descarga (Instructivo de Vales) ============ -->
+<!-- Vive acá (top-level, junto a los demás modales) y NO dentro de
+     InstructivoValesView.html: esa vista queda anidada dentro de
+     #detalle-seleccion-go, que tiene la clase "reveal" — al hacer scroll-in
+     se le agregan las clases translate-y-0/opacity-100 (ver Scripts.html) y
+     translate-y-0 deja un transform (aunque sea "0") permanentemente
+     aplicado. Cualquier transform en un ancestro convierte a los
+     descendientes position:fixed en fixed respecto a ESE ancestro, no al
+     viewport real — por eso el modal salía descentrado/cortado en vez de
+     centrado en la pantalla. Los modales existentes (news/reporte/
+     absentismo) nunca sufrieron esto porque siempre vivieron acá, fuera de
+     cualquier contenedor con transform. -->
+<div id="ival-modal-qr" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center bg-latam-profunda/60 p-4 backdrop-blur-sm" onclick="closeModalBackdrop(event, 'ival-modal-qr')">
+  <div class="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-card" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <h3 class="text-base font-extrabold text-latam-estrellada">Código QR de Descarga</h3>
+      <button type="button" onclick="closeModal('ival-modal-qr')" aria-label="Cerrar" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-latam-coral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+      </button>
+    </div>
+    <div class="p-5">
+      <img src="<?= driveImg('ivalQr', 700) ?>" alt="Código QR para descargar la app" class="w-full rounded-xl" />
+      <a href="#" target="_blank" rel="noopener noreferrer" class="mt-2 flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-5 py-3 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-latam-coral">
+        Abrir enlace de descarga directo
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modal: Red de Restaurantes Autorizados (Instructivo de Vales) ============ -->
+<div id="ival-modal-restaurantes" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center bg-latam-profunda/60 p-4 backdrop-blur-sm" onclick="closeModalBackdrop(event, 'ival-modal-restaurantes')">
+  <div class="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-card" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <h3 class="text-base font-extrabold text-latam-estrellada">Red de Restaurantes Autorizados</h3>
+      <button type="button" onclick="closeModal('ival-modal-restaurantes')" aria-label="Cerrar" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-latam-coral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+      </button>
+    </div>
+    <div class="p-5">
+      <img src="<?= driveImg('ivalRestaurantes', 900) ?>" alt="Mapa de restaurantes autorizados" class="w-full rounded-xl" />
+    </div>
+  </div>
+</div>

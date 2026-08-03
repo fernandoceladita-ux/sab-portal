@@ -1,0 +1,229 @@
+<div class="mx-auto max-w-4xl animate-fadeUp">
+  <div class="mb-6 flex items-start gap-3 p-5 text-slate-600">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-5 w-5 flex-shrink-0 text-latam-coral"><path d="M12 3.5l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" /></svg>
+    <p class="text-sm leading-relaxed">
+      <strong class="font-extrabold text-latam-coral">Tripulante en Reserva de Aeropuerto:</strong> Si te encuentras bajo
+      asignación de reserva en el aeropuerto, hasta próximo aviso, el procedimiento digital varía: deberás recoger
+      tu vale en formato físico en la Oficina de Ventas para ser canjeado exclusivamente en el restaurante
+      <strong>PeruSuyo Mercado Peruano</strong>.
+    </p>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white p-5">
+    <p class="mb-4 text-sm font-extrabold uppercase tracking-wide text-latam-estrellada">Guía de Uso</p>
+
+    <!-- ===== Desktop ===== -->
+    <div class="hidden gap-6 sm:grid sm:grid-cols-[1.1fr_0.9fr]">
+      <div class="flex flex-col gap-3">
+        <div data-ival-step="1" onclick="selectIvalStep(1)" class="cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 border-latam-coral bg-latam-coral/5 shadow-sm">
+          <div class="flex items-start gap-3">
+            <span class="ival-step-num flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition bg-latam-coral text-white">1</span>
+            <div class="min-w-0">
+              <p class="ival-step-title flex items-center gap-1.5 text-sm font-extrabold text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="7" y="2.5" width="10" height="19" rx="2.2" /><path d="M11 18h2" stroke-linecap="round" /></svg>
+                Acceso y Descarga de la App
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-600"><strong class="text-slate-800">Tripulación de Cabina:</strong> ingresa desde tu One Device. <strong class="text-slate-800">Tripulación de Mando:</strong> descarga la app escaneando el código QR.</p>
+              <button type="button" onclick="event.stopPropagation(); openModal('ival-modal-qr')" class="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z" /></svg>
+                Ver QR de Descarga
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div data-ival-step="2" onclick="selectIvalStep(2)" class="cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 border-slate-200 bg-white hover:border-latam-estrellada/30">
+          <div class="flex items-start gap-3">
+            <span class="ival-step-num flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition bg-slate-100 text-slate-400">2</span>
+            <div class="min-w-0">
+              <p class="ival-step-title flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round" /></svg>
+                Visualiza tu Vale
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-600">Ingresa a la sección "Generar Vale". Allí podrás encontrar el vale asignado y disponible del día de manera inmediata.</p>
+            </div>
+          </div>
+        </div>
+
+        <div data-ival-step="3" onclick="selectIvalStep(3)" class="cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 border-slate-200 bg-white hover:border-latam-estrellada/30">
+          <div class="flex items-start gap-3">
+            <span class="ival-step-num flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition bg-slate-100 text-slate-400">3</span>
+            <div class="min-w-0">
+              <p class="ival-step-title flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z" /></svg>
+                Genera el Código QR
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-600">Haz clic en la opción "Generar Vale". Se procesará la solicitud interna para emitir el código correspondiente para tu consumo.</p>
+            </div>
+          </div>
+        </div>
+
+        <div data-ival-step="4" onclick="selectIvalStep(4)" class="cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 border-slate-200 bg-white hover:border-latam-estrellada/30">
+          <div class="flex items-start gap-3">
+            <span class="ival-step-num flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition bg-slate-100 text-slate-400">4</span>
+            <div class="min-w-0">
+              <p class="ival-step-title flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Presenta y Canjea
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-600">Muestra el código QR generado en caja para que sea escaneado por el restaurante. También tienes la opción de dictar el código alfanumérico en pantalla.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center rounded-2xl bg-slate-50 p-6">
+        <div class="relative mx-auto w-full max-w-[230px]">
+          <div class="relative overflow-hidden rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 shadow-card">
+            <span class="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-lg bg-slate-900"></span>
+            <img id="ival-desktop-phone-img" src="<?= driveImg('ivalPaso1', 400) ?>" alt="Acceso y Descarga de la App" class="w-full animate-fadeIn" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Mobile ===== -->
+    <div class="sm:hidden">
+      <div id="ival-mobile-track" class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
+        <div class="flex w-[82%] flex-shrink-0 snap-center flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="mb-3 flex items-center gap-2.5">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white">1</span>
+            <p class="flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="7" y="2.5" width="10" height="19" rx="2.2" /><path d="M11 18h2" stroke-linecap="round" /></svg>
+              Acceso y Descarga de la App
+            </p>
+          </div>
+          <p class="text-sm leading-relaxed text-slate-600"><strong class="text-slate-800">Tripulación de Cabina:</strong> ingresa desde tu One Device. <strong class="text-slate-800">Tripulación de Mando:</strong> descarga la app escaneando el código QR.</p>
+          <button type="button" onclick="openModal('ival-modal-qr')" class="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z" /></svg>
+            Ver QR de Descarga
+          </button>
+          <div class="mt-4 flex justify-center rounded-xl bg-slate-50 p-4">
+            <div class="relative mx-auto w-full max-w-[230px]">
+              <div class="relative overflow-hidden rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 shadow-card">
+                <span class="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-lg bg-slate-900"></span>
+                <img data-ival-step-img="1" src="<?= driveImg('ivalPaso1', 400) ?>" alt="Acceso y Descarga de la App" class="w-full animate-fadeIn" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex w-[82%] flex-shrink-0 snap-center flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="mb-3 flex items-center gap-2.5">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white">2</span>
+            <p class="flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round" /></svg>
+              Visualiza tu Vale
+            </p>
+          </div>
+          <p class="text-sm leading-relaxed text-slate-600">Ingresa a la sección "Generar Vale". Allí podrás encontrar el vale asignado y disponible del día de manera inmediata.</p>
+          <div class="mt-4 flex justify-center rounded-xl bg-slate-50 p-4">
+            <div class="relative mx-auto w-full max-w-[230px]">
+              <div class="relative overflow-hidden rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 shadow-card">
+                <span class="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-lg bg-slate-900"></span>
+                <img data-ival-step-img="2" src="<?= driveImg('ivalPaso2', 400) ?>" alt="Visualiza tu Vale" class="w-full animate-fadeIn" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex w-[82%] flex-shrink-0 snap-center flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="mb-3 flex items-center gap-2.5">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white">3</span>
+            <p class="flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z" /></svg>
+              Genera el Código QR
+            </p>
+          </div>
+          <p class="text-sm leading-relaxed text-slate-600">Haz clic en la opción "Generar Vale". Se procesará la solicitud interna para emitir el código correspondiente para tu consumo.</p>
+          <div class="mt-4 flex justify-center rounded-xl bg-slate-50 p-4">
+            <div class="relative mx-auto w-full max-w-[230px]">
+              <div class="relative overflow-hidden rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 shadow-card">
+                <span class="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-lg bg-slate-900"></span>
+                <img data-ival-step-img="3" src="<?= driveImg('ivalPaso3', 400) ?>" alt="Genera el Código QR" class="w-full animate-fadeIn" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex w-[82%] flex-shrink-0 snap-center flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="mb-3 flex items-center gap-2.5">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white">4</span>
+            <p class="flex items-center gap-1.5 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              Presenta y Canjea
+            </p>
+          </div>
+          <p class="text-sm leading-relaxed text-slate-600">Muestra el código QR generado en caja para que sea escaneado por el restaurante. También tienes la opción de dictar el código alfanumérico en pantalla.</p>
+          <div class="mt-4 flex justify-center rounded-xl bg-slate-50 p-4">
+            <div class="relative mx-auto w-full max-w-[230px]">
+              <div class="relative overflow-hidden rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 shadow-card">
+                <span class="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-lg bg-slate-900"></span>
+                <img data-ival-step-img="4" src="<?= driveImg('ivalPaso4', 400) ?>" alt="Presenta y Canjea" class="w-full animate-fadeIn" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ival-mobile-dots" class="mt-4 flex items-center justify-center gap-2">
+        <button type="button" data-ival-dot="0" onclick="ivalScrollToIndex(0)" aria-label="Ir al paso 1" class="h-1.5 w-6 rounded-full bg-latam-coral transition-all duration-300"></button>
+        <button type="button" data-ival-dot="1" onclick="ivalScrollToIndex(1)" aria-label="Ir al paso 2" class="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 hover:bg-slate-400"></button>
+        <button type="button" data-ival-dot="2" onclick="ivalScrollToIndex(2)" aria-label="Ir al paso 3" class="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 hover:bg-slate-400"></button>
+        <button type="button" data-ival-dot="3" onclick="ivalScrollToIndex(3)" aria-label="Ir al paso 4" class="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 hover:bg-slate-400"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Consideraciones de Uso (accordion) ===== -->
+  <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <button type="button" onclick="toggleAccordion('ival-consid-body','ival-consid-chevron')" class="flex w-full items-center gap-2.5 px-5 py-4 text-left transition hover:bg-slate-50">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.7" stroke-linecap="round" /><circle cx="12" cy="16.5" r=".9" fill="currentColor" stroke="none" /></svg>
+      <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Consideraciones de Uso</span>
+      <svg id="ival-consid-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+    </button>
+    <div id="ival-consid-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+      <div class="overflow-hidden">
+        <div class="grid grid-cols-1 gap-3 border-t border-slate-100 p-5 sm:grid-cols-2">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5">
+            <p class="mb-1.5 flex items-center gap-2 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="3" y="5" width="18" height="14" rx="2.5" /><circle cx="9" cy="12" r="2" /><path d="M14 10h4M14 14h4M6 16.5c.5-1.6 1.8-2.5 3-2.5s2.5.9 3 2.5" stroke-linecap="round" /></svg>
+              Historial de Pendientes
+            </p>
+            <p class="text-sm leading-relaxed text-slate-600">En la sección "Vales generados" podrás encontrar todos los vales que emitiste pero que aún no han sido canjeados en restaurantes.</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5">
+            <p class="mb-1.5 flex items-center gap-2 text-sm font-extrabold text-latam-coral">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              Vencimiento Diario
+            </p>
+            <p class="text-sm leading-relaxed text-slate-600">Una vez generado el vale, este puede ser usado una sola vez y hasta finalizar el día. Pasado este lapso, el vale vencerá automáticamente.</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5">
+            <p class="mb-1.5 flex items-center gap-2 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              Control de Consumo
+            </p>
+            <p class="text-sm leading-relaxed text-slate-600">En la sección "Vales usados" podrás validar el detalle histórico del vale que canjeaste y la información desglosada de lo consumido.</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5">
+            <p class="mb-1.5 flex items-center gap-2 text-sm font-extrabold text-latam-estrellada">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><path d="M2 8.5a15.5 15.5 0 0 1 20 0M5 12a10.6 10.6 0 0 1 14 0M8.3 15.5a5.8 5.8 0 0 1 7.4 0" stroke-linecap="round" /><circle cx="12" cy="19" r="1.1" fill="currentColor" stroke="none" /></svg>
+              Conexión Recomendada
+            </p>
+            <p class="text-sm leading-relaxed text-slate-600">Busca contar con una conexión a internet estable en tu dispositivo móvil al momento de generar el QR para un rendimiento óptimo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" onclick="openModal('ival-modal-restaurantes')" class="mt-4 flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-left transition hover:-translate-y-0.5 hover:border-latam-estrellada/40 hover:shadow-sm">
+    <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral/10">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><path d="M7 2.5v7M5 2.5v7M9 2.5v7M7 9.5v12M17 2.5c-2 0-3.5 2-3.5 5s1.5 5 3.5 5M17 2.5c2 0 3.5 2 3.5 5s-1.5 5-3.5 5M17 12.5v9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </span>
+    <span class="flex-1 text-sm font-extrabold text-latam-estrellada">Red de Restaurantes Autorizados</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-slate-400"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>
+  </button>
+  <p class="mt-2 px-1 text-xs text-slate-400">Toca el título para ver el mapa completo.</p>
+</div>

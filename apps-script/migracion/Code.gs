@@ -45,6 +45,16 @@ const DRIVE_ASSETS = {
   tituloHero: '1Ydays4nRyJBy_PZETHoUyss--2h-8YyL',
   logoLatam: '11abTjcpbU5KzruNghEI1SdIHu9zNAVVQ',
   noticiaReembolso: '1G0E9rbgM_f_s2mkjArcwe4hZsRFczoLN',
+  // TODO: subir a Drive las 6 imágenes de public/img/gestion-operativa/instructivo_vales/
+  // (paso1.png, paso2.png, paso3.png, paso4.png, "codigo QR de la app.png",
+  // restaurantes_autorizados.png), compartir cada una como "Cualquier persona
+  // con el enlace: Lector", y reemplazar los IDs de abajo (ver driveImg()).
+  ivalPaso1: '1uyqCHhy_j-mI9kLUgmkWi6E6D5WKI7Vb',
+  ivalPaso2: '1-QCLM780SoTYxYMwWmiFtlblDj5BkkGF',
+  ivalPaso3: '1hgl13vh39MGJ__aRM8zxqpwp4aUJplkM',
+  ivalPaso4: '1fyFbkwdIOE99REPIqL2BQY0_ernsL0RI',
+  ivalQr: '1wVTAsdBavm-wzkLS4Ez2dG5QR0Ni7YNz',
+  ivalRestaurantes: '1YyPyg0WQNTbI2efGo1waoiQn0ItHJTxE',
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no
@@ -52,6 +62,7 @@ const DRIVE_ASSETS = {
 const MODULE_PAGES = {
   'gestion-personal': 'GestionPersonal',
   'mi-rol': 'MiRol',
+  'gestion-operacional': 'GestionOperacional',
 }
 
 // Mismos hex que bg-latam-* en tailwind.config.js. Se inyectan como
@@ -140,6 +151,13 @@ const MES_SUBSIGUIENTE_GID = 1379865326
 const DESCANSO_MEDICO_GID = 1801672376
 const DESCANSO_MEDICO_FOLDER_ID = '1GD46b5Zigv8wSKE2jdpNwJnJV3-JH4JW'
 const VACACIONES_GID = 1772728526
+
+// Mismos GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
+// los trámites del módulo "Gestión Operacional" — comparten el mismo Sheet
+// y Drive reales.
+const UNIFORMES_GID = 815933579
+const UNIFORMES_FOLDER_ID = '1ivO-uXw8HWzFICk0w3RzPwUv7tnYHNDT'
+const REGISTRO_SUNAT_GID = 1592932357
 
 // Máximo de envíos aceptados por minuto, contados globalmente.
 const RATE_LIMIT_PER_MINUTE = 20
@@ -386,6 +404,88 @@ function buildVacacionesRow(data, correo) {
     'BP Beneficiario (Cesión)': sanitizeValue(data.beneficiarioBP),
     'Nombre Beneficiario (Cesión)': sanitizeValue(data.beneficiarioNombre),
     'Bloque de Días a Ceder (Cesión)': sanitizeValue(data.bloqueDias),
+  }
+}
+
+// Llamada desde UniformesScript.html vía
+// `google.script.run.submitCambioUniforme(payload)`.
+// A diferencia de los demás trámites, Cambio de Uniforme no tiene un único
+// campo bp/nombre (varía según canal: lanyard o calidad), así que valida
+// correo/nombreColaborador en vez de la regla genérica bp+nombre.
+function submitCambioUniforme(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+  if (!String(data.nombreColaborador || '').trim()) {
+    throw new Error('Nombre y apellidos son obligatorios')
+  }
+
+  const fotoUrl = data.calidadFoto
+    ? uploadFileToDrive(data.calidadFoto, data.calidadFotoNombre, data.calidadFotoTipo, UNIFORMES_FOLDER_ID)
+    : ''
+
+  writeToSheet(UNIFORMES_GID, buildUniformesRow(data, correo, fotoUrl))
+  return { status: 'ok' }
+}
+
+function buildUniformesRow(data, correo, fotoUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'Nombre Colaborador': sanitizeValue(data.nombreColaborador),
+    'Canal': sanitizeValue(data.canal),
+    'BP (Lanyard)': sanitizeValue(data.lanyardBP),
+    'Nombre (Lanyard)': sanitizeValue(data.lanyardNombre),
+    'Motivo (Lanyard)': sanitizeValue(data.motivo),
+    'Base (Lanyard)': sanitizeValue(data.base),
+    'BP (Calidad)': sanitizeValue(data.calidadBP),
+    'Nombre (Calidad)': sanitizeValue(data.calidadNombre),
+    'Tipo de Solicitud (Calidad)': sanitizeValue(data.calidadTipo),
+    'Detalle (Calidad)': sanitizeValue(data.calidadDetalle),
+    'Foto de Prenda (Calidad)': fotoUrl || '',
+  }
+}
+
+// Llamada desde RegistroSunatScript.html vía
+// `google.script.run.submitRegistroSunat(payload)`.
+function submitRegistroSunat(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  writeToSheet(REGISTRO_SUNAT_GID, buildRegistroSunatRow(data, correo))
+  return { status: 'ok' }
+}
+
+function buildRegistroSunatRow(data, correo) {
+  return {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'BP': sanitizeValue(data.bp),
+    'Nombre': sanitizeValue(data.nombre),
+    'Fecha de Nacimiento': sanitizeValue(data.fechaNacimiento),
+    'Pasaporte': sanitizeValue(data.pasaporte),
+    'Tipo de Equipo': sanitizeValue(data.tipoEquipo),
+    'Uso': sanitizeValue(data.uso),
+    'Marca': sanitizeValue(data.marca),
+    'Modelo': sanitizeValue(data.modelo),
+    'Serie': sanitizeValue(data.serie),
   }
 }
 

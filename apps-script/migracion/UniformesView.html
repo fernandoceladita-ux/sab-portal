@@ -1,0 +1,153 @@
+<form id="un-form" novalidate class="mx-auto max-w-3xl animate-fadeUp">
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Gestiona de manera prioritaria el abastecimiento, reemplazo de lanyards o reporte de prendas debido a
+    contingencias operacionales o problemas de calidad en fábrica.
+  </p>
+
+  <div class="mt-6">
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('un-step-1-body','un-step-1-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">1</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Identificación del Colaborador</span>
+          <svg id="un-step-1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="un-step-1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico Corporativo <span class="text-latam-coral">*</span></label>
+                <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" placeholder="nombre.apellido@latam.com" class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombre y Apellidos <span class="text-latam-coral">*</span></label>
+                <input type="text" name="nombreColaborador" required class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleUnStep2()" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">2</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Selecciona el canal o requerimiento de uniformes</span>
+          <svg id="un-step-2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="un-step-2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <button type="button" data-un-canal="armario" onclick="selectUnCanal('armario', true)" class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada/40">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400"><path d="M8 4 6 6.5 4 5M16 4l2 2.5 2-1.5M8 4l4 3 4-3M12 7v13M6 9l-2 1v9h4v-6M18 9l2 1v9h-4v-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                  <span>Plataforma Armario Latam (Click aquí)</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="ml-auto h-4 w-4 flex-shrink-0 text-slate-400"><circle cx="8" cy="15" r="3.5" /><path d="M10.5 12.5 18 5M18 5h-4M18 5v4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </button>
+                <button type="button" data-un-canal="lanyard" onclick="selectUnCanal('lanyard', false)" class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada/40">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="un-canal-icon mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9V4Z" /><path d="M8.5 12h7M8.5 15.5h4.5" stroke-linecap="round" /></svg>
+                  <span>Solicitud de lanyard por daño o pérdida</span>
+                </button>
+                <button type="button" data-un-canal="calidad" onclick="selectUnCanal('calidad', false)" class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-bold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada/40">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="un-canal-icon mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                  <span>Formulario para cambio de uniforme por problemas de calidad</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="un-meta-panel" class="hidden animate-fadeUp overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+    <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+      <svg id="un-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"></svg>
+      <span id="un-meta-title"></span>
+    </div>
+    <div class="bg-[#fafbfc] px-5 py-6">
+
+      <div data-un-panel="lanyard" class="hidden">
+        <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Ingresar BP <span class="text-latam-coral">*</span></label><input type="text" name="lanyardBP" required class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombre Completo <span class="text-latam-coral">*</span></label><input type="text" name="lanyardNombre" required class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+        </div>
+        <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Motivo <span class="text-latam-coral">*</span></label>
+            <div class="flex flex-wrap gap-3">
+              <button type="button" data-un-radio="motivo" data-un-radio-value="Rotura" onclick="selectUnRadio('motivo','Rotura')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">Rotura</button>
+              <button type="button" data-un-radio="motivo" data-un-radio-value="Desgaste" onclick="selectUnRadio('motivo','Desgaste')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">Desgaste</button>
+              <button type="button" data-un-radio="motivo" data-un-radio-value="Pérdida" onclick="selectUnRadio('motivo','Pérdida')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">Pérdida</button>
+            </div>
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-latam-estrellada">Base <span class="text-latam-coral">*</span></label>
+            <div class="flex flex-wrap gap-3">
+              <button type="button" data-un-radio="base" data-un-radio-value="LP" onclick="selectUnRadio('base','LP')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">LP</button>
+              <button type="button" data-un-radio="base" data-un-radio-value="XL" onclick="selectUnRadio('base','XL')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">XL</button>
+              <button type="button" data-un-radio="base" data-un-radio-value="4C" onclick="selectUnRadio('base','4C')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">4C</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-un-panel="calidad" class="hidden">
+        <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">BP <span class="text-latam-coral">*</span></label><input type="text" name="calidadBP" required class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+          <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombre <span class="text-latam-coral">*</span></label><input type="text" name="calidadNombre" required class="un-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Descripción de solicitud por calidad <span class="text-latam-coral">*</span></label>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" data-un-radio="calidadTipo" data-un-radio-value="Error de talla (si es una talla más no aplica cambio)" onclick="selectUnRadio('calidadTipo','Error de talla (si es una talla más no aplica cambio)')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">Error de talla (si es una talla más no aplica cambio)</button>
+            <button type="button" data-un-radio="calidadTipo" data-un-radio-value="Mala calidad (escribir en detalles fecha estimada en que recibió prenda o artículo)" onclick="selectUnRadio('calidadTipo','Mala calidad (escribir en detalles fecha estimada en que recibió prenda o artículo)')" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:border-slate-300">Mala calidad (escribir en detalles fecha estimada en que recibió prenda o artículo)</button>
+          </div>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Detallar cuál fue el error en la talla o el problema por la mala calidad <span class="text-latam-coral">*</span></label>
+          <textarea name="calidadDetalle" rows="4" required placeholder="Escribe tu respuesta detallada aquí..." class="un-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Subir foto de prenda o artículo con etiqueta <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(es necesario para identificar qué proveedor es) · Formatos válidos: JPG, PNG, PDF · Máx 10 MB</span></label>
+          <div id="un-fu-idle-calidadArchivo">
+            <button type="button" onclick="document.getElementById('un-fu-input-calidadArchivo').click()" ondragover="fileDragOver(event, this)" ondragleave="fileDragLeave(this)" ondrop="unFileDrop(event, this)" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-7 text-center transition-all hover:border-latam-estrellada hover:bg-latam-estrellada/5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-latam-estrellada"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span class="text-sm font-semibold text-slate-600">Haz clic aquí para subir el archivo o arrastra la imagen</span>
+              <span class="text-xs text-slate-400">Formatos permitidos: JPG PNG PDF (Máx. 10MB)</span>
+            </button>
+          </div>
+          <div id="un-fu-done-calidadArchivo" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+            <div class="flex min-w-0 items-center gap-2.5">
+              <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+              <div class="min-w-0"><p id="un-fu-name-calidadArchivo" class="truncate text-sm font-bold text-slate-700"></p><p id="un-fu-size-calidadArchivo" class="text-xs text-slate-400"></p></div>
+            </div>
+            <button type="button" onclick="unClearFilePreview()" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-latam-coral">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+            </button>
+          </div>
+          <input id="un-fu-input-calidadArchivo" name="calidadArchivo" type="file" accept=".jpg,.jpeg,.png,.pdf" required class="sr-only" onchange="unHandleFileSelect(this)" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="un-buttons" class="mt-7 hidden flex-col-reverse justify-end gap-3 sm:flex-row">
+    <button type="button" onclick="clearUnForm()" id="un-btn-borrar" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50">
+      Borrar formulario
+    </button>
+    <button type="button" onclick="submitUnForm()" id="un-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50">
+      <span id="un-btn-enviar-label">Enviar Solicitud de Lanyard</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div id="un-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="un-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Solicitud enviada correctamente a los sistemas de soporte.
+  </div>
+</form>

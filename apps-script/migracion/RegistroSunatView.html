@@ -1,0 +1,107 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Completa el formulario integrado abajo para registrar tus herramientas de trabajo tecnológicas corporativas y
+    personales.
+  </p>
+
+  <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="flex flex-col items-start gap-2 rounded-2xl bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-card">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-latam-coral/10">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><rect x="3" y="5" width="18" height="14" rx="2.5" /><circle cx="9" cy="12" r="2" /><path d="M14 10h4M14 14h4M6 16.5c.5-1.6 1.8-2.5 3-2.5s2.5.9 3 2.5" stroke-linecap="round" /></svg>
+      </span>
+      <h4 class="text-[13.5px] font-extrabold text-latam-estrellada">Límite de Registro</h4>
+      <p class="text-[12.5px] leading-relaxed text-slate-500">Se puede registrar un solo artículo por persona de forma activa.</p>
+    </div>
+    <div class="flex flex-col items-start gap-2 rounded-2xl bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-card">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-latam-coral/10">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </span>
+      <h4 class="text-[13.5px] font-extrabold text-latam-estrellada">Vigencia</h4>
+      <p class="text-[12.5px] leading-relaxed text-slate-500">No es necesario actualizar o volver a realizar este proceso si no se cambia el artículo.</p>
+    </div>
+    <div class="flex flex-col items-start gap-2 rounded-2xl bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-card">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-latam-coral/10">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </span>
+      <h4 class="text-[13.5px] font-extrabold text-latam-estrellada">Restricción por Cambio</h4>
+      <p class="text-[12.5px] leading-relaxed text-slate-500">En caso que cambie el artículo, debe esperar un año para volver a registrarlo.</p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-2xl border-t-4 border-latam-estrellada bg-white shadow-card">
+    <div class="flex items-center gap-2 bg-latam-estrellada px-5 py-3.5 text-[15px] font-bold text-white">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3ZM14 5l4 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Formulario Digital de Inscripción
+    </div>
+
+    <form id="rs-form" novalidate class="bg-[#fafbfc] px-5 py-6">
+      <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+        <div class="mb-5 sm:col-span-2">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico <span class="text-latam-coral">*</span></label>
+          <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" placeholder="nombre.apellido@latam.com" class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">BP <span class="text-latam-coral">*</span></label>
+          <input type="text" name="bp" required class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Apellidos y Nombres <span class="text-latam-coral">*</span></label>
+          <input type="text" name="nombre" required class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Nacimiento <span class="text-latam-coral">*</span></label>
+          <input type="date" name="fechaNacimiento" required class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Pasaporte <span class="text-latam-coral">*</span></label>
+          <input type="text" name="pasaporte" required placeholder="Ingresa el número de pasaporte" class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Tipo de Equipo <span class="text-latam-coral">*</span></label>
+          <select name="tipoEquipo" required class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+            <option value="" disabled selected>Elegir una opción...</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Tablet">Tablet</option>
+          </select>
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Uso <span class="text-latam-coral">*</span></label>
+          <select name="uso" required class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
+            <option value="" disabled selected>Elegir una opción...</option>
+            <option value="Uso Corporativo">Uso Corporativo</option>
+            <option value="Uso Mixto (Corporativo y Personal)">Uso Mixto (Corporativo y Personal)</option>
+            <option value="Uso Personal">Uso Personal</option>
+          </select>
+        </div>
+        <div class="mb-5 sm:col-span-2">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Marca <span class="text-latam-coral">*</span></label>
+          <input type="text" name="marca" required placeholder="Ej. Lenovo, Apple, HP" class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Modelo <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Ingresar sin guiones)</span></label>
+          <input type="text" name="modelo" required placeholder="Ej. ThinkPad T490" class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-latam-estrellada">Serie <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Ingresar sin guiones)</span></label>
+          <input type="text" name="serie" required placeholder="Ej. PF1K2345" class="rs-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+      </div>
+
+      <div class="mt-2 flex flex-col-reverse justify-end gap-3 sm:flex-row">
+        <button type="button" onclick="clearRsForm()" id="rs-btn-borrar" class="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-slate-600 transition hover:-translate-y-0.5 hover:border-latam-estrellada hover:text-latam-estrellada disabled:cursor-not-allowed disabled:opacity-50">
+          Borrar formulario
+        </button>
+        <button type="button" onclick="submitRsForm()" id="rs-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50">
+          <span id="rs-btn-enviar-label">Enviar Registro</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="rs-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="rs-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Registro enviado correctamente a los sistemas de soporte.
+  </div>
+</div>

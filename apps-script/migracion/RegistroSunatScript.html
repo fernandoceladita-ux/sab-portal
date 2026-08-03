@@ -1,0 +1,87 @@
+<script>
+  function rsClearFieldErrors() {
+    document.querySelectorAll('.rs-fld').forEach(function (el) {
+      el.classList.remove('border-red-400', 'ring-4', 'ring-red-100')
+    })
+  }
+
+  function rsShowError(msg) {
+    var el = document.getElementById('rs-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function rsHideError() {
+    document.getElementById('rs-error').classList.add('hidden')
+  }
+  function rsShowSuccess() {
+    var el = document.getElementById('rs-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function rsSetSending(val) {
+    document.getElementById('rs-btn-enviar').disabled = val
+    document.getElementById('rs-btn-borrar').disabled = val
+    document.getElementById('rs-btn-enviar-label').textContent = val ? 'Guardando...' : 'Enviar Registro'
+  }
+
+  function clearRsForm() {
+    document.getElementById('rs-form').reset()
+    rsClearFieldErrors()
+    rsHideError()
+  }
+
+  function rsResetAfterSubmit() {
+    var form = document.getElementById('rs-form')
+    var keep = { correo: true, bp: true, nombre: true }
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (!el.name || keep[el.name]) continue
+      el.value = ''
+    }
+  }
+
+  async function submitRsForm() {
+    rsHideError()
+    rsClearFieldErrors()
+
+    var form = document.getElementById('rs-form')
+    var firstInvalid = null
+    var ok = true
+    form.querySelectorAll('.rs-fld[required]').forEach(function (el) {
+      var val = (el.value || '').trim()
+      var invalid = !val
+      if (!invalid && el.type === 'email') invalid = !/.+@latam\.com$/i.test(val)
+      if (invalid) {
+        ok = false
+        el.classList.add('border-red-400', 'ring-4', 'ring-red-100')
+        if (!firstInvalid) firstInvalid = el
+      }
+    })
+
+    if (!ok) {
+      if (firstInvalid) firstInvalid.focus()
+      rsShowError('Revisa los campos marcados: son obligatorios.')
+      return
+    }
+
+    var fd = new FormData(form)
+    var payload = {}
+    fd.forEach(function (value, key) { payload[key] = value })
+
+    rsSetSending(true)
+    try {
+      await runServer('submitRegistroSunat', payload)
+      rsShowSuccess()
+      rsResetAfterSubmit()
+    } catch (err) {
+      rsShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      rsSetSending(false)
+    }
+  }
+</script>
