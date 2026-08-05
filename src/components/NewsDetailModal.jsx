@@ -28,7 +28,7 @@ function renderHighlighted(text) {
 
 function GalleryCard({ item }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 backdrop-blur-sm">
+    <div className="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
       <img src={`${import.meta.env.BASE_URL}${item.image}`} alt={item.caption ?? ''} className="block aspect-video w-full object-cover" />
       {item.caption && (
         <p className="px-3.5 py-2.5 text-[12.5px] font-semibold leading-snug text-white">{renderHighlighted(item.caption)}</p>
@@ -39,7 +39,7 @@ function GalleryCard({ item }) {
 
 function HotelCard({ hotel }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 backdrop-blur-sm">
+    <div className="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
       {hotel.image && (
         <img src={`${import.meta.env.BASE_URL}${hotel.image}`} alt={hotel.title} className="block aspect-video w-full object-cover" />
       )}
@@ -76,7 +76,7 @@ function PersonCard({ person }) {
 
 function RecognitionGroup({ group }) {
   return (
-    <div className="rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
+    <div className="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
       <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-white/10 pb-2.5">
         <IconStar className="h-4 w-4 flex-shrink-0 text-latam-coral" />
         <h4 className="text-[13px] font-extrabold text-white">{group.title}</h4>
@@ -99,7 +99,7 @@ function RecognitionGroup({ group }) {
 function InfoCard({ section }) {
   const Icon = SECTION_ICONS[section.icon] ?? IconClipboard
   return (
-    <div className="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+    <div className="flex flex-col rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
       <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
         <Icon className="h-4 w-4 flex-shrink-0 text-latam-coral" />
         <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-white">{section.title}</h4>
