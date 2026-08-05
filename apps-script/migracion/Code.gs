@@ -55,6 +55,16 @@ const DRIVE_ASSETS = {
   ivalPaso4: '1fyFbkwdIOE99REPIqL2BQY0_ernsL0RI',
   ivalQr: '1wVTAsdBavm-wzkLS4Ez2dG5QR0Ni7YNz',
   ivalRestaurantes: '1YyPyg0WQNTbI2efGo1waoiQn0ItHJTxE',
+  gestionOperacionalHero: '1PZ9-miuYDUaibtYeKgFiFqN7tHZ-hyb9',
+  // TODO: pegar los IDs reales de Drive para el header y las 5 tarjetas de
+  // Gestión Personal (compartir cada archivo como "Cualquier persona con el
+  // enlace: Lector" antes, o driveImg() devolverá '').
+  gestionPersonalHero: 'REEMPLAZAR_GESTION_PERSONAL_HERO',
+  actualizacionDatosCard: 'REEMPLAZAR_ACTUALIZACION_DATOS_CARD',
+  renovacionFotocheckCard: 'REEMPLAZAR_RENOVACION_FOTOCHECK_CARD',
+  domicilioDgacCard: 'REEMPLAZAR_DOMICILIO_DGAC_CARD',
+  vacunaFiebreAmarillaCard: 'REEMPLAZAR_VACUNA_FIEBRE_AMARILLA_CARD',
+  visaPasaporteCard: 'REEMPLAZAR_VISA_PASAPORTE_CARD',
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no

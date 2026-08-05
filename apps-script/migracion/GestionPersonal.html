@@ -1,6 +1,6 @@
 <section
   class="relative flex min-h-[200px] items-end bg-cover bg-center px-5 py-7 sm:min-h-[220px] sm:px-10"
-  style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1400&amp;q=70')"
+  style="background-image:url('<?= driveImg('gestionPersonalHero', 1400) ?>')"
 >
   <div class="absolute inset-0 bg-gradient-to-r from-latam-profunda/90 via-latam-profunda/70 to-latam-profunda/30"></div>
   <div class="relative z-10 max-w-xl animate-fadeUp">
@@ -18,7 +18,7 @@
     <div id="hub-carousel-track" class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-[calc(50%-125px)] pb-16 pt-6 sm:px-0">
       <button type="button" id="carousel-item-actualizacion-datos" data-hub-card onclick="selectHubItem('actualizacion-datos')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
         <div class="h-32 w-full overflow-hidden bg-slate-100">
-          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          <img src="<?= driveImg('actualizacionDatosCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
         </div>
         <div class="flex flex-1 flex-col p-4">
           <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Actualización de Datos</h3>
@@ -33,7 +33,7 @@
 
       <a href="https://www.appsheet.com/Account/Login?appName=Solicitud%20De%20Credenciales%20PE&FullScope=False&provider=google&returnUrl=https%3A%2F%2Fwww.appsheet.com%2Fstart%2Ffc09f2b3-fd11-46ae-882b-d8ce2cb7a8d1%3Fplatform%3Ddesktop#appName=SolicitudDeCredencialesPE-501453028&vss=H4sIAAAAAAAAA6WOOw7CMBAF7_Jqn8AliAIhaEA0mMLEG8kisaPYCUSW786aj1ID5b7VjCZhtHTbR11dIU9pvjY0QSIpHKaOFKTC0rvY-0ZBKOx0-xoXltxIzhqtkJHP4mOIFCDTtwL5b4GANeSirS31xVZYtrxJfheOh5lCFmiHqC8NPbOZypm32ldDIHPknJ8ywtqt7p12ZusNS2vdBMoPSSDo2G8BAAA=&view=Bienvenida" target="_blank" rel="noopener noreferrer" class="group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:border-latam-estrellada/40 sm:w-[270px]">
         <div class="h-32 w-full overflow-hidden bg-slate-100">
-          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          <img src="<?= driveImg('renovacionFotocheckCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
         </div>
         <div class="flex flex-1 flex-col p-4">
           <h3 class="mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Renovación de Fotocheck</h3>
@@ -48,7 +48,7 @@
 
       <button type="button" id="carousel-item-domicilio-dgac" data-hub-card onclick="selectHubItem('domicilio-dgac')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
         <div class="h-32 w-full overflow-hidden bg-slate-100">
-          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          <img src="<?= driveImg('domicilioDgacCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
         </div>
         <div class="flex flex-1 flex-col p-4">
           <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Domicilio DGAC</h3>
@@ -63,7 +63,7 @@
 
       <button type="button" id="carousel-item-vacuna-fiebre-amarilla" data-hub-card onclick="selectHubItem('vacuna-fiebre-amarilla')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
         <div class="h-32 w-full overflow-hidden bg-slate-100">
-          <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          <img src="<?= driveImg('vacunaFiebreAmarillaCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
         </div>
         <div class="flex flex-1 flex-col p-4">
           <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Vacuna Fiebre Amarilla</h3>
@@ -78,7 +78,7 @@
 
       <button type="button" id="carousel-item-visa-pasaporte" data-hub-card onclick="selectHubItem('visa-pasaporte')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
         <div class="h-32 w-full overflow-hidden bg-slate-100">
-          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=700&amp;q=70" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          <img src="<?= driveImg('visaPasaporteCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
         </div>
         <div class="flex flex-1 flex-col p-4">
           <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Procedimiento Visa / Pasaporte</h3>
