@@ -175,6 +175,9 @@ export const IconCheck = ({ className }) =>
 export const IconSparkle = ({ className }) =>
   wrap(<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" strokeLinecap="round" />, className)
 
+export const IconStar = ({ className }) =>
+  wrap(<path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" strokeLinejoin="round" strokeLinecap="round" />, className)
+
 export const IconAlertTriangle = ({ className }) =>
   wrap(
     <>

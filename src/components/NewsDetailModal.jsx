@@ -1,5 +1,5 @@
 import Modal from './Modal.jsx'
-import { IconPlane, IconCalendar, IconClipboard, IconClose, IconHelp, IconClock, IconSmartphone } from './icons.jsx'
+import { IconPlane, IconCalendar, IconClipboard, IconClose, IconHelp, IconClock, IconSmartphone, IconCheck, IconStar } from './icons.jsx'
 
 const SECTION_ICONS = {
   flight: IconPlane,
@@ -23,6 +23,76 @@ function renderHighlighted(text) {
     ) : (
       part
     ),
+  )
+}
+
+function GalleryCard({ item }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 backdrop-blur-sm">
+      <img src={`${import.meta.env.BASE_URL}${item.image}`} alt={item.caption ?? ''} className="block aspect-video w-full object-cover" />
+      {item.caption && (
+        <p className="px-3.5 py-2.5 text-[12.5px] font-semibold leading-snug text-white">{renderHighlighted(item.caption)}</p>
+      )}
+    </div>
+  )
+}
+
+function HotelCard({ hotel }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 backdrop-blur-sm">
+      {hotel.image && (
+        <img src={`${import.meta.env.BASE_URL}${hotel.image}`} alt={hotel.title} className="block aspect-video w-full object-cover" />
+      )}
+      <div className="p-3.5">
+        <h4 className="text-[13px] font-extrabold text-white">{hotel.title}</h4>
+        {hotel.subtitle && <p className="mt-0.5 text-[12px] italic text-slate-300">{hotel.subtitle}</p>}
+        {hotel.items && hotel.items.length > 0 && (
+          <ul className="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
+            {hotel.items.map((item) => (
+              <li key={item} className="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                <IconCheck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral" />
+                {renderHighlighted(item)}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function PersonCard({ person }) {
+  return (
+    <div className="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+      <img
+        src={`${import.meta.env.BASE_URL}${person.photo}`}
+        alt={person.name}
+        className="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24"
+      />
+      <p className="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">{person.name}</p>
+    </div>
+  )
+}
+
+function RecognitionGroup({ group }) {
+  return (
+    <div className="rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
+      <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-white/10 pb-2.5">
+        <IconStar className="h-4 w-4 flex-shrink-0 text-latam-coral" />
+        <h4 className="text-[13px] font-extrabold text-white">{group.title}</h4>
+        {group.badge && (
+          <span className="ml-auto rounded-full bg-latam-coral px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
+            {group.badge}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+        {group.people.map((person) => (
+          <PersonCard key={person.name} person={person} />
+        ))}
+      </div>
+      {group.note && <p className="mt-3 text-center text-[11px] italic text-slate-400">{group.note}</p>}
+    </div>
   )
 }
 
@@ -67,14 +137,21 @@ export default function NewsDetailModal({ news, onClose }) {
   if (image) {
     return (
       <Modal onClose={onClose} className="bg-latam-profunda">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20"
-        >
-          <IconClose className="h-4 w-4" />
-        </button>
+        {/* Envoltorio `sticky top-0 h-0`: al no ocupar alto no empuja el
+            resto del contenido, pero al pegarse al techo del contenedor que
+            SÍ scrollea (el de Modal.jsx) mantiene el botón absolute que
+            lleva adentro siempre visible, en vez de scrollear junto con la
+            imagen larga. */}
+        <div className="sticky top-0 z-20 h-0">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20"
+          >
+            <IconClose className="h-4 w-4" />
+          </button>
+        </div>
         <img src={`${import.meta.env.BASE_URL}${image}`} alt={news.noticia} className="block w-full" />
       </Modal>
     )
@@ -84,21 +161,30 @@ export default function NewsDetailModal({ news, onClose }) {
 
   return (
     <Modal onClose={onClose} className="text-white">
+      {/* Envoltorio `sticky top-0 h-0` fuera del panel con `overflow-hidden`:
+          si el botón quedara adentro de ese panel (como antes), su
+          `overflow-hidden` rompe el sticky (dejaría de despegarse), y como
+          el panel entero scrollea dentro del contenedor de Modal.jsx, la X
+          terminaba desapareciendo al bajar en noticias largas (ej. la de
+          reconocimientos, con 6 fotos). Al no ocupar alto (h-0) no empuja
+          el resto del contenido hacia abajo. */}
+      <div className="sticky top-0 z-30 h-0">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20"
+        >
+          <IconClose className="h-4 w-4" />
+        </button>
+      </div>
+
       <div
         className="relative flex flex-col overflow-hidden rounded-2xl"
         style={{ background: 'linear-gradient(185deg, #0F004F 0%, #1B0088 55%, #080030 100%)' }}
       >
         <div className="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-latam-diavivo opacity-40 blur-[90px]" />
         <div className="pointer-events-none absolute bottom-0 left-0 h-56 w-56 rounded-full bg-latam-coral opacity-20 blur-[100px]" />
-
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20"
-        >
-          <IconClose className="h-4 w-4" />
-        </button>
 
         <div className="relative h-40 w-full overflow-hidden">
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent" />
@@ -139,6 +225,30 @@ export default function NewsDetailModal({ news, onClose }) {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {restSections.map((section) => (
                 <InfoCard key={section.title} section={section} />
+              ))}
+            </div>
+          )}
+
+          {detail.gallery && detail.gallery.length > 0 && (
+            <div className="grid grid-cols-1 gap-3">
+              {detail.gallery.map((item) => (
+                <GalleryCard key={item.image} item={item} />
+              ))}
+            </div>
+          )}
+
+          {detail.recognitions && detail.recognitions.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {detail.recognitions.map((group) => (
+                <RecognitionGroup key={group.title} group={group} />
+              ))}
+            </div>
+          )}
+
+          {detail.hotels && detail.hotels.length > 0 && (
+            <div className="grid grid-cols-1 gap-3">
+              {detail.hotels.map((hotel) => (
+                <HotelCard key={hotel.title} hotel={hotel} />
               ))}
             </div>
           )}

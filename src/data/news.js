@@ -1,73 +1,114 @@
 // Noticias del hero. Agrega/quita objetos aquí — NoveltyCarousel las rota solo.
 export const NEWS = [
   {
-    noticia: 'Ampliación del Piloto: Sanguchito de Pollo',
-    description: 'Implementación confirmada en las rutas internacionales de Punta Cana (PUJ) y Cancún (CUN).',
+    noticia: 'Personas que Inspiran',
+    description: 'Conoce a las tripulantes con el mejor desempeño en Crew Care y Vuelos Impecables de junio.',
     href: '#',
     detail: {
-      eyebrow: 'Extensión de Plazo',
-      title: '¡Continúa el sándwich a bordo!',
-      tag: 'Regional YC (PUJ + CUN)',
-      body: 'Gracias a sus sugerencias y buenas ideas, se dio inicio con este piloto en nuestro servicio de catering, que busca elevar la experiencia de nuestros pasajeros a un nivel superior. El éxito del mismo va de la mano con el toque de hospitalidad que nos caracteriza en cada vuelo, durante la entrega del servicio.',
-      highlight: 'Cambio de producto: El sándwich de jamón y queso será sustituido por un sándwich de pollo a la brasa con queso.',
-      sections: [
+      eyebrow: 'Reconocimiento',
+      title: 'Personas que Inspiran',
+      tag: 'Junio 2026',
+      body: 'Cada mes reconocemos a quienes elevan la experiencia de nuestros pasajeros con su calidez y profesionalismo a bordo. Estas son las tripulantes que más se destacaron en junio:',
+      // TODO: guarda las 6 fotos (rostro, se recortan en círculo) en
+      // public/img/noticia_modal/personas/ con estos nombres exactos (o
+      // ajusta las rutas de abajo si usas otros).
+      recognitions: [
         {
-          icon: 'flight',
-          title: 'Alcance Obligatorio',
-          body: 'Aplica únicamente en los números de vuelos detallados para la ruta LIM–PUJ y LIM–CUN (solo one way):',
-          table: {
-            headers: ['Ruta', 'Vuelo', 'Hora'],
-            rows: [
-              ['LIM - CUN', '2456', '13:05'],
-              ['LIM - PUJ', '2450', '12:30'],
-            ],
-          },
+          title: 'TOP Crew Care',
+          badge: '100%',
+          note: 'Mayor %CC con mínimo 20 muestras.',
+          people: [
+            { photo: 'img/noticia_modal/personas/caroline_parra.jpg', name: 'Caroline Mirella Parra Galvez' },
+            { photo: 'img/noticia_modal/personas/roxana_villanueva.jpg', name: 'Roxana Esther Villanueva Del Aguila' },
+            { photo: 'img/noticia_modal/personas/maria_mendoza.jpg', name: 'Maria Jose Mendoza Belaunde' },
+          ],
         },
         {
-          icon: 'calendar_month',
-          title: 'Vigencia de la Medida',
-          body: 'Se inició el 01 de junio, y ahora se extiende la vigencia todo el mes de julio.',
+          title: 'TOP Crew Care HVC',
+          badge: '95%',
+          note: 'Mayor %CC HVC con mínimo 20 muestras.',
+          people: [
+            { photo: 'img/noticia_modal/personas/paola_gutierrez.jpg', name: 'Paola Alejandra Gutierrez Espinoza' },
+          ],
         },
         {
-          icon: 'fact_check',
-          title: 'Medición de Avance (NIMBUS)',
-          body: 'Se activa campaña en NIMBUS para que JSB y HR de manera obligatoria respondan la breve encuesta que necesitamos para medir el avance del piloto.',
+          title: 'TOP Vuelos Impecables',
+          note: '3 vuelos impecables realizados.',
+          people: [
+            { photo: 'img/noticia_modal/personas/rosa_chinen.jpg', name: 'Rosa Angela Chinen Sanchez' },
+            { photo: 'img/noticia_modal/personas/maria_seoane.jpg', name: 'Maria Seoane Garcia' },
+          ],
         },
       ],
     },
   },
   {
-    noticia: 'Reembolso Multas Elecciones 2026',
-    description: 'Revisa los plazos y carga tus comprobantes oficiales de exoneración en el portal de Datos Personales.',
-    href: '#',
-    image: 'img/noticia_modal/plazo_reembolso.png',
-  },
-  {
-    noticia: 'Autogestión: Contacto Movilización',
-    description: 'Ya puedes contactar por tu propia cuenta.',
+    noticia: 'Proyecto GENESYS',
+    description: 'Llamadas automáticas para notificar tu movimiento diario — llega el 10 de agosto.',
     href: '#',
     detail: {
-      eyebrow: 'Canal Directo',
-      title: '¡Contáctanos por Google Chat!',
-      tag: 'Coordinación operativa 24/7',
-      body: 'Ante cualquier contingencia que afecte tu asignación de vuelo, el canal más rápido de coordinación con Movilización es **Google Chat desde tu dispositivo móvil**, sin necesidad de llamada telefónica.',
-      highlight: 'Nota: Ideal para resolver contingencias en tiempo real y asegurar la regularidad de tu itinerario de manera ágil.',
-      footer: 'Simulación: Contenido informativo de referencia • Somos LATAM',
+      eyebrow: 'Nuevo Proyecto',
+      title: 'Proyecto GENESYS: IA Crew',
+      tag: 'Implementación: 10 de agosto',
+      body: 'Genesys es un sistema de llamadas automáticas para los tripulantes. Estamos desarrollando una lógica para el cálculo automático del PDR, así como para la identificación de los horarios disponibles para realizar llamadas. Este análisis se encargará de integrar y comprender toda la información relevante.',
+      highlight: 'Tu notificador de movimiento diario.',
       sections: [
         {
-          icon: 'help',
-          title: 'Alcance / Cuándo Usarlo',
-          body: 'Retrasos de transporte, imprevistos de salud de último momento o cualquier situación que ponga en riesgo tu presentación a tiempo.',
-        },
-        {
           icon: 'clock',
-          title: 'Tiempo de Respuesta',
-          body: 'El equipo de Movilización responde en un **máximo de 10 minutos** durante operación activa.',
+          title: 'Período de Descanso Reglamentario',
+          body: 'Se calcula automáticamente para asegurar que cada llamada respete tu tiempo de descanso legal.',
         },
         {
-          icon: 'phone',
-          title: 'Canales Alternos',
-          body: 'Si no tienes conexión a internet, comunícate a la central telefónica de Movilización disponible en tu credencial corporativa.',
+          icon: 'fact_check',
+          title: 'Otras Variables',
+          body: 'El sistema integra información adicional relevante para identificar el mejor momento de contacto.',
+        },
+        {
+          icon: 'calendar_month',
+          title: 'Días Libres',
+          body: 'Genesys reconoce tus días libres para no interrumpir tu descanso fuera de turno.',
+        },
+        {
+          icon: 'help',
+          title: 'Convenio Sindical',
+          body: 'Toda la lógica de llamadas se ajusta a lo establecido en el convenio sindical vigente.',
+        },
+      ],
+    },
+  },
+  {
+    noticia: '¡Cambios en hoteles MVD y MBJ!',
+    description: 'Nuevo contrato con Dazzler en MVD y tarifas de acompañantes en el Grand Palladium de MBJ.',
+    href: '#',
+    detail: {
+      eyebrow: 'Actualización de Hoteles',
+      title: '¡Cambios en hoteles MVD y MBJ!',
+      body: 'Se actualizaron las condiciones de hospedaje para las bases de Montevideo (MVD) y Montego Bay (MBJ). Revisa los detalles de cada hotel a continuación:',
+      // TODO: guarda las 2 fotos en public/img/noticia_modal/ con estos
+      // nombres exactos (o ajusta las rutas de abajo si usas otros).
+      hotels: [
+        {
+          image: 'img/noticia_modal/hotel_dazzler_mvd.jpg',
+          title: 'MVD: Hotel Dazzler',
+          subtitle: 'Contrato hasta el 31 de julio del 2029.',
+          items: [
+            'Incluye desayuno o desayuno de madrugada / to go.',
+            'Wi-Fi incluido.',
+            'Por día, 1 botella de agua por cada tripulante.',
+            'Room service.',
+            '20% de descuento en F&B.',
+            'Servicio de Lavandería (2 prendas de uniforme pernocte).',
+          ],
+        },
+        {
+          image: 'img/noticia_modal/hotel_grand_palladium_mbj.jpg',
+          title: 'MBJ: Hotel Grand Palladium',
+          subtitle: 'Tarifas para acompañantes — del 1 de agosto al 19 de diciembre de 2026.',
+          items: [
+            'Acompañante 1: USD 86.36 + 10% + GART USD 4 per room per night.',
+            'Acompañante 2: USD 136.36 + 10% + GART USD 4 per room per night.',
+            'Niños 3-12 años: USD 86.36 + 10% + GART USD 4 per room per night.',
+          ],
         },
       ],
     },
