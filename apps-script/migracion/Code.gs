@@ -60,11 +60,11 @@ const DRIVE_ASSETS = {
   // Gestión Personal (compartir cada archivo como "Cualquier persona con el
   // enlace: Lector" antes, o driveImg() devolverá '').
   gestionPersonalHero: 'REEMPLAZAR_GESTION_PERSONAL_HERO',
-  actualizacionDatosCard: 'REEMPLAZAR_ACTUALIZACION_DATOS_CARD',
-  renovacionFotocheckCard: 'REEMPLAZAR_RENOVACION_FOTOCHECK_CARD',
-  domicilioDgacCard: 'REEMPLAZAR_DOMICILIO_DGAC_CARD',
-  vacunaFiebreAmarillaCard: 'REEMPLAZAR_VACUNA_FIEBRE_AMARILLA_CARD',
-  visaPasaporteCard: 'REEMPLAZAR_VISA_PASAPORTE_CARD',
+  actualizacionDatosCard: '1ipjHwJ5UjsrBVdO5jFya3FpYPnZW8KlK',
+  renovacionFotocheckCard: '1i_dGezxStUON6DX3k3nUn0km6o83h8Bd',
+  domicilioDgacCard: '19AGy4MCn9oWQZAbWdVPZro5TTcERvN30',
+  vacunaFiebreAmarillaCard: '1MNnQJ6uPQxIFLxQGcsHPk4er3NqM251v',
+  visaPasaporteCard: '1ecYhyLPIbYTdJd2g9CFXDDjfSpRbjrsQ',
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no
