@@ -1,15 +1,23 @@
 <!-- ============ Modal: Detalle de Noticia (3 paneles, uno por novedad) ============ -->
+<!-- Cada panel usa el mismo truco de botón "X" fijo que NewsDetailModal.jsx
+     en React: un <div class="sticky top-0 h-0"> ANTES del panel con
+     overflow-hidden (nunca adentro — overflow-hidden en un ancestro rompe
+     el sticky) para que la X quede siempre visible arriba del panel aunque
+     el contenido sea largo y haya que hacer scroll (ej. el de las 6 fotos
+     de reconocimientos). -->
 <div id="modal-news" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center bg-latam-profunda/60 p-4 backdrop-blur-sm" onclick="closeModalBackdrop(event, 'modal-news')">
   <div class="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-card text-white" onclick="event.stopPropagation()">
 
-    <!-- Panel 0: Sanguchito de Pollo -->
+    <!-- Panel 0: Personas que Inspiran -->
     <div data-news-panel="0" class="news-panel hidden">
+      <div class="sticky top-0 z-30 h-0">
+        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+        </button>
+      </div>
       <div class="relative flex flex-col overflow-hidden rounded-2xl" style="background:linear-gradient(185deg, #0F004F 0%, #1B0088 55%, #080030 100%)">
         <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-latam-diavivo opacity-40 blur-[90px]"></div>
         <div class="pointer-events-none absolute bottom-0 left-0 h-56 w-56 rounded-full bg-latam-coral opacity-20 blur-[100px]"></div>
-        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
-        </button>
         <div class="relative h-40 w-full overflow-hidden">
           <div class="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent"></div>
           <div class="absolute inset-0 z-10 bg-gradient-to-r from-[#0F004F]/60 to-transparent"></div>
@@ -18,113 +26,215 @@
         </div>
         <div class="relative z-10 space-y-4 px-6 pb-7 pt-3">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Extensión de Plazo</span>
-            <span class="text-xs font-semibold uppercase tracking-wide text-slate-300">Regional YC (PUJ + CUN)</span>
+            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Reconocimiento</span>
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-300">Junio 2026</span>
           </div>
-          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">¡Continúa el sándwich a bordo!</h2>
-          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Gracias a sus sugerencias y buenas ideas, se dio inicio con este piloto en nuestro servicio de catering, que busca elevar la experiencia de nuestros pasajeros a un nivel superior. El éxito del mismo va de la mano con el toque de hospitalidad que nos caracteriza en cada vuelo, durante la entrega del servicio.</p>
+          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">Personas que Inspiran</h2>
+          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Cada mes reconocemos a quienes elevan la experiencia de nuestros pasajeros con su calidez y profesionalismo a bordo. Estas son las tripulantes que más se destacaron en junio:</p>
+
+          <div class="flex flex-col gap-3">
+            <div class="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
+              <div class="mb-3 flex flex-wrap items-center gap-2 border-b border-white/10 pb-2.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+                <h4 class="text-[13px] font-extrabold text-white">TOP Crew Care</h4>
+                <span class="ml-auto rounded-full bg-latam-coral px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">100%</span>
+              </div>
+              <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaCarolineParra', 200) ?>" alt="Caroline Mirella Parra Galvez" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Caroline Mirella Parra Galvez</p>
+                </div>
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaRoxanaVillanueva', 200) ?>" alt="Roxana Esther Villanueva Del Aguila" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Roxana Esther Villanueva Del Aguila</p>
+                </div>
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaMariaMendoza', 200) ?>" alt="Maria Jose Mendoza Belaunde" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Maria Jose Mendoza Belaunde</p>
+                </div>
+              </div>
+              <p class="mt-3 text-center text-[11px] italic text-slate-400">Mayor %CC con mínimo 20 muestras.</p>
+            </div>
+
+            <div class="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
+              <div class="mb-3 flex flex-wrap items-center gap-2 border-b border-white/10 pb-2.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+                <h4 class="text-[13px] font-extrabold text-white">TOP Crew Care HVC</h4>
+                <span class="ml-auto rounded-full bg-latam-coral px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">95%</span>
+              </div>
+              <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaPaolaGutierrez', 200) ?>" alt="Paola Alejandra Gutierrez Espinoza" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Paola Alejandra Gutierrez Espinoza</p>
+                </div>
+              </div>
+              <p class="mt-3 text-center text-[11px] italic text-slate-400">Mayor %CC HVC con mínimo 20 muestras.</p>
+            </div>
+
+            <div class="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-2.5 backdrop-blur-sm sm:p-3.5">
+              <div class="mb-3 flex flex-wrap items-center gap-2 border-b border-white/10 pb-2.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+                <h4 class="text-[13px] font-extrabold text-white">TOP Vuelos Impecables</h4>
+              </div>
+              <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaRosaChinen', 200) ?>" alt="Rosa Angela Chinen Sanchez" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Rosa Angela Chinen Sanchez</p>
+                </div>
+                <div class="flex w-[76px] flex-shrink-0 flex-col items-center gap-1.5 text-center sm:w-28 sm:gap-2">
+                  <img src="<?= driveImg('personaMariaSeoane', 200) ?>" alt="Maria Seoane Garcia" class="h-16 w-16 rounded-full border-2 border-latam-coral object-cover shadow-lg sm:h-24 sm:w-24" />
+                  <p class="text-[10px] font-bold leading-snug text-white sm:text-[11.5px]">Maria Seoane Garcia</p>
+                </div>
+              </div>
+              <p class="mt-3 text-center text-[11px] italic text-slate-400">3 vuelos impecables realizados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 1:  Cambios en hoteles MVD y MBJ  -->
+    <div data-news-panel="1" class="news-panel hidden">
+      <div class="sticky top-0 z-30 h-0">
+        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+        </button>
+      </div>
+      <div class="relative flex flex-col overflow-hidden rounded-2xl" style="background:linear-gradient(185deg, #0F004F 0%, #1B0088 55%, #080030 100%)">
+        <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-latam-diavivo opacity-40 blur-[90px]"></div>
+        <div class="pointer-events-none absolute bottom-0 left-0 h-56 w-56 rounded-full bg-latam-coral opacity-20 blur-[100px]"></div>
+        <div class="relative h-40 w-full overflow-hidden">
+          <div class="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent"></div>
+          <div class="absolute inset-0 z-10 bg-gradient-to-r from-[#0F004F]/60 to-transparent"></div>
+          <img src="<?= driveImg('hero', 800) ?>" alt="" class="h-full w-full scale-105 object-cover object-[center_65%]" />
+          <span class="absolute left-5 top-4 z-20 text-[10px] font-bold uppercase tracking-[3px] text-slate-300">Comunicados</span>
+        </div>
+        <div class="relative z-10 space-y-4 px-6 pb-7 pt-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Actualización de Hoteles</span>
+          </div>
+          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">¡Cambios en hoteles MVD y MBJ!</h2>
+          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Se actualizaron las condiciones de hospedaje para las bases de Montevideo (MVD) y Montego Bay (MBJ). Revisa los detalles de cada hotel a continuación:</p>
+
+          <div class="grid grid-cols-1 gap-3">
+            <div class="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
+              <img src="<?= driveImg('hotelDazzlerMvd', 700) ?>" alt="MVD: Hotel Dazzler" class="block aspect-video w-full object-cover" />
+              <div class="p-3.5">
+                <h4 class="text-[13px] font-extrabold text-white">MVD: Hotel Dazzler</h4>
+                <p class="mt-0.5 text-[12px] italic text-slate-300">Contrato hasta el 31 de julio del 2029.</p>
+                <ul class="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Incluye desayuno o desayuno de madrugada / to go.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Wi-Fi incluido.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Por día, 1 botella de agua por cada tripulante.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Room service.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    20% de descuento en F&amp;B.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Servicio de Lavandería (2 prendas de uniforme pernocte).
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
+              <img src="<?= driveImg('hotelGrandPalladiumMbj', 700) ?>" alt="MBJ: Hotel Grand Palladium" class="block aspect-video w-full object-cover" />
+              <div class="p-3.5">
+                <h4 class="text-[13px] font-extrabold text-white">MBJ: Hotel Grand Palladium</h4>
+                <p class="mt-0.5 text-[12px] italic text-slate-300">Tarifas para acompañantes — del 1 de agosto al 19 de diciembre de 2026.</p>
+                <ul class="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Acompañante 1: USD 86.36 + 10% + GART USD 4 per room per night.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Acompañante 2: USD 136.36 + 10% + GART USD 4 per room per night.
+                  </li>
+                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    Niños 3-12 años: USD 86.36 + 10% + GART USD 4 per room per night.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Proyecto GENESYS-->
+    <div data-news-panel="2" class="news-panel hidden">
+      <div class="sticky top-0 z-30 h-0">
+        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+        </button>
+      </div>
+      <div class="relative flex flex-col overflow-hidden rounded-2xl" style="background:linear-gradient(185deg, #0F004F 0%, #1B0088 55%, #080030 100%)">
+        <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-latam-diavivo opacity-40 blur-[90px]"></div>
+        <div class="pointer-events-none absolute bottom-0 left-0 h-56 w-56 rounded-full bg-latam-coral opacity-20 blur-[100px]"></div>
+        <div class="relative h-40 w-full overflow-hidden">
+          <div class="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent"></div>
+          <div class="absolute inset-0 z-10 bg-gradient-to-r from-[#0F004F]/60 to-transparent"></div>
+          <img src="<?= driveImg('hero', 800) ?>" alt="" class="h-full w-full scale-105 object-cover object-[center_65%]" />
+          <span class="absolute left-5 top-4 z-20 text-[10px] font-bold uppercase tracking-[3px] text-slate-300">Comunicados</span>
+        </div>
+        <div class="relative z-10 space-y-4 px-6 pb-7 pt-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Nuevo Proyecto</span>
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-300">Implementación: 10 de agosto</span>
+          </div>
+          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">Proyecto GENESYS: IA Crew</h2>
+          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Genesys es un sistema de llamadas automáticas para los tripulantes. Estamos desarrollando una lógica para el cálculo automático del PDR, así como para la identificación de los horarios disponibles para realizar llamadas. Este análisis se encargará de integrar y comprender toda la información relevante.</p>
           <div class="rounded-r-xl border-l-4 border-latam-coral bg-white/5 p-3.5">
-            <p class="text-[13px] font-medium italic leading-snug text-slate-200">Cambio de producto: El sándwich de jamón y queso será sustituido por un sándwich de pollo a la brasa con queso.</p>
+            <p class="text-[13px] font-medium italic leading-snug text-slate-200">Tu notificador de movimiento diario.</p>
           </div>
 
-          <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+          <div class="flex flex-col rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
             <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M10.5 20.5 12 15l-6 1.7v-2L12 11V6a1.5 1.5 0 0 1 3 0v5l6 3.7v2L15 15l1.5 5.5-1.7-1-1.3-2-1.3 2-1.7 1Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
-              <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Alcance Obligatorio</h4>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Período de Descanso Reglamentario</h4>
             </div>
-            <p class="text-[12.5px] leading-relaxed text-slate-300">Aplica únicamente en los números de vuelos detallados para la ruta LIM–PUJ y LIM–CUN (solo one way):</p>
-            <div class="mt-3 overflow-hidden rounded-lg border border-white/10 bg-black/20 text-[12px]">
-              <div class="grid grid-cols-3 border-b border-white/10 bg-white/5 px-3 py-2 font-semibold text-slate-300">
-                <div>Ruta</div><div class="text-center">Vuelo</div><div class="text-right">Hora</div>
-              </div>
-              <div class="divide-y divide-white/5">
-                <div class="grid grid-cols-3 items-center px-3 py-2"><div class="font-bold text-white">LIM - CUN</div><div class="text-center text-slate-300">2456</div><div class="text-right font-extrabold text-latam-coral">13:05</div></div>
-                <div class="grid grid-cols-3 items-center px-3 py-2"><div class="font-bold text-white">LIM - PUJ</div><div class="text-center text-slate-300">2450</div><div class="text-right font-extrabold text-latam-coral">12:30</div></div>
-              </div>
-            </div>
+            <p class="text-[12.5px] leading-relaxed text-slate-300">Se calcula automáticamente para asegurar que cada llamada respete tu tiempo de descanso legal.</p>
           </div>
 
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
-              <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round" /></svg>
-                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Vigencia de la Medida</h4>
-              </div>
-              <p class="text-[12.5px] leading-relaxed text-slate-300">Se inició el 01 de junio, y ahora se extiende la vigencia todo el mes de julio.</p>
-            </div>
-            <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+            <div class="flex flex-col rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
               <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9V4Z" /><path d="M8.5 12h7M8.5 15.5h4.5" stroke-linecap="round" /></svg>
-                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Medición de Avance (NIMBUS)</h4>
+                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Otras Variables</h4>
               </div>
-              <p class="text-[12.5px] leading-relaxed text-slate-300">Se activa campaña en NIMBUS para que JSB y HR de manera obligatoria respondan la breve encuesta que necesitamos para medir el avance del piloto.</p>
+              <p class="text-[12.5px] leading-relaxed text-slate-300">El sistema integra información adicional relevante para identificar el mejor momento de contacto.</p>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Panel 1: Reembolso Multas (imagen simple) -->
-    <div data-news-panel="1" class="news-panel hidden">
-      <div class="relative overflow-hidden rounded-2xl bg-latam-profunda">
-        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
-        </button>
-        <img src="<?= driveImg('noticiaReembolso', 900) ?>" alt="Reembolso Multas Elecciones 2026" class="block w-full" />
-      </div>
-    </div>
-
-    <!-- Panel 2: Autogestión Movilización -->
-    <div data-news-panel="2" class="news-panel hidden">
-      <div class="relative flex flex-col overflow-hidden rounded-2xl" style="background:linear-gradient(185deg, #0F004F 0%, #1B0088 55%, #080030 100%)">
-        <div class="pointer-events-none absolute right-0 top-0 h-72 w-72 rounded-full bg-latam-diavivo opacity-40 blur-[90px]"></div>
-        <div class="pointer-events-none absolute bottom-0 left-0 h-56 w-56 rounded-full bg-latam-coral opacity-20 blur-[100px]"></div>
-        <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
-        </button>
-        <div class="relative h-40 w-full overflow-hidden">
-          <div class="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent"></div>
-          <div class="absolute inset-0 z-10 bg-gradient-to-r from-[#0F004F]/60 to-transparent"></div>
-          <img src="<?= driveImg('hero', 800) ?>" alt="" class="h-full w-full scale-105 object-cover object-[center_65%]" />
-          <span class="absolute left-5 top-4 z-20 text-[10px] font-bold uppercase tracking-[3px] text-slate-300">Comunicados</span>
-        </div>
-        <div class="relative z-10 space-y-4 px-6 pb-7 pt-3">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Canal Directo</span>
-            <span class="text-xs font-semibold uppercase tracking-wide text-slate-300">Coordinación operativa 24/7</span>
-          </div>
-          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">¡Contáctanos por Google Chat!</h2>
-          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Ante cualquier contingencia que afecte tu asignación de vuelo, el canal más rápido de coordinación con Movilización es <span class="rounded bg-latam-coral/25 px-1.5 py-0.5 font-semibold text-white">Google Chat desde tu dispositivo móvil</span>, sin necesidad de llamada telefónica.</p>
-          <div class="rounded-r-xl border-l-4 border-latam-coral bg-white/5 p-3.5">
-            <p class="text-[13px] font-medium italic leading-snug text-slate-200">Nota: Ideal para resolver contingencias en tiempo real y asegurar la regularidad de tu itinerario de manera ágil.</p>
-          </div>
-
-          <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
-            <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.7" stroke-linecap="round" /><circle cx="12" cy="16.5" r=".9" fill="currentColor" stroke="none" /></svg>
-              <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Alcance / Cuándo Usarlo</h4>
-            </div>
-            <p class="text-[12.5px] leading-relaxed text-slate-300">Retrasos de transporte, imprevistos de salud de último momento o cualquier situación que ponga en riesgo tu presentación a tiempo.</p>
-          </div>
-
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+            <div class="flex flex-col rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
               <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Tiempo de Respuesta</h4>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round" /></svg>
+                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Días Libres</h4>
               </div>
-              <p class="text-[12.5px] leading-relaxed text-slate-300">El equipo de Movilización responde en un <span class="rounded bg-latam-coral/25 px-1.5 py-0.5 font-semibold text-white">máximo de 10 minutos</span> durante operación activa.</p>
+              <p class="text-[12.5px] leading-relaxed text-slate-300">Genesys reconoce tus días libres para no interrumpir tu descanso fuera de turno.</p>
             </div>
-            <div class="flex flex-col rounded-xl border border-latam-diavivo/25 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+            <div class="flex flex-col rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
               <div class="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><rect x="6" y="2.5" width="12" height="19" rx="2.2" /><path d="M10.5 18h3" stroke-linecap="round" /></svg>
-                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Canales Alternos</h4>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.7" stroke-linecap="round" /><circle cx="12" cy="16.5" r=".9" fill="currentColor" stroke="none" /></svg>
+                <h4 class="text-[11px] font-extrabold uppercase tracking-wider text-white">Convenio Sindical</h4>
               </div>
-              <p class="text-[12.5px] leading-relaxed text-slate-300">Si no tienes conexión a internet, comunícate a la central telefónica de Movilización disponible en tu credencial corporativa.</p>
+              <p class="text-[12.5px] leading-relaxed text-slate-300">Toda la lógica de llamadas se ajusta a lo establecido en el convenio sindical vigente.</p>
             </div>
           </div>
-
-          <p class="border-t border-white/10 pt-4 text-center text-[11px] uppercase tracking-wider text-slate-400">Simulación: Contenido informativo de referencia • Somos LATAM</p>
         </div>
       </div>
     </div>

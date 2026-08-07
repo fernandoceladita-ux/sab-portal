@@ -44,7 +44,23 @@ const DRIVE_ASSETS = {
   hero: '1naWRjC2mqaDFRO8Ii4_BmkU81gbbhFkk',
   tituloHero: '1Ydays4nRyJBy_PZETHoUyss--2h-8YyL',
   logoLatam: '11abTjcpbU5KzruNghEI1SdIHu9zNAVVQ',
-  noticiaReembolso: '1G0E9rbgM_f_s2mkjArcwe4hZsRFczoLN',
+  // Versión blanca del logo (se usa arriba de todo, con el header
+  // transparente; al hacer scroll y volverse blanco el fondo del header,
+  // se intercambia por logoLatam de arriba, a color, para que no se pierda).
+  logoLatamWhite: '1bHAo7BH2DZ0clMZ1nuZjzWh8K5aNE-Hf',
+  // TODO: pegar los IDs reales de Drive de las noticias del hero (ver
+  // Modals.html → modal-news). 6 fotos de personas para "Personas que
+  // Inspiran" y 2 fotos de hotel para "Cambios en hoteles MVD y MBJ"
+  // (Proyecto GENESYS no usa imágenes). Compartir cada archivo como
+  // "Cualquier persona con el enlace: Lector" antes de pegar el ID.
+  personaCarolineParra: '1rIqEsxfvMyHRFSKr23JgFlMrShV9pfwx',
+  personaRoxanaVillanueva: '11N3mpnpC3qSgqh-4z0QpH4QrVRqgR0q-',
+  personaMariaMendoza: '14COOBT6MHw7XUVmDSreGCwWi1XltPxaa',
+  personaPaolaGutierrez: '1pX8vwc9h1RCYzz02iZ5aQ9jylD0H7gtY',
+  personaRosaChinen: '1bfdQiDJDJzLPltuEgVWCcliVK3iad5tW',
+  personaMariaSeoane: '1Ks8xq3BKNDrA_RD7p0-2z6xraBYTbpy2',
+  hotelDazzlerMvd: '1ykw6lsb-QtdbYbwUMsV0GYxZXZRg6gJk',
+  hotelGrandPalladiumMbj: '1LeCy-cwv3a4RbRU23OCMQdLWOmTMYXxF',
   // TODO: subir a Drive las 6 imágenes de public/img/gestion-operativa/instructivo_vales/
   // (paso1.png, paso2.png, paso3.png, paso4.png, "codigo QR de la app.png",
   // restaurantes_autorizados.png), compartir cada una como "Cualquier persona
@@ -55,16 +71,31 @@ const DRIVE_ASSETS = {
   ivalPaso4: '1fyFbkwdIOE99REPIqL2BQY0_ernsL0RI',
   ivalQr: '1wVTAsdBavm-wzkLS4Ez2dG5QR0Ni7YNz',
   ivalRestaurantes: '1YyPyg0WQNTbI2efGo1waoiQn0ItHJTxE',
-  gestionOperacionalHero: '1PZ9-miuYDUaibtYeKgFiFqN7tHZ-hyb9',
   // TODO: pegar los IDs reales de Drive para el header y las 5 tarjetas de
   // Gestión Personal (compartir cada archivo como "Cualquier persona con el
   // enlace: Lector" antes, o driveImg() devolverá '').
-  gestionPersonalHero: 'REEMPLAZAR_GESTION_PERSONAL_HERO',
+  gestionPersonalHero: '1n8-7VZ8wM6Oji-vQqKD6rXsUowIVwHJF',
   actualizacionDatosCard: '1ipjHwJ5UjsrBVdO5jFya3FpYPnZW8KlK',
   renovacionFotocheckCard: '1i_dGezxStUON6DX3k3nUn0km6o83h8Bd',
   domicilioDgacCard: '19AGy4MCn9oWQZAbWdVPZro5TTcERvN30',
   vacunaFiebreAmarillaCard: '1MNnQJ6uPQxIFLxQGcsHPk4er3NqM251v',
   visaPasaporteCard: '1ecYhyLPIbYTdJd2g9CFXDDjfSpRbjrsQ',
+  // TODO: pegar los IDs reales de Drive para el header y las 7 tarjetas de
+  // Mi Rol (mismo orden que HUB_IDS_MIROL en MiRol.html).
+  miRolHero: '1netm7cZDkTjG70sBgjQlHhd5eeI0Nrbi',
+  solicitudMesSubsiguienteCard: '1Z_NvThe5EhkBnENbudhbRHQEaKzCPQFY',
+  cambiosVoluntariosCard: '1lQ-Pm7QwY9njHa8CyDkcbgg34K8W8Z79',
+  descansoMedicoCard: '1J8UOiCkzgR0epPaAnb-QBwHRomUy8vqq',
+  seguroMedicoCard: '1da9sXWBKME9a70Qn5uEL3PIUDw5BUT6I',
+  cesionVacacionesCard: '1VAiyzD-sRC7Y0g3xRG-lMYl0j3tZzKeP',
+  gruposPbsCard: '1ipjHwJ5UjsrBVdO5jFya3FpYPnZW8KlK',
+  cambiosWebSabCard: '1pG7nm3IP8lIWPf0ges_W0cTRxasKJ77T',
+
+  gestionOperacionalHero: '1PZ9-miuYDUaibtYeKgFiFqN7tHZ-hyb9',
+  instructivoVales: '1zWVWc9-Xg2iIsAR7c7WyIqe_iNTIkDtF',
+  consultasViaticos: '1xagbBQxoOrgcff-3DzNlAXzAeTxS3y27',
+  cambioUniforme: '1pG7nm3IP8lIWPf0ges_W0cTRxasKJ77T',
+  registroEquipos: '1HKAyaA4E6zprT4RJ9Gq5QAazjKRcXTA1'
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no

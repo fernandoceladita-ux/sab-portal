@@ -2,6 +2,8 @@
   // ===================== Header: fondo sólido al hacer scroll =====================
   const header = document.getElementById('site-header')
   const brandLabel = document.getElementById('brand-label')
+  const logoWhite = document.getElementById('logo-white')
+  const logoColor = document.getElementById('logo-color')
   const mobileDrawer = document.getElementById('mobile-drawer')
   const mobileOverlay = document.getElementById('mobile-overlay')
   let mobileOpen = false
@@ -19,6 +21,11 @@
       brandLabel.classList.remove('text-latam-estrellada')
       brandLabel.classList.add('text-white')
     }
+    // Logo blanco sobre el hero transparente, logo a color en cuanto el
+    // header se pone blanco al hacer scroll (si no, se pierde contra el
+    // fondo blanco). Mismo criterio "solid" que ya usa brand-label.
+    logoWhite.classList.toggle('hidden', solid)
+    logoColor.classList.toggle('hidden', !solid)
     document.querySelectorAll('.nav-inicio, .menu-trigger').forEach((el) => {
       if (solid) {
         el.classList.add('text-slate-700')

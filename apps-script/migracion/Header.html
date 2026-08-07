@@ -3,7 +3,12 @@
 <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-transparent transition-all duration-300">
   <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
     <a href="?page=home" class="flex items-center gap-2.5">
-      <img src="<?= driveImg('logoLatam', 200) ?>" alt="LATAM" class="h-7 w-15 flex-shrink-0 object-contain" />
+      <!-- Dos <img> apiladas en vez de cambiar el src por JS: evita el
+           parpadeo/carga de red al hacer scroll — ambas ya están cargadas,
+           applyHeaderSkin() en Scripts.html solo alterna cuál se ve, igual
+           que ya hace con brand-label (texto blanco/color). -->
+      <img id="logo-white" src="<?= driveImg('logoLatamWhite', 200) ?>" alt="LATAM" class="h-7 w-15 flex-shrink-0 object-contain" />
+      <img id="logo-color" src="<?= driveImg('logoLatam', 200) ?>" alt="LATAM" class="hidden h-7 w-15 flex-shrink-0 object-contain" />
       <span class="flex flex-col leading-tight">
         <span id="brand-label" class="text-[18px] font-bold text-white transition-colors">LATAM</span>
       </span>
