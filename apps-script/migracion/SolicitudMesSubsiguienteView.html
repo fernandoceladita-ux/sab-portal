@@ -45,15 +45,6 @@
                 <label class="mb-2 block text-sm font-bold text-latam-estrellada">Apellidos y Nombres <span class="text-latam-coral">*</span></label>
                 <input type="text" name="nombre" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
               </div>
-              <div class="mb-5 sm:col-span-2">
-                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona el Mes del Rol a Postular <span class="text-latam-coral">*</span></label>
-                <select name="mesRol" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">
-                  <option value="" disabled selected>Elegir una opción...</option>
-                  <option value="Agosto 2026 (Dentro de plazo reglamentario)">Agosto 2026 (Dentro de plazo reglamentario)</option>
-                  <option value="Septiembre 2026 (Dentro de plazo reglamentario)">Septiembre 2026 (Dentro de plazo reglamentario)</option>
-                  <option value="Julio 2026 (FUERA DE PLAZO - Solicitud Rechazada)">Julio 2026 (FUERA DE PLAZO - Solicitud Rechazada)</option>
-                </select>
-              </div>
             </div>
           </div>
         </div>
@@ -100,7 +91,7 @@
                 </div>
                 <div class="bg-[#fafbfc] px-5 py-6">
 
-                  <div data-mes-panel="afectacion" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                  <div data-mes-panel="afectacion" class="hidden grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de afectación de libre <span class="text-latam-coral">*</span></label><input type="date" name="fechaAfectacion" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Número de vuelo <span class="text-latam-coral">*</span></label><input type="text" name="numVuelo1" required placeholder="Ej. LA2456" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Ruta <span class="text-latam-coral">*</span></label><input type="text" name="ruta1" required placeholder="Ej. LIM - MIA" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
@@ -108,7 +99,7 @@
                     <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Comentario adicional <span class="text-latam-coral">*</span></label><textarea name="comentario1" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
                   </div>
 
-                  <div data-mes-panel="adicionales" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                  <div data-mes-panel="adicionales" class="hidden grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de afectación de vuelos adicionales <span class="text-latam-coral">*</span></label><input type="date" name="fechaVuelosAdicionales" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Número de vuelo <span class="text-latam-coral">*</span></label><input type="text" name="numVuelo2" required placeholder="Ej. LA2456" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Ruta <span class="text-latam-coral">*</span></label><input type="text" name="ruta2" required placeholder="Ej. LIM - MIA" class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
@@ -116,7 +107,7 @@
                     <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Comentario adicional <span class="text-latam-coral">*</span></label><textarea name="comentario2" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
                   </div>
 
-                  <div data-mes-panel="jefatura" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                  <div data-mes-panel="jefatura" class="hidden grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <div class="mb-5"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de libre <span class="text-latam-coral">*</span></label><input type="date" name="fechaLibreJefatura" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" /></div>
                     <div class="mb-5 sm:col-span-2"><label class="mb-2 block text-sm font-bold text-latam-estrellada">Motivo de la otorgación del libre <span class="text-latam-coral">*</span></label><textarea name="motivoJefatura" rows="4" required class="mes-fld w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10"></textarea></div>
                   </div>
@@ -140,7 +131,7 @@
                     </div>
                   </div>
 
-                  <div data-mes-panel="permisos" class="hidden grid-cols-1 gap-x-5 sm:grid sm:grid-cols-2">
+                  <div data-mes-panel="permisos" class="hidden grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <div class="mb-5 sm:col-span-2">
                       <label class="mb-2 block text-sm font-bold text-latam-estrellada">Selecciona el tipo de permiso legal que requieres solicitar <span class="text-latam-coral">*</span></label>
                       <select name="tipoPermiso" required class="mes-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10">

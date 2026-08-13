@@ -155,7 +155,17 @@
 
       runServer('submitMesSubsiguiente', payload)
         .then(function () {
-          form.reset()
+          // Ojo: no usar form.reset() acá — eso también limpiaría el Paso 1
+          // (correo/BP/nombre), y ese debe mantenerse tal cual quedó tras
+          // enviar. Solo se limpian los campos del Paso 2 (dentro del panel
+          // de la novedad seleccionada).
+          document.querySelectorAll('#mes-meta-panel .mes-fld').forEach(function (el) {
+            if (el.tagName === 'SELECT') {
+              el.selectedIndex = 0
+            } else {
+              el.value = ''
+            }
+          })
           document.querySelectorAll('[data-mes-novedad]').forEach(function (btn) {
             btn.classList.remove('border-latam-estrellada', 'bg-latam-estrellada/5', 'text-latam-estrellada')
             btn.classList.add('border-slate-200', 'text-slate-600')
