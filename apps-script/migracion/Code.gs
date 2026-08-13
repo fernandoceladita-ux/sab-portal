@@ -336,33 +336,75 @@ function submitMesSubsiguiente(data) {
   return { status: 'ok' }
 }
 
+// Texto legible que se guarda en "Selecciona el tipo de solicitud que deseas
+// realizar", reconstruido a partir de las opciones del Paso 2 del site
+// (ver SolicitudMesSubsiguienteView.html) — el payload solo trae el id corto
+// (afectacion/adicionales/jefatura/documentacion/permisos).
+const MES_NOVEDAD_LABELS = {
+  afectacion: 'Libre compensado por afectación (> 06:00 hrs)',
+  adicionales: 'Libre compensado por vuelos adicionales',
+  jefatura: 'Libre aprobado por jefatura directa',
+  documentacion: 'Trámites de Documentación Técnica',
+  permisos: 'Solicitud de Permisos Especiales',
+}
+
 function buildMesSubsiguienteRow(data, correo) {
+  const tipoPermiso = String(data.tipoPermiso || '').trim()
+  const documentoTecnico = String(data.documentoTecnico || '').trim()
+
   return {
     'Marca temporal': new Date(),
-    'Correo': sanitizeValue(correo),
-    'BP': sanitizeValue(data.bp),
-    'Nombre': sanitizeValue(data.nombre),
-    'Mes del Rol': sanitizeValue(data.mesRol),
-    'Novedad': sanitizeValue(data.novedad),
-    'Fecha Afectación': sanitizeValue(data.fechaAfectacion),
-    'N° Vuelo (Afectación)': sanitizeValue(data.numVuelo1),
+    'Dirección de correo electrónico': sanitizeValue(correo),
+    'Ingresa tu BP': sanitizeValue(data.bp),
+    'Ingresa tus nombres y apellidos completos': sanitizeValue(data.nombre),
+    // Para "Solicitud de Permisos Especiales" y "Documentación Técnica" se
+    // guarda el tipo/documento elegido tal cual (no la etiqueta genérica del
+    // paso 2) — así queda igual que en el Sheet original.
+    'Selecciona el tipo de solicitud que deseas realizar': sanitizeValue(
+      data.novedad === 'permisos' ? tipoPermiso
+        : data.novedad === 'documentacion' ? documentoTecnico
+        : (MES_NOVEDAD_LABELS[data.novedad] || data.novedad)
+    ),
+
+    // Panel "Permisos Especiales": el site pide una sola Fecha de
+    // inicio/fin genérica; el Sheet original tenía una columna por tipo
+    // de permiso. Se enruta el mismo valor ingresado a la columna que
+    // corresponde según el tipo elegido, dejando las demás vacías.
+    'Fecha de inicio (Matrimonio)': tipoPermiso === 'Permiso por matrimonio' ? sanitizeValue(data.fechaInicioPermiso) : '',
+    'Fecha de fin (Matrimonio)': tipoPermiso === 'Permiso por matrimonio' ? sanitizeValue(data.fechaFinPermiso) : '',
+    'Fecha de inicio (Paternidad)': tipoPermiso === 'Permiso por paternidad' ? sanitizeValue(data.fechaInicioPermiso) : '',
+    'Fecha de fin (Paternidad)': tipoPermiso === 'Permiso por paternidad' ? sanitizeValue(data.fechaFinPermiso) : '',
+    'Fecha (Mudanza)': tipoPermiso === 'Permiso por mudanza' ? sanitizeValue(data.fechaInicioPermiso) : '',
+    'Fecha (Boda Familiar Directo)': tipoPermiso === 'Permiso por boda de familiar directo' ? sanitizeValue(data.fechaInicioPermiso) : '',
+
+    // Panel "Documentación Técnica": Gestión de Visa usa el bloque
+    // combinado (con comentario); Gestión de Pasaporte usa el bloque
+    // genérico, sin comentario (confirmado contra el Form original:
+    // sección "Gestión de visa" vs "Gestión de pasaporte").
+    'Fecha Cita / Fecha de entrega de pasaporte por renovación de visa': documentoTecnico === 'Gestión Visa Crew y/o Turista' ? sanitizeValue(data.fechaCita) : '',
+    'Hora Cita / Hora entrega pasaporte por renovación de visa': documentoTecnico === 'Gestión Visa Crew y/o Turista' ? sanitizeValue(data.horaCita) : '',
+    'Comentario adicional (Gestión Visa Crew y/o Turista)': documentoTecnico === 'Gestión Visa Crew y/o Turista' ? sanitizeValue(data.comentario4) : '',
+    'Fecha Cita': documentoTecnico === 'Gestión Pasaporte' ? sanitizeValue(data.fechaCita) : '',
+    'Hora Cita': documentoTecnico === 'Gestión Pasaporte' ? sanitizeValue(data.horaCita) : '',
+
+    'Fecha de afectación de libre': sanitizeValue(data.fechaAfectacion),
+    'Número de vuelo (Afectación)': sanitizeValue(data.numVuelo1),
     'Ruta (Afectación)': sanitizeValue(data.ruta1),
-    'Hora Llegada (Afectación)': sanitizeValue(data.horaLlegada1),
-    'Comentario (Afectación)': sanitizeValue(data.comentario1),
-    'Fecha Vuelos Adicionales': sanitizeValue(data.fechaVuelosAdicionales),
-    'N° Vuelo (Adicionales)': sanitizeValue(data.numVuelo2),
-    'Ruta (Adicionales)': sanitizeValue(data.ruta2),
-    'Mes Libre Deseado': sanitizeValue(data.mesLibreDeseado),
-    'Comentario (Adicionales)': sanitizeValue(data.comentario2),
-    'Fecha Libre (Jefatura)': sanitizeValue(data.fechaLibreJefatura),
-    'Motivo (Jefatura)': sanitizeValue(data.motivoJefatura),
-    'Documento Técnico': sanitizeValue(data.documentoTecnico),
-    'Fecha de Cita': sanitizeValue(data.fechaCita),
-    'Hora de Cita': sanitizeValue(data.horaCita),
-    'Comentario (Documentación)': sanitizeValue(data.comentario4),
-    'Tipo de Permiso': sanitizeValue(data.tipoPermiso),
-    'Fecha Inicio Permiso': sanitizeValue(data.fechaInicioPermiso),
-    'Fecha Fin Permiso': sanitizeValue(data.fechaFinPermiso),
+    'Hora de llegada de vuelo': sanitizeValue(data.horaLlegada1),
+    'Comentario adicional (Afectación)': sanitizeValue(data.comentario1),
+
+    'Fecha de afectación de vuelos adicionales': sanitizeValue(data.fechaVuelosAdicionales),
+    'Número de vuelo (Vuelos Adicionales)': sanitizeValue(data.numVuelo2),
+    'Ruta (Vuelos Adicionales)': sanitizeValue(data.ruta2),
+    'Fecha que deseo mi libre (mes subsiguiente)': sanitizeValue(data.mesLibreDeseado),
+    'Comentario adicional (Vuelos Adicionales)': sanitizeValue(data.comentario2),
+
+    'Fecha de libre': sanitizeValue(data.fechaLibreJefatura),
+    'Motivo de la otorgación del libre': sanitizeValue(data.motivoJefatura),
+
+    // 'Estado de Solicitud', 'Freeze', 'CPL', 'Comentarios', 'Comentarios2',
+    // 'Enviar correo' y 'Status de correo' son columnas de uso manual del
+    // equipo de Roles — no se completan desde el formulario.
   }
 }
 

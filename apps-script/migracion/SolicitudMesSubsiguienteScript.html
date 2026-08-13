@@ -92,6 +92,33 @@
       clearMesFieldErrors()
     }
 
+    // Matrimonio/Paternidad piden Fecha de inicio + Fecha de fin (así se
+    // guardan en el Sheet). Mudanza/Boda de Familiar Directo solo tienen
+    // una fecha única en el Sheet original, así que visualmente se oculta
+    // "Fecha de fin" y se renombra "Fecha de inicio" a solo "Fecha".
+    window.handleTipoPermisoChange = function (value) {
+      var soloFecha = value === 'Permiso por mudanza' || value === 'Permiso por boda de familiar directo'
+      var finWrap = document.getElementById('mes-permiso-fin-wrap')
+      var finInput = finWrap.querySelector('input')
+      var inicioLabel = document.getElementById('mes-permiso-inicio-label')
+
+      finWrap.classList.toggle('hidden', soloFecha)
+      finInput.required = !soloFecha
+      if (soloFecha) finInput.value = ''
+      inicioLabel.innerHTML = soloFecha
+        ? 'Fecha <span class="text-latam-coral">*</span>'
+        : 'Fecha de inicio <span class="text-latam-coral">*</span>'
+    }
+
+    // Gestión Visa Crew y/o Turista sí tiene "Comentario adicional" en el
+    // Sheet original; Gestión Pasaporte no — solo Fecha Cita + Hora Cita.
+    window.handleDocumentoTecnicoChange = function (value) {
+      var comentarioWrap = document.getElementById('mes-doc-comentario-wrap')
+      var esPasaporte = value === 'Gestión Pasaporte'
+      comentarioWrap.classList.toggle('hidden', esPasaporte)
+      if (esPasaporte) comentarioWrap.querySelector('textarea').value = ''
+    }
+
     function clearMesFieldErrors() {
       document.querySelectorAll('.mes-fld').forEach(function (el) {
         el.classList.remove('border-red-400', 'ring-4', 'ring-red-100')
@@ -180,6 +207,8 @@
             panel.classList.remove('grid')
           })
           document.getElementById('mes-meta-panel').classList.add('hidden')
+          handleTipoPermisoChange('')
+          handleDocumentoTecnicoChange('')
           var buttonsAfterSubmit = document.getElementById('mes-buttons')
           buttonsAfterSubmit.classList.add('hidden')
           buttonsAfterSubmit.classList.remove('flex')
@@ -216,6 +245,8 @@
         panel.classList.remove('grid')
       })
       document.getElementById('mes-meta-panel').classList.add('hidden')
+      handleTipoPermisoChange('')
+      handleDocumentoTecnicoChange('')
       var buttonsOnClear = document.getElementById('mes-buttons')
       buttonsOnClear.classList.add('hidden')
       buttonsOnClear.classList.remove('flex')
