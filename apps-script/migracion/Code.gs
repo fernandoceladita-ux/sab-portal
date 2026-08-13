@@ -196,8 +196,20 @@ const VACACIONES_GID = 1772728526
 // Mismos GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
 // los trámites del módulo "Gestión Operacional" — comparten el mismo Sheet
 // y Drive reales.
-const UNIFORMES_GID = 815933579
+const UNIFORMES_GID = 815933579 // ya no se escribe acá, ver UNIFORMES_LANYARD_GID / UNIFORMES_CALIDAD_GID
 const UNIFORMES_FOLDER_ID = '1ivO-uXw8HWzFICk0w3RzPwUv7tnYHNDT'
+
+// Cambio de Uniforme se guardaba antes en 2 Google Forms/Sheets separados
+// (uno por canal). Migramos de vuelta a 2 pestañas —mismo Sheet por ahora,
+// pero con los headers EXACTOS de esos sheets originales— para que el día
+// que se apunte directo a los sheets legacy solo haya que cambiar el GID acá,
+// sin tocar el mapeo de columnas.
+// TODO: crear ambas pestañas en el mismo Sheet (SHEET_ID) con esos headers
+// exactos y reemplazar estos placeholders por su GID real (el número después
+// de #gid= en la URL de cada pestaña). Mientras diga REEMPLAZAR, writeToSheet
+// va a fallar con "No se encontró la pestaña (gid) indicada".
+const UNIFORMES_LANYARD_GID = 784092675
+const UNIFORMES_CALIDAD_GID = 1182245477
 const REGISTRO_SUNAT_GID = 1592932357
 
 // Máximo de envíos aceptados por minuto, contados globalmente.
@@ -508,29 +520,51 @@ function submitCambioUniforme(data) {
     throw new Error('Nombre y apellidos son obligatorios')
   }
 
-  const fotoUrl = data.calidadFoto
-    ? uploadFileToDrive(data.calidadFoto, data.calidadFotoNombre, data.calidadFotoTipo, UNIFORMES_FOLDER_ID)
-    : ''
+  // Cada canal va a su propia pestaña con headers idénticos al sheet legacy
+  // correspondiente (ver comentario en UNIFORMES_LANYARD_GID más arriba).
+  if (data.canal === 'lanyard') {
+    writeToSheet(UNIFORMES_LANYARD_GID, buildLanyardRow(data, correo))
+    return { status: 'ok' }
+  }
 
-  writeToSheet(UNIFORMES_GID, buildUniformesRow(data, correo, fotoUrl))
-  return { status: 'ok' }
+  if (data.canal === 'calidad') {
+    const fotoUrl = data.calidadFoto
+      ? uploadFileToDrive(data.calidadFoto, data.calidadFotoNombre, data.calidadFotoTipo, UNIFORMES_FOLDER_ID)
+      : ''
+    writeToSheet(UNIFORMES_CALIDAD_GID, buildCalidadRow(data, correo, fotoUrl))
+    return { status: 'ok' }
+  }
+
+  throw new Error('Canal no reconocido')
 }
 
-function buildUniformesRow(data, correo, fotoUrl) {
+// Headers idénticos al Google Sheet original de "Solicitud de Lanyards
+// Región Andina" (Marca temporal, Dirección de correo electrónico, Ingresar
+// BP, Motivo, Nombre, Base).
+function buildLanyardRow(data, correo) {
   return {
     'Marca temporal': new Date(),
-    'Correo': sanitizeValue(correo),
-    'Nombre Colaborador': sanitizeValue(data.nombreColaborador),
-    'Canal': sanitizeValue(data.canal),
-    'BP (Lanyard)': sanitizeValue(data.lanyardBP),
-    'Nombre (Lanyard)': sanitizeValue(data.lanyardNombre),
-    'Motivo (Lanyard)': sanitizeValue(data.motivo),
-    'Base (Lanyard)': sanitizeValue(data.base),
-    'BP (Calidad)': sanitizeValue(data.calidadBP),
-    'Nombre (Calidad)': sanitizeValue(data.calidadNombre),
-    'Tipo de Solicitud (Calidad)': sanitizeValue(data.calidadTipo),
-    'Detalle (Calidad)': sanitizeValue(data.calidadDetalle),
-    'Foto de Prenda (Calidad)': fotoUrl || '',
+    'Dirección de correo electrónico': sanitizeValue(correo),
+    'Ingresar BP': sanitizeValue(data.lanyardBP),
+    'Motivo': sanitizeValue(data.motivo),
+    'Nombre': sanitizeValue(data.lanyardNombre),
+    'Base': sanitizeValue(data.base),
+  }
+}
+
+// Headers idénticos al Google Sheet original de "Formulario de reclamos de
+// calidad de prendas LP" (las columnas RECIBIDO / SOLICITUD DE EMERGENCIA /
+// ENTREGA / CASOS CALIDAD / FOTO las llena el equipo a mano después, no el
+// formulario — si esa pestaña las tiene, quedan vacías y no pasa nada).
+function buildCalidadRow(data, correo, fotoUrl) {
+  return {
+    'Marca temporal': new Date(),
+    'Dirección de correo electrónico': sanitizeValue(correo),
+    'BP': sanitizeValue(data.calidadBP),
+    'NOMBRE': sanitizeValue(data.calidadNombre),
+    'Descripción de solicitud por calidad': sanitizeValue(data.calidadTipo),
+    'Detallar cual fue el error en la talla o el problema por la mala calidad': sanitizeValue(data.calidadDetalle),
+    'SUBIR FOTO DE PRENDA O ARTÍCULO CON ETIQUETA (es necesario para que se identifique qué proveedor es).': fotoUrl || '',
   }
 }
 
@@ -556,19 +590,23 @@ function submitRegistroSunat(data) {
   return { status: 'ok' }
 }
 
+// Headers idénticos al Google Sheet original de "Registro de Equipos SUNAT"
+// (las columnas Fecha de Registro / Status / Comentario / Tiempo de
+// Respuesta a TC (días) las llena el equipo a mano después, no el
+// formulario — si la pestaña las tiene, quedan vacías y no pasa nada).
 function buildRegistroSunatRow(data, correo) {
   return {
     'Marca temporal': new Date(),
-    'Correo': sanitizeValue(correo),
+    'Dirección de correo electrónico': sanitizeValue(correo),
     'BP': sanitizeValue(data.bp),
-    'Nombre': sanitizeValue(data.nombre),
-    'Fecha de Nacimiento': sanitizeValue(data.fechaNacimiento),
-    'Pasaporte': sanitizeValue(data.pasaporte),
-    'Tipo de Equipo': sanitizeValue(data.tipoEquipo),
-    'Uso': sanitizeValue(data.uso),
-    'Marca': sanitizeValue(data.marca),
-    'Modelo': sanitizeValue(data.modelo),
-    'Serie': sanitizeValue(data.serie),
+    'APELLIDOS Y NOMBRES': sanitizeValue(data.nombre),
+    'PASAPORTE': sanitizeValue(data.pasaporte),
+    'TIPO DE EQUIPO': sanitizeValue(data.tipoEquipo),
+    'USO': sanitizeValue(data.uso),
+    'MARCA': sanitizeValue(data.marca),
+    'MODELO (sin guiones)': sanitizeValue(data.modelo),
+    'SERIE (sin guiones)': sanitizeValue(data.serie),
+    'FECHA DE NACIMIENTO (dd/mm/aaaa)': sanitizeValue(data.fechaNacimiento),
   }
 }
 
