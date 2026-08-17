@@ -337,11 +337,19 @@
     modal.classList.add('flex')
     document.body.style.overflow = 'hidden'
   }
+  // Modales que necesitan limpiar su propio estado JS (no solo <form>.reset())
+  // al cerrarse — por X, por "Cancelar", por click en el backdrop o por
+  // Escape, todos pasan por acá, así que basta con registrarlos una vez.
+  const MODAL_RESET_FN = {
+    'modal-reporte': 'resetReporteForm',
+  }
   function closeModal(id) {
     const modal = document.getElementById(id)
     modal.classList.add('hidden')
     modal.classList.remove('flex')
     document.body.style.overflow = ''
+    const fnName = MODAL_RESET_FN[id]
+    if (fnName && typeof window[fnName] === 'function') window[fnName]()
   }
   function closeModalBackdrop(e, id) {
     if (e.target.id === id) closeModal(id)
@@ -352,41 +360,7 @@
     closeSearch()
   })
 
-  // ===================== Formularios de los modales (simulados) =====================
-  // Igual que en la versión React: por ahora estos dos formularios no están
-  // conectados a un backend real, solo simulan el envío (setTimeout). Se
-  // pueden conectar más adelante al mismo bridge de Google Sheets que usan
-  // los formularios de trámites (ver /apps-script/Code.gs).
-  function fakeSubmit(e, formId, successId, modalId) {
-    e.preventDefault()
-    const form = document.getElementById(formId)
-    if (!form.checkValidity()) {
-      form.reportValidity()
-      return
-    }
-    const btn = form.querySelector('button[type="submit"]')
-    const label = btn.querySelector('.btn-label')
-    btn.disabled = true
-    const originalText = label.textContent
-    label.textContent = 'Enviando...'
-    setTimeout(() => {
-      form.classList.add('hidden')
-      document.getElementById(successId).classList.remove('hidden')
-      document.getElementById(successId).classList.add('flex')
-      setTimeout(() => {
-        closeModal(modalId)
-        form.reset()
-        form.classList.remove('hidden')
-        document.getElementById(successId).classList.add('hidden')
-        document.getElementById(successId).classList.remove('flex')
-        btn.disabled = false
-        label.textContent = originalText
-        if (formId === 'form-absentismo') clearFile('absentismo')
-      }, 1800)
-    }, 700)
-  }
-
-  // ===================== Upload de archivo (modal Absentismo) =====================
+  // ===================== Upload de archivo (modales con adjunto) =====================
   function handleFileChange(input, prefix) {
     const file = input.files && input.files[0]
     if (!file) return
@@ -564,6 +538,20 @@
         const body = document.getElementById('step-2-body')
         if (body && body.style.gridTemplateRows !== '1fr') toggleStep(2)
       }
+    }, 60)
+  }
+
+  // ===================== "Ir" a Descanso Médico (Centro de Ayuda y Reportes → Mi Rol) =====================
+  // La tarjeta "Absentismos" del Home ya no abre el modal simulado — lleva
+  // directo a Mi Rol > Descanso Médico con el desplegable 2 (el formulario)
+  // ya abierto, en vez de dejarlo colapsado como al entrar por el menú normal.
+  function openDescansoMedicoFromHome() {
+    showView('mi-rol')
+    closeAllMenus()
+    if (typeof selectHubItemMiRol === 'function') selectHubItemMiRol('descanso-medico')
+    setTimeout(() => {
+      const body = document.getElementById('dm-step-2-body')
+      if (body && body.style.gridTemplateRows !== '1fr') toggleAccordion('dm-step-2-body', 'dm-step-2-chevron')
     }, 60)
   }
 

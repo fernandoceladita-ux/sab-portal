@@ -1,0 +1,234 @@
+<script>
+  (function () {
+    // El modal "Reportes" (Home) solo tiene "Reporte de Demoras" por ahora,
+    // con 2 sub-tipos que van cada uno a su propia pestaña del Sheet (ver
+    // submitReporteDemora en Code.gs). Cuando se sumen más tipos de reporte,
+    // este archivo es el lugar para ampliar el mapeo.
+    var reporteState = { subtipo: null, siNo: null }
+
+    var DEMORA_PREGUNTAS = {
+      'sin-hotel': '¿Tuviste demora > 4 horas de espera sin beneficio de hotel?',
+      'fuera-avion': '¿Tuviste demora mayor a 1:45 horas fuera del avión?',
+    }
+
+    window.selectDemoraSubtipo = function (subtipo) {
+      reporteState.subtipo = subtipo
+      document.querySelectorAll('.demora-subtipo-btn').forEach(function (btn) {
+        var active = btn.getAttribute('data-demora-subtipo') === subtipo
+        btn.classList.toggle('border-latam-coral', active)
+        btn.classList.toggle('bg-latam-coral/10', active)
+        btn.classList.toggle('text-white', active)
+        btn.classList.toggle('border-white/15', !active)
+        btn.classList.toggle('bg-white/5', !active)
+        btn.classList.toggle('text-white/80', !active)
+        var dot = btn.querySelector('.demora-subtipo-dot')
+        if (dot) {
+          dot.classList.toggle('border-latam-coral', active)
+          dot.classList.toggle('bg-latam-coral', active)
+          dot.classList.toggle('border-white/30', !active)
+        }
+      })
+
+      document.getElementById('demora-pregunta').textContent = DEMORA_PREGUNTAS[subtipo]
+      // ATO / Validación MD solo existen en el Sheet de "Sin Hotel".
+      document.getElementById('demora-ato-wrap').classList.toggle('hidden', subtipo !== 'sin-hotel')
+      document.getElementById('demora-validacionmd-wrap').classList.toggle('hidden', subtipo !== 'sin-hotel')
+      document.getElementById('demora-panel').classList.remove('hidden')
+
+      if (!document.getElementById('tripulacion-list').children.length) addTripulanteRow()
+      reporteState.siNo = null
+      updateDemoraSiNoUI()
+    }
+
+    window.selectDemoraSiNo = function (value) {
+      reporteState.siNo = value
+      updateDemoraSiNoUI()
+    }
+
+    function updateDemoraSiNoUI() {
+      document.querySelectorAll('.demora-sino-btn').forEach(function (btn) {
+        var active = btn.getAttribute('data-demora-sino') === reporteState.siNo
+        btn.classList.toggle('border-latam-coral', active)
+        btn.classList.toggle('bg-latam-coral/10', active)
+        btn.classList.toggle('text-white', active)
+        btn.classList.toggle('border-white/15', !active)
+        btn.classList.toggle('bg-white/5', !active)
+        btn.classList.toggle('text-white/80', !active)
+      })
+    }
+
+    // ===================== Lista dinámica de tripulación =====================
+    window.addTripulanteRow = function () {
+      var list = document.getElementById('tripulacion-list')
+      var row = document.createElement('div')
+      row.className = 'flex items-center gap-2'
+      row.innerHTML =
+        '<input type="text" name="tripulante" required class="reporte-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" placeholder="Apellidos y Nombres" />' +
+        '<button type="button" aria-label="Quitar tripulante" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-latam-coral" onclick="removeTripulanteRow(this)">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>' +
+        '</button>'
+      list.appendChild(row)
+    }
+
+    window.removeTripulanteRow = function (btn) {
+      var list = document.getElementById('tripulacion-list')
+      var row = btn.closest('div')
+      // Siempre debe quedar al menos 1 fila — si es la única, se limpia en
+      // vez de eliminarse (así "Agrega los nombres..." nunca queda sin fila).
+      if (list.children.length <= 1) {
+        row.querySelector('input').value = ''
+        return
+      }
+      row.remove()
+    }
+
+    // ===================== Envío =====================
+    function runServer(fnName) {
+      var args = Array.prototype.slice.call(arguments, 1)
+      return new Promise(function (resolve, reject) {
+        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+        runner[fnName].apply(runner, args)
+      })
+    }
+
+    function fileToBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader()
+        reader.onload = function () { resolve(String(reader.result).split(',')[1] || '') }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    }
+
+    function clearReporteFieldErrors() {
+      document.querySelectorAll('.reporte-fld').forEach(function (el) {
+        el.classList.remove('border-red-400', 'ring-4', 'ring-red-400/20')
+      })
+    }
+
+    function validateReporteForm() {
+      clearReporteFieldErrors()
+      var form = document.getElementById('form-reporte')
+      var ok = true
+      var firstInvalid = null
+
+      form.querySelectorAll('.reporte-fld[required]').forEach(function (el) {
+        if (el.offsetParent === null) return
+        var val = (el.value || '').trim()
+        var invalid = !val
+        if (!invalid && el.type === 'email') invalid = !/.+@latam\.com$/i.test(val)
+        if (invalid) {
+          ok = false
+          el.classList.add('border-red-400', 'ring-4', 'ring-red-400/20')
+          if (!firstInvalid) firstInvalid = el
+        }
+      })
+
+      if (!reporteState.subtipo) ok = false
+      if (!reporteState.siNo) ok = false
+      if (firstInvalid) firstInvalid.focus()
+      return ok
+    }
+
+    window.submitReporteForm = async function () {
+      var errorBox = document.getElementById('reporte-error')
+      var successBox = document.getElementById('reporte-success')
+      errorBox.classList.add('hidden')
+      successBox.classList.add('hidden')
+      successBox.classList.remove('flex')
+
+      if (!validateReporteForm()) {
+        errorBox.textContent = !reporteState.subtipo
+          ? 'Selecciona el tipo de demora que deseas reportar.'
+          : !reporteState.siNo
+          ? 'Responde si tuviste la demora.'
+          : 'Por favor completa todos los campos obligatorios.'
+        errorBox.classList.remove('hidden')
+        return
+      }
+
+      var form = document.getElementById('form-reporte')
+      var formData = new FormData(form)
+      var tripulantes = Array.from(document.querySelectorAll('#tripulacion-list input'))
+        .map(function (el) { return el.value.trim() })
+        .filter(Boolean)
+
+      var fileInput = document.getElementById('reportedemora-file-input')
+      var file = fileInput.files && fileInput.files[0]
+
+      var btnEnviar = document.getElementById('reporte-btn-enviar')
+      var label = document.getElementById('reporte-btn-enviar-label')
+      btnEnviar.disabled = true
+      label.textContent = 'Enviando...'
+
+      try {
+        var archivo = file ? await fileToBase64(file) : ''
+        var payload = {
+          correo: formData.get('correo'),
+          bp: formData.get('bp'),
+          nombre: formData.get('nombre'),
+          categoria: formData.get('categoria'),
+          correoCpl: formData.get('correoCpl'),
+          subtipo: reporteState.subtipo,
+          demoraSiNo: reporteState.siNo,
+          fecha: formData.get('fecha'),
+          numeroVuelo: formData.get('numeroVuelo'),
+          tripulacion: tripulantes.join(', '),
+          comentarioAdicional: formData.get('comentarioAdicional'),
+          archivo: archivo,
+          archivoNombre: file ? file.name : '',
+          archivoTipo: file ? file.type : '',
+          ato: formData.get('ato'),
+          validacionMd: formData.get('validacionMd'),
+        }
+        await runServer('submitReporteDemora', payload)
+        resetReporteForm()
+        successBox.classList.remove('hidden')
+        successBox.classList.add('flex')
+      } catch (err) {
+        errorBox.textContent = 'Ocurrió un error al enviar tu reporte. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
+        errorBox.classList.remove('hidden')
+      } finally {
+        btnEnviar.disabled = false
+        label.textContent = 'Enviar Reporte'
+      }
+    }
+
+    // Llamada tanto al cerrar el modal (ver MODAL_RESET_FN en Scripts.html)
+    // como tras un envío exitoso — así vuelve a su estado inicial en ambos
+    // casos, sin arrastrar nada de la vez anterior.
+    window.resetReporteForm = function () {
+      var form = document.getElementById('form-reporte')
+      if (form) form.reset()
+      clearReporteFieldErrors()
+
+      document.querySelectorAll('.demora-subtipo-btn').forEach(function (btn) {
+        btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-white')
+        btn.classList.add('border-white/15', 'bg-white/5', 'text-white/80')
+        var dot = btn.querySelector('.demora-subtipo-dot')
+        if (dot) {
+          dot.classList.remove('border-latam-coral', 'bg-latam-coral')
+          dot.classList.add('border-white/30')
+        }
+      })
+
+      var panel = document.getElementById('demora-panel')
+      if (panel) panel.classList.add('hidden')
+      var list = document.getElementById('tripulacion-list')
+      if (list) list.innerHTML = ''
+      if (typeof clearFile === 'function') clearFile('reportedemora')
+
+      reporteState.subtipo = null
+      reporteState.siNo = null
+      updateDemoraSiNoUI()
+
+      var errorBox = document.getElementById('reporte-error')
+      var successBox = document.getElementById('reporte-success')
+      if (errorBox) errorBox.classList.add('hidden')
+      if (successBox) {
+        successBox.classList.add('hidden')
+        successBox.classList.remove('flex')
+      }
+    }
+  })()
+</script>

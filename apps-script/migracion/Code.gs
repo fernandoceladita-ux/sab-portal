@@ -18,8 +18,8 @@
 //   Home.html      hero + carrusel de novedades + tarjetas de módulos + FAQ
 //                  + Centro de Ayuda (home actual)
 //   Placeholder.html  página temporal para módulos aún no migrados
-//   Modals.html    modal de detalle de noticia + modal Reporte Diario +
-//                  modal Absentismo (se muestran/ocultan con JS, no navegan)
+//   Modals.html    modal de detalle de noticia + modal Reportes (Reporte de
+//                  Demoras) — se muestran/ocultan con JS, no navegan
 //   Scripts.html   todo el JS del sitio (menú, carrusel, acordeón FAQ, modales)
 //
 // Cómo desplegar:
@@ -646,6 +646,122 @@ function buildRegistroSunatRow(data, correo) {
     'MODELO (sin guiones)': sanitizeValue(data.modelo),
     'SERIE (sin guiones)': sanitizeValue(data.serie),
     'FECHA DE NACIMIENTO (dd/mm/aaaa)': sanitizeValue(data.fechaNacimiento),
+  }
+}
+
+// ============================================================================
+// Reportes — modal "Reportes" en Home (Centro de Ayuda y Reportes). Por
+// ahora solo existe el tipo "Reporte de Demoras", con 2 sub-tipos que van
+// cada uno a su propia pestaña, con headers idénticos a los Sheets
+// originales de AppSheet. Se puede sumar más tipos de reporte más adelante
+// sin tocar lo ya armado acá.
+//
+// En AppSheet, id/codigo_operacion/pais/correo/fecha_hora se llenan solos
+// (cuenta de Google + fórmula); acá no hay ese contexto automático, así que
+// correo/bp/nombre/categoria/correo_cpl los pide el formulario, y
+// id/codigo_operacion/pais/fecha_hora se arman en el servidor.
+// ============================================================================
+
+// TODO: crear ambas pestañas en el mismo Sheet (SHEET_ID) con esos headers
+// exactos ("Pago_Demora_4H_Sin_Hotel_LP" / "Pago_Demora_145_Fuera_Avion_LP")
+// y reemplazar estos -1 por el gid real de cada una (el número después de
+// #gid= en la URL de esa pestaña). -1 nunca es un gid real, así que mientras
+// no se reemplace, writeToSheet falla con un error claro en vez de escribir
+// por accidente en la pestaña equivocada.
+const DEMORA_SIN_HOTEL_GID = 523210422
+const DEMORA_FUERA_AVION_GID = 345983368
+// TODO: crear una carpeta en Drive para los "Archivo de referencia" de este
+// reporte, compartirla como "Cualquier persona con el enlace: Lector", y
+// pegar el ID acá (ver driveImg()/demás *_FOLDER_ID para el formato).
+const DEMORA_ARCHIVO_FOLDER_ID = '1CjlIt4LLX9APfxtFuAgw8rvq__yvAPbG'
+
+const DEMORA_TIPO_LABELS = {
+  'sin-hotel': 'Pago por demora de vuelo > 4 horas sin beneficio de espera en hotel - LP',
+  'fuera-avion': 'Pago por demora de vuelo inicial > 1:45 horas fuera del avión - LP',
+}
+
+// Llamada desde ReportesScript.html vía `google.script.run.submitReporteDemora(payload)`.
+function submitReporteDemora(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const subtipo = String(data.subtipo || '').trim()
+  if (subtipo !== 'sin-hotel' && subtipo !== 'fuera-avion') {
+    throw new Error('Selecciona el tipo de demora que deseas reportar')
+  }
+
+  const archivoUrl = data.archivo
+    ? uploadFileToDrive(data.archivo, data.archivoNombre, data.archivoTipo, DEMORA_ARCHIVO_FOLDER_ID)
+    : ''
+
+  // Mismo formato de id corto (8 caracteres hex) que ya usa AppSheet para
+  // armar 'codigo_operacion' — ahí sale solo, acá se arma a mano.
+  const id = Utilities.getUuid().split('-')[0]
+  const pais = 'LP' // fijo por ahora — más adelante puede variar (ver conversación).
+  const codigoOperacion = id + '-LATAM-' + pais
+
+  if (subtipo === 'sin-hotel') {
+    writeToSheet(DEMORA_SIN_HOTEL_GID, buildDemoraSinHotelRow(data, correo, id, codigoOperacion, pais, archivoUrl))
+  } else {
+    writeToSheet(DEMORA_FUERA_AVION_GID, buildDemoraFueraAvionRow(data, correo, id, codigoOperacion, pais, archivoUrl))
+  }
+
+  return { status: 'ok' }
+}
+
+function buildDemoraSinHotelRow(data, correo, id, codigoOperacion, pais, archivoUrl) {
+  return {
+    'pago_demora_4h_sin_hotel_lp_id': id,
+    'codigo_operacion': codigoOperacion,
+    'pais': pais,
+    'correo': sanitizeValue(correo),
+    'fecha_hora': new Date(),
+    'bp': sanitizeValue(data.bp),
+    'nombre': sanitizeValue(data.nombre),
+    'categoria': sanitizeValue(data.categoria),
+    'correo_cpl': sanitizeValue(data.correoCpl),
+    'tipo': DEMORA_TIPO_LABELS['sin-hotel'],
+    'demora_mayor_4h_sin_hotel': sanitizeValue(data.demoraSiNo),
+    'fecha': sanitizeValue(data.fecha),
+    'numero_vuelo': sanitizeValue(data.numeroVuelo),
+    'tripulacion': sanitizeValue(data.tripulacion),
+    'comentario_adicional': sanitizeValue(data.comentarioAdicional),
+    'archivo_referencia': archivoUrl || '',
+    'ATO': sanitizeValue(data.ato),
+    'Validación MD': sanitizeValue(data.validacionMd),
+  }
+}
+
+function buildDemoraFueraAvionRow(data, correo, id, codigoOperacion, pais, archivoUrl) {
+  return {
+    'pago_demora_145_fuera_avion_lp_id': id,
+    'codigo_operacion': codigoOperacion,
+    'pais': pais,
+    'correo': sanitizeValue(correo),
+    'fecha_hora': new Date(),
+    'bp': sanitizeValue(data.bp),
+    'nombre': sanitizeValue(data.nombre),
+    'categoria': sanitizeValue(data.categoria),
+    'correo_cpl': sanitizeValue(data.correoCpl),
+    'tipo': DEMORA_TIPO_LABELS['fuera-avion'],
+    'demora_mayor_145_fuera_avion': sanitizeValue(data.demoraSiNo),
+    'fecha': sanitizeValue(data.fecha),
+    'numero_vuelo': sanitizeValue(data.numeroVuelo),
+    'tripulacion': sanitizeValue(data.tripulacion),
+    'comentario_adicional': sanitizeValue(data.comentarioAdicional),
+    'archivo_referencia': archivoUrl || '',
   }
 }
 
