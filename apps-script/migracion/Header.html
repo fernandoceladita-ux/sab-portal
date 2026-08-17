@@ -68,11 +68,45 @@
       </div>
     </nav>
 
-    <!-- Mobile toggle -->
-    <button id="mobile-toggle" onclick="toggleMobileMenu()" class="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-colors active:bg-white/10 lg:hidden" aria-label="Abrir menú">
-      <svg id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-6 w-6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" stroke-width="2" /></svg>
-      <svg id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="hidden h-6 w-6"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
-    </button>
+    <!-- Buscador + toggle mobile agrupados: en mobile el <nav> desaparece y
+         sin este wrapper `justify-between` los repartía sueltos por toda la
+         fila (logo... lupa... hamburguesa). Así quedan pegados a la derecha,
+         uno al lado del otro. -->
+    <div class="flex items-center gap-1">
+      <!-- Buscador: ícono siempre visible (desktop y mobile) que despliega
+           search-panel debajo del header. Ver SEARCH_INDEX en Scripts.html. -->
+      <button id="search-toggle" type="button" onclick="toggleSearch()" class="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/10 active:bg-white/10" aria-label="Buscar un trámite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>
+      </button>
+
+      <!-- Mobile toggle -->
+      <button id="mobile-toggle" onclick="toggleMobileMenu()" class="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-colors active:bg-white/10 lg:hidden" aria-label="Abrir menú">
+        <svg id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-6 w-6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" stroke-width="2" /></svg>
+        <svg id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="hidden h-6 w-6"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel de búsqueda -->
+  <div id="search-panel" class="absolute inset-x-0 top-full z-50 hidden animate-fadeUp px-4 pt-3 sm:px-6 lg:px-10">
+    <div class="mx-auto w-full max-w-lg rounded-2xl border-t-4 border-latam-coral bg-white p-3 shadow-card">
+      <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-slate-400"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Buscar un trámite..."
+          autocomplete="off"
+          oninput="handleSearchInput(this.value)"
+          onkeydown="handleSearchKeydown(event)"
+          class="w-full bg-transparent text-[14px] font-semibold text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+        />
+        <button type="button" onclick="closeSearch()" aria-label="Cerrar búsqueda" class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+      <div id="search-results" class="mt-1 max-h-[60vh] overflow-y-auto"></div>
+    </div>
   </div>
 
   <!-- Mobile drawer -->

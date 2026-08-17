@@ -37,13 +37,106 @@
     })
     document.getElementById('mobile-toggle').classList.toggle('text-latam-estrellada', solid)
     document.getElementById('mobile-toggle').classList.toggle('text-white', !solid)
+    document.getElementById('search-toggle').classList.toggle('text-latam-estrellada', solid)
+    document.getElementById('search-toggle').classList.toggle('text-white', !solid)
   }
   window.addEventListener('scroll', applyHeaderSkin, { passive: true })
   applyHeaderSkin()
 
+  // ===================== Buscador del header =====================
+  // Mismos 15 ítems que ya están en los mega-menús/drawer (ver Header.html)
+  // — se listan acá aparte en vez de leerlos del DOM porque algunos abren
+  // en pestaña nueva (Renovación de Fotocheck, vía AppSheet) y necesitan
+  // ese comportamiento distinto al navegar desde un resultado.
+  const SEARCH_INDEX = [
+    { title: 'Actualización de Datos', module: 'Gestión Personal', href: '?page=gestion-personal&item=actualizacion-datos', dot: 'bg-latam-diavivo' },
+    { title: 'Renovación de Fotocheck', module: 'Gestión Personal', href: 'https://www.appsheet.com/Account/Login?appName=Solicitud%20De%20Credenciales%20PE&FullScope=False&provider=google&returnUrl=https%3A%2F%2Fwww.appsheet.com%2Fstart%2Ffc09f2b3-fd11-46ae-882b-d8ce2cb7a8d1%3Fplatform%3Ddesktop#appName=SolicitudDeCredencialesPE-501453028&vss=H4sIAAAAAAAAA6WOOw7CMBAF7_Jqn8AliAIhaEA0mMLEG8kisaPYCUSW786aj1ID5b7VjCZhtHTbR11dIU9pvjY0QSIpHKaOFKTC0rvY-0ZBKOx0-xoXltxIzhqtkJHP4mOIFCDTtwL5b4GANeSirS31xVZYtrxJfheOh5lCFmiHqC8NPbOZypm32ldDIHPknJ8ywtqt7p12ZusNS2vdBMoPSSDo2G8BAAA=&view=Bienvenida', dot: 'bg-latam-diavivo', external: true },
+    { title: 'Domicilio DGAC', module: 'Gestión Personal', href: '?page=gestion-personal&item=domicilio-dgac', dot: 'bg-latam-diavivo' },
+    { title: 'Vacuna Fiebre Amarilla', module: 'Gestión Personal', href: '?page=gestion-personal&item=vacuna-fiebre-amarilla', dot: 'bg-latam-diavivo' },
+    { title: 'Procedimiento Visa / Pasaporte', module: 'Gestión Personal', href: '?page=gestion-personal&item=visa-pasaporte', dot: 'bg-latam-diavivo' },
+    { title: 'Solicitud Mes Subsiguiente', module: 'Mi Rol', href: '?page=mi-rol&item=solicitud-mes-subsiguiente', dot: 'bg-latam-estrellada' },
+    { title: 'Cambios Voluntarios', module: 'Mi Rol', href: '?page=mi-rol&item=cambios-voluntarios', dot: 'bg-latam-estrellada' },
+    { title: 'Descanso Médico', module: 'Mi Rol', href: '?page=mi-rol&item=descanso-medico', dot: 'bg-latam-estrellada' },
+    { title: 'Activa tu seguro Médico', module: 'Mi Rol', href: '?page=mi-rol&item=seguro-medico', dot: 'bg-latam-estrellada' },
+    { title: 'Intercambio o Cesión de Vacaciones', module: 'Mi Rol', href: '?page=mi-rol&item=cesion-vacaciones', dot: 'bg-latam-estrellada' },
+    { title: 'Grupos PBS 2026', module: 'Mi Rol', href: '?page=mi-rol&item=grupos-pbs', dot: 'bg-latam-estrellada' },
+    { title: 'Cambios Web SAB LP', module: 'Mi Rol', href: '?page=mi-rol&item=cambios-web-sab', dot: 'bg-latam-estrellada' },
+    { title: 'Instructivo de Vales', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=instructivo-vales', dot: 'bg-latam-profunda' },
+    { title: 'Consultas Viáticos y Horas de Vuelo', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=consultas-viaticos', dot: 'bg-latam-profunda' },
+    { title: 'Cambio de Uniforme', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=cambio-uniforme', dot: 'bg-latam-profunda' },
+    { title: 'Registro de Equipos SUNAT', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=registro-sunat', dot: 'bg-latam-profunda' },
+  ]
+
+  function normalizeSearch(str) {
+    return str.toLowerCase()
+      .replace(/[áàä]/g, 'a')
+      .replace(/[éèë]/g, 'e')
+      .replace(/[íìï]/g, 'i')
+      .replace(/[óòö]/g, 'o')
+      .replace(/[úùü]/g, 'u')
+      .replace(/ñ/g, 'n')
+  }
+
+  function toggleSearch() {
+    const panel = document.getElementById('search-panel')
+    const isOpen = !panel.classList.contains('hidden')
+    if (isOpen) {
+      closeSearch()
+      return
+    }
+    closeAllMenus()
+    panel.classList.remove('hidden')
+    const input = document.getElementById('search-input')
+    input.value = ''
+    renderSearchResults('')
+    setTimeout(() => input.focus(), 0)
+  }
+  function closeSearch() {
+    document.getElementById('search-panel').classList.add('hidden')
+  }
+  function handleSearchInput(value) {
+    renderSearchResults(value)
+  }
+  function handleSearchKeydown(e) {
+    if (e.key !== 'Enter') return
+    const first = document.querySelector('#search-results a')
+    if (!first) return
+    if (first.target === '_blank') window.open(first.href, '_blank', 'noopener,noreferrer')
+    else window.location.href = first.href
+  }
+  function renderSearchResults(query) {
+    const results = document.getElementById('search-results')
+    const q = normalizeSearch(query.trim())
+    if (!q) {
+      results.innerHTML = ''
+      return
+    }
+    const matches = SEARCH_INDEX.filter((item) => normalizeSearch(item.title).includes(q))
+    if (!matches.length) {
+      results.innerHTML = '<p class="px-3 py-4 text-center text-[13px] font-semibold text-slate-400">No se encontraron trámites para &quot;' + query.trim() + '&quot;.</p>'
+      return
+    }
+    results.innerHTML = matches.map((item) => (
+      '<a href="' + item.href + '"' + (item.external ? ' target="_blank" rel="noopener noreferrer"' : '') + ' class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-slate-50">' +
+        '<span class="h-2 w-2 flex-shrink-0 rounded-full ' + item.dot + '"></span>' +
+        '<span class="flex flex-col">' +
+          '<span class="text-[14px] font-bold text-slate-800">' + item.title + '</span>' +
+          '<span class="text-[12px] font-semibold text-slate-400">' + item.module + '</span>' +
+        '</span>' +
+      '</a>'
+    )).join('')
+  }
+  document.addEventListener('mousedown', (e) => {
+    const panel = document.getElementById('search-panel')
+    if (panel.classList.contains('hidden')) return
+    const toggle = document.getElementById('search-toggle')
+    if (!panel.contains(e.target) && !toggle.contains(e.target)) closeSearch()
+  })
+
   // ===================== Mega-menú desktop =====================
   let openMenuKey = null
   function toggleMenu(key) {
+    closeSearch()
     document.querySelectorAll('.mega-panel').forEach((p) => {
       if (p.id !== 'menu-' + key) p.classList.add('hidden')
     })
@@ -72,6 +165,7 @@
 
   // ===================== Drawer mobile =====================
   function toggleMobileMenu() {
+    closeSearch()
     mobileOpen = !mobileOpen
     document.getElementById('icon-menu').classList.toggle('hidden', mobileOpen)
     document.getElementById('icon-close').classList.toggle('hidden', !mobileOpen)
@@ -101,6 +195,7 @@
     document.querySelectorAll('.menu-trigger .chevron').forEach((c) => c.classList.remove('rotate-180'))
     openMenuKey = null
     closeMobileMenu()
+    closeSearch()
   }
   // Mismo acento por módulo que MODULE_ACCENTS en Header.jsx.
   const MOBILE_MODULE_BG = {
@@ -251,6 +346,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return
     document.querySelectorAll('.modal-overlay:not(.hidden)').forEach((m) => closeModal(m.id))
+    closeSearch()
   })
 
   // ===================== Formularios de los modales (simulados) =====================
