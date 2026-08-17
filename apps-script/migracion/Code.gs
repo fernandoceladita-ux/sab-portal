@@ -119,10 +119,12 @@ const MODULE_COLORS = {
 
 function doGet(e) {
   const page = (e.parameter.page || 'home').toLowerCase()
+  const itemId = e.parameter.item || ''
+  logPageView(page, itemId)
   const template = HtmlService.createTemplateFromFile('Index')
   template.page = page
   template.modulePageFile = MODULE_PAGES[page] || null
-  template.itemId = e.parameter.item || ''
+  template.itemId = itemId
   template.scriptUrl = ScriptApp.getService().getUrl()
   template.pageColor = MODULE_COLORS[page] || '#F5F5FA'
   return template
@@ -130,6 +132,43 @@ function doGet(e) {
     .setTitle('SAB Perú · Servicio a Bordo — LATAM Airlines')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+}
+
+// ============================================================================
+// Analytics casero: cada carga de página (?page=...&item=...) dispara doGet()
+// de nuevo en el servidor porque el sitio no es una SPA — así que registrar
+// "vistas de página" es tan simple como un appendRow acá, sin tocar nada del
+// cliente. Guarda en una pestaña "Analytics" propia dentro del mismo Sheet
+// (SHEET_ID) que ya usan los trámites; la crea sola la primera vez si no
+// existe todavía, con sus encabezados.
+//
+// Ojo: `Session.getActiveUser().getEmail()` solo devuelve algo si el
+// deployment está configurado como "Ejecutar como: Usuario que accede" y el
+// acceso está restringido a tu dominio de Workspace — si el deployment es
+// "Ejecutar como: Yo" + acceso "Cualquier persona", esta columna va a salir
+// vacía siempre (no hay forma de identificar al visitante en ese caso).
+const ANALYTICS_SHEET_NAME = 'Analytics'
+
+function logPageView(page, itemId) {
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID)
+    let sheet = ss.getSheetByName(ANALYTICS_SHEET_NAME)
+    if (!sheet) {
+      sheet = ss.insertSheet(ANALYTICS_SHEET_NAME)
+      sheet.appendRow(['Marca temporal', 'Página', 'Ítem/Sección', 'Correo'])
+      sheet.getRange(1, 1, 1, 4).setFontWeight('bold')
+    }
+    let correo = ''
+    try {
+      correo = Session.getActiveUser().getEmail() || ''
+    } catch (err) {
+      correo = ''
+    }
+    sheet.appendRow([new Date(), page, itemId, correo])
+  } catch (err) {
+    // Un fallo al loguear (ej. permisos, cuota) nunca debe romper la carga
+    // de la página — se ignora silenciosamente.
+  }
 }
 
 // Permite que un .html incluya a otro con <?!= include('NombreDeArchivo') ?>.

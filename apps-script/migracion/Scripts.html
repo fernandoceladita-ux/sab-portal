@@ -86,6 +86,7 @@
     }
     closeAllMenus()
     panel.classList.remove('hidden')
+    google.script.run.logPageView('buscador', 'abrir')
     const input = document.getElementById('search-input')
     input.value = ''
     renderSearchResults('')
@@ -325,6 +326,8 @@
     const panel = document.querySelector('[data-news-panel="' + index + '"]')
     if (panel) panel.classList.remove('hidden')
     openModal('modal-news')
+    const titleEl = document.querySelector('[data-novelty-index="' + index + '"] h3')
+    google.script.run.logPageView('modal-noticia', titleEl ? titleEl.textContent.trim() : String(index))
   }
 
   // ===================== Modales genéricos =====================
@@ -688,6 +691,12 @@
       showView(page)
       closeAllMenus()
       const item = params.get('item')
+      // Estas navegaciones son 100% client-side (ver comentario arriba de
+      // showView) — nunca pasan por doGet(), así que logPageView() de
+      // Code.gs no se disparaba nunca para ellas. Se llama acá a mano, sin
+      // esperar respuesta (fire-and-forget: si falla, no debe afectar la
+      // navegación).
+      google.script.run.logPageView(page, item || '')
       if (page === 'gestion-personal' && item && typeof selectHubItem === 'function') {
         setTimeout(() => selectHubItem(item), 50)
       }
