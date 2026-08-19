@@ -243,10 +243,6 @@ const UNIFORMES_FOLDER_ID = '1ivO-uXw8HWzFICk0w3RzPwUv7tnYHNDT'
 // pero con los headers EXACTOS de esos sheets originales— para que el día
 // que se apunte directo a los sheets legacy solo haya que cambiar el GID acá,
 // sin tocar el mapeo de columnas.
-// TODO: crear ambas pestañas en el mismo Sheet (SHEET_ID) con esos headers
-// exactos y reemplazar estos placeholders por su GID real (el número después
-// de #gid= en la URL de cada pestaña). Mientras diga REEMPLAZAR, writeToSheet
-// va a fallar con "No se encontró la pestaña (gid) indicada".
 const UNIFORMES_LANYARD_GID = 784092675
 const UNIFORMES_CALIDAD_GID = 1182245477
 const REGISTRO_SUNAT_GID = 1592932357
@@ -765,6 +761,150 @@ function buildDemoraFueraAvionRow(data, correo, id, codigoOperacion, pais, archi
   }
 }
 
+// ============================================================================
+// Consultas Soporte SAB — modal en Home (Centro de Ayuda y Reportes). Antes
+// vivía en AppSheet, con una vista distinta por filial (LP/4C/XL) y ~25
+// temas, cada uno resuelto por un responsable fijo. Se migra de a poco: por
+// ahora solo estos 5 temas y solo LP; el resto (y 4C/XL) se agregan más
+// adelante sumando entradas a CONSULTAS_TEMAS, sin tocar submitConsultaSoporte.
+//
+// Vive en un Google Sheet APARTE del resto del sitio (no usa SHEET_ID) — por
+// eso usa writeToSheetIn en vez de writeToSheet.
+//
+// Igual que en Reportes: id/codigo_operacion/pais/fecha_hora se arman acá
+// (antes salían solos de AppSheet). A diferencia de Reportes, acá
+// coordinador_responsable TAMPOCO se pide al tripulante: se resuelve
+// automático buscando el tema en la pestaña de Responsables (ver
+// resolveCoordinadorResponsable) — cada tema ya tiene un responsable fijo.
+// ============================================================================
+
+const CONSULTAS_SHEET_ID = '1nmB84XLrocV_MCYchPK5g1ypqj5mHQf0Pe_cY_eq7YM'
+const CONSULTAS_RESPONSABLES_GID = 297897581
+
+// Cada tema tiene su propio gid de Sheet y su propia carpeta de Drive, por
+// país. Por ahora solo LP está armado (gid/folder reales); cuando tengas los
+// de 4C y XL, se agregan como una clave más dentro de gidByPais/folderIdByPais
+// de CADA tema — no hace falta tocar submitConsultaSoporte.
+// `temaSheet` es el texto EXACTO tal como aparece en la columna "Tema" de la
+// pestaña de Responsables (gid 297897581) — se usa para resolver el
+// coordinador_responsable. `idColumnKey` es el nombre real del primer header
+// de cada hoja (ej. "lck_lp_id") — los 5 confirmados contra el header real.
+const CONSULTAS_TEMAS = {
+  lck: {
+    label: 'Verificación de Competencia / Chequeo en línea / Hands on (LCK)',
+    temaSheet: 'Verificación de Competencia / Chequeo en línea / Hands on (LCK)',
+    idColumnKey: 'lck_lp_id', // confirmado
+    gidByPais: { LP: 1441840812 },
+    folderIdByPais: { LP: '1Uw4p4xg0VuB3BZ4YXArvCDiyQ10W1gNW' },
+  },
+  aptoMedico: {
+    label: 'Apto Médico',
+    temaSheet: 'Apto Médico',
+    idColumnKey: 'apto_medico_lp_id', // confirmado
+    gidByPais: { LP: 1888173382 },
+    folderIdByPais: { LP: '1IGkN2MG9HqbPwmbTdozt70CHWbnBdRRe' },
+  },
+  reva: {
+    label: 'Curso Entrenamiento Periódico (Reva)',
+    temaSheet: 'Curso Entrenamiento Periódico (Reva)',
+    idColumnKey: 'reva_lp_id', // confirmado
+    gidByPais: { LP: 1065806131 },
+    folderIdByPais: { LP: '1TWSE3S5G8c-QB1twAhivzIiQUP27cexS' },
+  },
+  experienciaReciente: {
+    label: 'Experiencia reciente 90 días / Re-entrenamiento Vuelo',
+    temaSheet: 'Experiencia reciente 90 días / Re-entrenamiento Vuelo',
+    idColumnKey: 'experiencia_reciente_lp_id', // confirmado
+    gidByPais: { LP: 1978889809 },
+    folderIdByPais: { LP: '1X7cWj_G_W5GqsjuEE_Gu2un__tp0jdSk' },
+  },
+  licenciaLocal: {
+    label: 'Licencia Local / Convalidación Licencia Chilena',
+    temaSheet: 'Licencia Local / Convalidación Licencia Chilena',
+    idColumnKey: 'lic_local_conv_lic_chilena_lp_id', // confirmado
+    gidByPais: { LP: 298358111 },
+    folderIdByPais: { LP: '15cS8x7jmt9IPXYl9MBCmPh54NH5-cyh5' },
+  },
+}
+
+// Llamada desde ConsultasScript.html vía `google.script.run.submitConsultaSoporte(payload)`.
+function submitConsultaSoporte(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const bp = String(data.bp || '').trim()
+  const nombre = String(data.nombre || '').trim()
+  if (!bp || !nombre) {
+    throw new Error('BP y nombre son obligatorios')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const temaConfig = CONSULTAS_TEMAS[data.tema]
+  if (!temaConfig) {
+    throw new Error('Selecciona el tema de tu consulta')
+  }
+
+  const pais = 'LP' // fijo por ahora — más adelante vendrá de un selector de filial.
+  const gid = temaConfig.gidByPais[pais]
+  const folderId = temaConfig.folderIdByPais[pais]
+  if (!gid || !folderId) {
+    throw new Error('Este tema todavía no está disponible para tu filial')
+  }
+
+  const archivoUrl = data.archivo
+    ? uploadFileToDrive(data.archivo, data.archivoNombre, data.archivoTipo, folderId)
+    : ''
+
+  // Mismo formato de id corto (8 hex) y codigo_operacion que ya usa Reportes.
+  const id = Utilities.getUuid().split('-')[0]
+  const codigoOperacion = id + '-LATAM-' + pais
+  const coordinadorResponsable = resolveCoordinadorResponsable(temaConfig.temaSheet, pais)
+
+  writeToSheetIn(CONSULTAS_SHEET_ID, gid, {
+    [temaConfig.idColumnKey]: id,
+    'codigo_operacion': codigoOperacion,
+    'pais': pais,
+    'correo': sanitizeValue(correo),
+    'fecha_hora': new Date(),
+    'bp': sanitizeValue(data.bp),
+    'nombre': sanitizeValue(data.nombre),
+    'categoria': sanitizeValue(data.categoria),
+    'correo_cpl': sanitizeValue(data.correoCpl),
+    'tipo': temaConfig.label,
+    'coordinador_responsable': coordinadorResponsable,
+    'consulta': sanitizeValue(data.consulta),
+    'archivo_referencia': archivoUrl || '',
+  })
+
+  return { status: 'ok' }
+}
+
+// Busca en la pestaña de Responsables (gid 297897581, misma spreadsheet que
+// Consultas) la fila cuyo "Tema" coincide exacto y cuyo "Pais" (separado por
+// comas, ej. "LP,4C") incluye el país dado. Devuelve el Responsable, o ''
+// si no encuentra match (el equipo de soporte lo completa a mano en ese caso).
+function resolveCoordinadorResponsable(temaSheet, pais) {
+  const ss = SpreadsheetApp.openById(CONSULTAS_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === CONSULTAS_RESPONSABLES_GID)
+  if (!sheet) return ''
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) return ''
+  const rows = sheet.getRange(2, 1, lastRow - 1, 3).getValues() // Tema, Responsable, Pais
+
+  const match = rows.find((row) => {
+    const tema = String(row[0]).trim()
+    const paises = String(row[2]).split(',').map((p) => p.trim())
+    return tema === temaSheet && paises.includes(pais)
+  })
+  return match ? String(match[1]).trim() : ''
+}
+
 function uploadFileToDrive(base64, fileName, mimeType, folderId) {
   if (!base64) return ''
   const folder = DriveApp.getFolderById(folderId)
@@ -775,7 +915,14 @@ function uploadFileToDrive(base64, fileName, mimeType, folderId) {
 }
 
 function writeToSheet(targetGid, valuesByHeader) {
-  const ss = SpreadsheetApp.openById(SHEET_ID)
+  writeToSheetIn(SHEET_ID, targetGid, valuesByHeader)
+}
+
+// Igual que writeToSheet, pero permite apuntar a un Spreadsheet distinto al
+// principal (SHEET_ID) — lo usa Consultas Soporte SAB, que vive en su propio
+// Google Sheet separado (ver CONSULTAS_SHEET_ID).
+function writeToSheetIn(spreadsheetId, targetGid, valuesByHeader) {
+  const ss = SpreadsheetApp.openById(spreadsheetId)
   const sheet = ss.getSheets().find((s) => s.getSheetId() === targetGid)
   if (!sheet) throw new Error('No se encontró la pestaña (gid) indicada')
 

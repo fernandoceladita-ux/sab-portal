@@ -1,0 +1,176 @@
+<script>
+  (function () {
+    // El modal "Consultas Soporte SAB" (Home) migra de a poco los temas que
+    // antes vivían en AppSheet, uno por país. Por ahora solo hay 5 temas y
+    // todos de LP (ver CONSULTAS_TEMAS en Code.gs) — cuando se agreguen más
+    // temas o filiales, este archivo es el lugar para sumar botones nuevos
+    // si hiciera falta JS adicional (la mayoría de temas no lo necesita).
+    var consultaState = { tema: null }
+
+    // Temas que tienen su propio cuadro de recomendación (ver
+    // #consulta-reco-<tema> en Modals.html). Los que no están acá (Apto
+    // Médico, Licencia Local) simplemente no muestran ningún cuadro.
+    var CONSULTA_TEMAS_CON_RECO = ['reva', 'experienciaReciente', 'lck']
+
+    window.selectConsultaTema = function (tema) {
+      consultaState.tema = tema
+      document.querySelectorAll('.consulta-tema-btn').forEach(function (btn) {
+        var active = btn.getAttribute('data-consulta-tema') === tema
+        btn.classList.toggle('border-latam-coral', active)
+        btn.classList.toggle('bg-latam-coral/10', active)
+        btn.classList.toggle('text-white', active)
+        btn.classList.toggle('border-white/15', !active)
+        btn.classList.toggle('bg-white/5', !active)
+        btn.classList.toggle('text-white/80', !active)
+        var dot = btn.querySelector('.consulta-tema-dot')
+        if (dot) {
+          dot.classList.toggle('border-latam-coral', active)
+          dot.classList.toggle('bg-latam-coral', active)
+          dot.classList.toggle('border-white/30', !active)
+        }
+      })
+
+      document.querySelectorAll('.consulta-reco').forEach(function (box) {
+        box.classList.add('hidden')
+      })
+      if (CONSULTA_TEMAS_CON_RECO.indexOf(tema) !== -1) {
+        var reco = document.getElementById('consulta-reco-' + tema)
+        if (reco) reco.classList.remove('hidden')
+      }
+
+      document.getElementById('consulta-panel').classList.remove('hidden')
+    }
+
+    function runServer(fnName) {
+      var args = Array.prototype.slice.call(arguments, 1)
+      return new Promise(function (resolve, reject) {
+        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+        runner[fnName].apply(runner, args)
+      })
+    }
+
+    function fileToBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader()
+        reader.onload = function () { resolve(String(reader.result).split(',')[1] || '') }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    }
+
+    function clearConsultaFieldErrors() {
+      document.querySelectorAll('.consultas-fld').forEach(function (el) {
+        el.classList.remove('border-red-400', 'ring-4', 'ring-red-400/20')
+      })
+    }
+
+    function validateConsultaForm() {
+      clearConsultaFieldErrors()
+      var form = document.getElementById('form-consultas')
+      var ok = true
+      var firstInvalid = null
+
+      form.querySelectorAll('.consultas-fld[required]').forEach(function (el) {
+        if (el.offsetParent === null) return
+        var val = (el.value || '').trim()
+        var invalid = !val
+        if (!invalid && el.type === 'email') invalid = !/.+@latam\.com$/i.test(val)
+        if (invalid) {
+          ok = false
+          el.classList.add('border-red-400', 'ring-4', 'ring-red-400/20')
+          if (!firstInvalid) firstInvalid = el
+        }
+      })
+
+      if (!consultaState.tema) ok = false
+      if (firstInvalid) firstInvalid.focus()
+      return ok
+    }
+
+    window.submitConsultaForm = async function () {
+      var errorBox = document.getElementById('consultas-error')
+      var successBox = document.getElementById('consultas-success')
+      errorBox.classList.add('hidden')
+      successBox.classList.add('hidden')
+      successBox.classList.remove('flex')
+
+      if (!validateConsultaForm()) {
+        errorBox.textContent = !consultaState.tema
+          ? 'Selecciona el tema de tu consulta.'
+          : 'Por favor completa todos los campos obligatorios.'
+        errorBox.classList.remove('hidden')
+        return
+      }
+
+      var form = document.getElementById('form-consultas')
+      var formData = new FormData(form)
+      var fileInput = document.getElementById('consulta-file-input')
+      var file = fileInput.files && fileInput.files[0]
+
+      var btnEnviar = document.getElementById('consultas-btn-enviar')
+      var label = document.getElementById('consultas-btn-enviar-label')
+      btnEnviar.disabled = true
+      label.textContent = 'Enviando...'
+
+      try {
+        var archivo = file ? await fileToBase64(file) : ''
+        var payload = {
+          correo: formData.get('correo'),
+          bp: formData.get('bp'),
+          nombre: formData.get('nombre'),
+          categoria: formData.get('categoria'),
+          correoCpl: formData.get('correoCpl'),
+          tema: consultaState.tema,
+          consulta: formData.get('consulta'),
+          archivo: archivo,
+          archivoNombre: file ? file.name : '',
+          archivoTipo: file ? file.type : '',
+        }
+        await runServer('submitConsultaSoporte', payload)
+        resetConsultaForm()
+        successBox.classList.remove('hidden')
+        successBox.classList.add('flex')
+      } catch (err) {
+        errorBox.textContent = 'Ocurrió un error al enviar tu consulta. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
+        errorBox.classList.remove('hidden')
+      } finally {
+        btnEnviar.disabled = false
+        label.textContent = 'Enviar Consulta'
+      }
+    }
+
+    // Llamada tanto al cerrar el modal (ver MODAL_RESET_FN en Scripts.html)
+    // como tras un envío exitoso — así vuelve a su estado inicial en ambos
+    // casos, sin arrastrar nada de la vez anterior.
+    window.resetConsultaForm = function () {
+      var form = document.getElementById('form-consultas')
+      if (form) form.reset()
+      clearConsultaFieldErrors()
+
+      document.querySelectorAll('.consulta-tema-btn').forEach(function (btn) {
+        btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-white')
+        btn.classList.add('border-white/15', 'bg-white/5', 'text-white/80')
+        var dot = btn.querySelector('.consulta-tema-dot')
+        if (dot) {
+          dot.classList.remove('border-latam-coral', 'bg-latam-coral')
+          dot.classList.add('border-white/30')
+        }
+      })
+      document.querySelectorAll('.consulta-reco').forEach(function (box) { box.classList.add('hidden') })
+
+      var panel = document.getElementById('consulta-panel')
+      if (panel) panel.classList.add('hidden')
+      if (typeof clearFile === 'function') clearFile('consulta')
+
+      consultaState.tema = null
+
+      var errorBox = document.getElementById('consultas-error')
+      var successBox = document.getElementById('consultas-success')
+      if (errorBox) errorBox.classList.add('hidden')
+      if (successBox) {
+        successBox.classList.add('hidden')
+        successBox.classList.remove('flex')
+      }
+    }
+  })()
+</script>

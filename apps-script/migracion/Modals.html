@@ -402,6 +402,167 @@
   </div>
 </div>
 
+<!-- ============ Modal: Consultas Soporte SAB ============ -->
+<!-- Migra de a poco los temas de la app AppSheet original (25 temas × 3
+     filiales). Por ahora solo 5 temas y solo LP (ver CONSULTAS_TEMAS en
+     Code.gs) — el resto se suma más adelante sin tocar este modal. -->
+<div id="modal-consultas" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center bg-latam-profunda/60 p-4 backdrop-blur-sm" onclick="closeModalBackdrop(event, 'modal-consultas')">
+  <div class="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-latam-estrellada text-white shadow-card" onclick="event.stopPropagation()">
+    <button type="button" onclick="closeModal('modal-consultas')" aria-label="Cerrar" class="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+    </button>
+    <div class="px-6 pb-7 pt-6 sm:px-7">
+      <span class="mb-4 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Soporte</span>
+      <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">Consultas Soporte SAB</h2>
+      <p class="mt-1 text-sm text-slate-300">LP — más filiales próximamente</p>
+
+      <div id="consultas-success" class="mt-6 hidden items-center gap-2 rounded-xl bg-white/10 px-4 py-3.5 text-sm font-bold text-white animate-fadeUp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Consulta enviada correctamente.
+      </div>
+      <div id="consultas-error" class="mt-6 hidden rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-200 animate-fadeUp"></div>
+
+      <form id="form-consultas" novalidate class="mt-6">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-bold text-white">Correo electrónico corporativo <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-white/40">(@latam.com)</span></label>
+          <input type="email" name="correo" required pattern=".+@latam\.com$" class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
+        </div>
+        <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">BP <span class="text-latam-coral">*</span></label>
+            <input type="text" name="bp" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Apellidos y Nombres <span class="text-latam-coral">*</span></label>
+            <input type="text" name="nombre" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Categoría <span class="text-latam-coral">*</span></label>
+            <select name="categoria" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20">
+              <option value="" disabled selected>Elegir categoría...</option>
+              <option value="TC">TC</option>
+              <option value="TJ">TJ</option>
+            </select>
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Correo CPL <span class="text-latam-coral">*</span></label>
+            <select name="correoCpl" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20">
+              <option value="" disabled selected>Elegir CPL...</option>
+              <optgroup label="LP">
+                <option value="claudia.seminario@latam.com">Claudia Seminario</option>
+                <option value="rodolfo.pautrat@latam.com">Rodolfo Pautrat</option>
+                <option value="valeria.carpio@latam.com">Valeria Carpio</option>
+                <option value="rocio.flores@latam.com">Rocío Flores</option>
+                <option value="maria.cespedes@latam.com">María Céspedes</option>
+                <option value="luis.bacigalupo@latam.com">Luis Bacigalupo</option>
+                <option value="adriana.tasayco@latam.com">Adriana Tasayco</option>
+              </optgroup>
+              <optgroup label="4C">
+                <option value="diana.vasquez@latam.com">Diana Vásquez</option>
+                <option value="diana.romero@latam.com">Diana Romero</option>
+                <option value="monica.pulgarin@latam.com">Mónica Pulgarín</option>
+              </optgroup>
+              <optgroup label="XL">
+                <option value="melissa.chica@latam.com">Melissa Chica</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-2 border-t border-white/10 pt-5">
+          <p class="mb-1 text-[10px] font-extrabold uppercase tracking-wider text-latam-coral">Elige tu consulta</p>
+        </div>
+        <div class="mb-5 grid grid-cols-1 gap-2">
+          <button type="button" data-consulta-tema="lck" onclick="selectConsultaTema('lck')" class="consulta-tema-btn flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3.5 text-left text-sm font-bold text-white/80 transition hover:border-white/30">
+            <span class="consulta-tema-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30"></span>
+            Verificación de Competencia / Chequeo en línea / Hands on (LCK)
+          </button>
+          <button type="button" data-consulta-tema="aptoMedico" onclick="selectConsultaTema('aptoMedico')" class="consulta-tema-btn flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3.5 text-left text-sm font-bold text-white/80 transition hover:border-white/30">
+            <span class="consulta-tema-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30"></span>
+            Apto Médico
+          </button>
+          <button type="button" data-consulta-tema="reva" onclick="selectConsultaTema('reva')" class="consulta-tema-btn flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3.5 text-left text-sm font-bold text-white/80 transition hover:border-white/30">
+            <span class="consulta-tema-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30"></span>
+            Curso Entrenamiento Periódico (Reva)
+          </button>
+          <button type="button" data-consulta-tema="experienciaReciente" onclick="selectConsultaTema('experienciaReciente')" class="consulta-tema-btn flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3.5 text-left text-sm font-bold text-white/80 transition hover:border-white/30">
+            <span class="consulta-tema-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30"></span>
+            Experiencia reciente 90 días / Re-entrenamiento Vuelo
+          </button>
+          <button type="button" data-consulta-tema="licenciaLocal" onclick="selectConsultaTema('licenciaLocal')" class="consulta-tema-btn flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3.5 text-left text-sm font-bold text-white/80 transition hover:border-white/30">
+            <span class="consulta-tema-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-white/30"></span>
+            Licencia Local / Convalidación Licencia Chilena
+          </button>
+        </div>
+
+        <!-- Detalle: aparece recién al elegir un tema arriba. -->
+        <div id="consulta-panel" class="hidden animate-fadeUp">
+          <!-- Recomendaciones por tema: solo la del tema elegido queda
+               visible (ver selectConsultaTema en ConsultasScript.html). Los
+               temas sin recomendación (Apto Médico, Licencia Local) no
+               muestran ningún cuadro acá. -->
+          <div id="consulta-reco-reva" class="consulta-reco mb-5 hidden rounded-xl border border-white/15 bg-white/5 p-4 text-sm leading-relaxed text-white/90">
+            Se puede considerar tu Verificación de la Competencia según el siguiente periodo de elegibilidad:
+            <br />- 30 días antes de la fecha de vencimiento.
+            <br />- El mes base en que vence tu chequeo.
+            <br />- En el mes de prórroga (30 días después de la fecha de vencimiento).
+          </div>
+          <div id="consulta-reco-experienciaReciente" class="consulta-reco mb-5 hidden rounded-xl border border-white/15 bg-white/5 p-4 text-sm leading-relaxed text-white/90">
+            En el equipo de Soporte nos encargamos de monitorear y gestionar la programación de tu Experiencia Reciente para asegurar que esté vigente.
+            <br /><br />⚠️ <strong>Importante:</strong> te pedimos por favor que nos contactes si faltan menos de 72 horas para la expiración y aún no has recibido noticias nuestras.
+            <br /><br />💡 <strong>Recuerda:</strong> si el plazo es mayor a 72 horas, no es necesario generar un reporte.
+          </div>
+          <div id="consulta-reco-lck" class="consulta-reco mb-5 hidden rounded-xl border border-white/15 bg-white/5 p-4 text-sm leading-relaxed text-white/90">
+            Recuerda que tu verificación de competencia se puede programar dentro de un período de elegibilidad, el cual incluye:
+            <br />- 30 días antes de tu fecha de vencimiento
+            <br />- Tu mes base (mes en el que vence tu chequeo)
+            <br />- El mes de prórroga
+            <br /><br />Si tu actividad no fue agendada durante el mes base, aún puedes ser programado durante el mes de prórroga, sin que esto implique la pérdida de tu chequeo.
+            <br /><br /><strong>Importante:</strong> te pedimos solo ingresar tu consulta si te encuentras en tu mes de prórroga y aún no has sido programado, para poder brindarte apoyo en la programación.
+          </div>
+
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Detalla tu consulta <span class="text-latam-coral">*</span></label>
+            <textarea name="consulta" rows="3" required class="consultas-fld w-full resize-none rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20"></textarea>
+          </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Archivo de referencia (opcional)</label>
+            <div id="consulta-file-idle">
+              <button type="button" onclick="document.getElementById('consulta-file-input').click()" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/20 bg-white/5 px-4 py-7 text-center transition-all hover:border-white/40 hover:bg-white/10">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-white/70"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-white/90"><span class="rounded bg-latam-coral/30 px-1.5 py-0.5">Haz clic aquí</span> para subir el archivo</span>
+                <span class="text-xs text-white/40">Formatos: PDF, PNG, JPG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="consulta-file-done" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/10">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </span>
+                <p id="consulta-file-name" class="truncate text-sm font-bold text-white"></p>
+              </div>
+              <button type="button" onclick="clearFile('consulta')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="consulta-file-input" name="archivo" type="file" accept=".pdf,.png,.jpg,.jpeg" class="sr-only" onchange="handleFileChange(this, 'consulta')" />
+          </div>
+        </div>
+
+        <div class="mt-2 flex flex-col-reverse justify-end gap-3 border-t border-white/10 pt-5 sm:flex-row">
+          <button type="button" onclick="closeModal('modal-consultas')" class="rounded-xl border-2 border-white/20 bg-transparent px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 sm:w-auto">Cancelar</button>
+          <button type="button" onclick="submitConsultaForm()" id="consultas-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-coral px-6 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+            <span id="consultas-btn-enviar-label">Enviar Consulta</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ============ Modal: QR de Descarga (Instructivo de Vales) ============ -->
 <!-- Vive acá (top-level, junto a los demás modales) y NO dentro de
      InstructivoValesView.html: esa vista queda anidada dentro de
