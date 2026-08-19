@@ -825,6 +825,57 @@ const CONSULTAS_TEMAS = {
     gidByPais: { LP: 298358111 },
     folderIdByPais: { LP: '15cS8x7jmt9IPXYl9MBCmPh54NH5-cyh5' },
   },
+  // Segunda tanda (misma mecánica, todavía falta la carpeta de Drive de cada
+  // una — quedan con REEMPLAZAR hasta que las crees y me pases los IDs).
+  recalificacionInicial50: {
+    label: 'Curso Recalificación (Inicial al 50%)',
+    temaSheet: 'Curso Recalificación (Inicial al 50%)',
+    idColumnKey: 'recalificacion_inicial_50_lp_id', // confirmado
+    gidByPais: { LP: 9456956 },
+    folderIdByPais: { LP: '1p0GrLNZoHrL6EV0yoKZ2HNd3Ltx8q48I' },
+  },
+  transicionHabilitacion: {
+    label: 'Curso Transición Flota (Bi o Tri-habilitación) - Solo Perú',
+    temaSheet: 'Curso Transición Flota (Bi o Tri-habilitación) - Solo Perú',
+    idColumnKey: 'transicion_habilitacion_lp_id', // confirmado
+    gidByPais: { LP: 1378690069 },
+    folderIdByPais: { LP: '18_tCCmLZmHvk61tQIfNrDSJyQ1omK-Pd' },
+  },
+  dmpSick: {
+    label: 'Descanso Médico Prolongado (DMP/SICK)',
+    temaSheet: 'Descanso Médico Prolongado (DMP/SICK)',
+    idColumnKey: 'dmp_sick_lp_id', // confirmado
+    gidByPais: { LP: 908218918 },
+    folderIdByPais: { LP: '13G2fZReKn0qqPCV84cOmRLFWpX4W6HSl' },
+  },
+  licenciaSinSueldo: {
+    label: 'Licencia sin sueldo (LSG/LNP)',
+    temaSheet: 'Licencia sin sueldo (LSG/LNP)',
+    idColumnKey: 'licencia_sin_sueldo_lp_id', // confirmado
+    gidByPais: { LP: 1579743640 },
+    folderIdByPais: { LP: '1IMIUePiGyATl7r-27RHFHkOJrltErSgb' },
+  },
+  natalidad: {
+    label: 'Natalidad (NAT/LP)',
+    temaSheet: 'Natalidad (NAT/LP)',
+    idColumnKey: 'natalidad_lp_id', // confirmado
+    gidByPais: { LP: 1621001756 },
+    folderIdByPais: { LP: '1Ay-DVZ6tcZ7258j7aAWu7d3yHZbUrFsH' },
+  },
+  valeEdenred: {
+    label: 'Vale de Alimentación: Edenred + High Rank',
+    temaSheet: 'Vale de Alimentación: Edenred + High Rank',
+    idColumnKey: 'vale_edenred_lp_id', // confirmado
+    gidByPais: { LP: 1447837966 },
+    folderIdByPais: { LP: '1q5k_QIFl1dKoEQc7gSV4B53XXfcuV0y7' },
+  },
+  cancelacionVacacionesMaternidad: {
+    label: 'Cancelación de vacaciones por maternidad',
+    temaSheet: 'Cancelación de vacaciones por maternidad',
+    idColumnKey: 'cancelacion_vacaciones_maternidad_lp_id', // confirmado
+    gidByPais: { LP: 2132606979 },
+    folderIdByPais: { LP: '1e8ICsye_5qRonpIQ37fXPIo_qtOszttP' },
+  },
 }
 
 // Llamada desde ConsultasScript.html vía `google.script.run.submitConsultaSoporte(payload)`.
