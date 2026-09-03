@@ -1,10 +1,10 @@
 <script>
   (function () {
     // El modal "Consultas Soporte SAB" (Home) migra de a poco los temas que
-    // antes vivían en AppSheet, uno por país. Por ahora solo hay 5 temas y
+    // antes vivían en AppSheet, uno por país. Por ahora solo hay 12 temas y
     // todos de LP (ver CONSULTAS_TEMAS en Code.gs) — cuando se agreguen más
-    // temas o filiales, este archivo es el lugar para sumar botones nuevos
-    // si hiciera falta JS adicional (la mayoría de temas no lo necesita).
+    // temas o filiales, este archivo es el lugar para sumar opciones nuevas
+    // al <select> de Modals.html.
     var consultaState = { tema: null }
 
     // Temas que tienen su propio cuadro de recomendación (ver
@@ -14,21 +14,6 @@
 
     window.selectConsultaTema = function (tema) {
       consultaState.tema = tema
-      document.querySelectorAll('.consulta-tema-btn').forEach(function (btn) {
-        var active = btn.getAttribute('data-consulta-tema') === tema
-        btn.classList.toggle('border-latam-coral', active)
-        btn.classList.toggle('bg-latam-coral/10', active)
-        btn.classList.toggle('text-white', active)
-        btn.classList.toggle('border-white/15', !active)
-        btn.classList.toggle('bg-white/5', !active)
-        btn.classList.toggle('text-white/80', !active)
-        var dot = btn.querySelector('.consulta-tema-dot')
-        if (dot) {
-          dot.classList.toggle('border-latam-coral', active)
-          dot.classList.toggle('bg-latam-coral', active)
-          dot.classList.toggle('border-white/30', !active)
-        }
-      })
 
       document.querySelectorAll('.consulta-reco').forEach(function (box) {
         box.classList.add('hidden')
@@ -46,15 +31,6 @@
       return new Promise(function (resolve, reject) {
         var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
         runner[fnName].apply(runner, args)
-      })
-    }
-
-    function fileToBase64(file) {
-      return new Promise(function (resolve, reject) {
-        var reader = new FileReader()
-        reader.onload = function () { resolve(String(reader.result).split(',')[1] || '') }
-        reader.onerror = reject
-        reader.readAsDataURL(file)
       })
     }
 
@@ -90,9 +66,11 @@
     window.submitConsultaForm = async function () {
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
+      var iaBox = document.getElementById('consultas-ia-respuesta')
       errorBox.classList.add('hidden')
       successBox.classList.add('hidden')
       successBox.classList.remove('flex')
+      iaBox.classList.add('hidden')
 
       if (!validateConsultaForm()) {
         errorBox.textContent = !consultaState.tema
@@ -104,8 +82,6 @@
 
       var form = document.getElementById('form-consultas')
       var formData = new FormData(form)
-      var fileInput = document.getElementById('consulta-file-input')
-      var file = fileInput.files && fileInput.files[0]
 
       var btnEnviar = document.getElementById('consultas-btn-enviar')
       var label = document.getElementById('consultas-btn-enviar-label')
@@ -113,7 +89,6 @@
       label.textContent = 'Enviando...'
 
       try {
-        var archivo = file ? await fileToBase64(file) : ''
         var payload = {
           correo: formData.get('correo'),
           bp: formData.get('bp'),
@@ -122,14 +97,16 @@
           correoCpl: formData.get('correoCpl'),
           tema: consultaState.tema,
           consulta: formData.get('consulta'),
-          archivo: archivo,
-          archivoNombre: file ? file.name : '',
-          archivoTipo: file ? file.type : '',
         }
-        await runServer('submitConsultaSoporte', payload)
+        var resultado = await runServer('submitConsultaSoporte', payload)
         resetConsultaForm()
-        successBox.classList.remove('hidden')
-        successBox.classList.add('flex')
+        if (resultado && resultado.respuestaIA) {
+          document.getElementById('consultas-ia-respuesta-texto').textContent = resultado.respuestaIA
+          iaBox.classList.remove('hidden')
+        } else {
+          successBox.classList.remove('hidden')
+          successBox.classList.add('flex')
+        }
       } catch (err) {
         errorBox.textContent = 'Ocurrió un error al enviar tu consulta. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
         errorBox.classList.remove('hidden')
@@ -141,36 +118,31 @@
 
     // Llamada tanto al cerrar el modal (ver MODAL_RESET_FN en Scripts.html)
     // como tras un envío exitoso — así vuelve a su estado inicial en ambos
-    // casos, sin arrastrar nada de la vez anterior.
+    // casos, sin arrastrar nada de la vez anterior. Ojo: no oculta
+    // consultas-ia-respuesta en el camino de "envío exitoso" (submitConsultaForm
+    // la muestra recién DESPUÉS de llamar a esta función) — sí la oculta al
+    // cerrar el modal, que es el otro caso que la dispara.
     window.resetConsultaForm = function () {
       var form = document.getElementById('form-consultas')
       if (form) form.reset()
       clearConsultaFieldErrors()
 
-      document.querySelectorAll('.consulta-tema-btn').forEach(function (btn) {
-        btn.classList.remove('border-latam-coral', 'bg-latam-coral/10', 'text-white')
-        btn.classList.add('border-white/15', 'bg-white/5', 'text-white/80')
-        var dot = btn.querySelector('.consulta-tema-dot')
-        if (dot) {
-          dot.classList.remove('border-latam-coral', 'bg-latam-coral')
-          dot.classList.add('border-white/30')
-        }
-      })
       document.querySelectorAll('.consulta-reco').forEach(function (box) { box.classList.add('hidden') })
 
       var panel = document.getElementById('consulta-panel')
       if (panel) panel.classList.add('hidden')
-      if (typeof clearFile === 'function') clearFile('consulta')
 
       consultaState.tema = null
 
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
+      var iaBox = document.getElementById('consultas-ia-respuesta')
       if (errorBox) errorBox.classList.add('hidden')
       if (successBox) {
         successBox.classList.add('hidden')
         successBox.classList.remove('flex')
       }
+      if (iaBox) iaBox.classList.add('hidden')
     }
   })()
 </script>

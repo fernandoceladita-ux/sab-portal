@@ -1,0 +1,26 @@
+<!-- Prototipo interno: borradores de respuesta con IA para Consultas de Reva
+     LP (ver generarBorradorRevaIA / listarConsultasRevaSinBorrador en
+     Code.gs). A propósito no tiene link en el menú ni tarjeta en Home —
+     solo se llega por URL directa (?page=consultas-ia). El coordinador
+     revisa/edita el borrador acá y lo copia a mano a su correo; nunca se
+     envía nada directo al tripulante desde esta pantalla. -->
+<div class="mx-auto max-w-3xl animate-fadeUp px-5 pb-16 pt-32 sm:pt-36">
+  <p class="mb-1.5 text-[11px] font-extrabold uppercase tracking-[2px] text-latam-coral">Prototipo interno</p>
+  <h1 class="mb-2 text-2xl font-extrabold text-latam-estrellada sm:text-[28px]">Borradores de Respuesta IA — Reva LP</h1>
+  <p class="mb-6 text-sm leading-relaxed text-slate-600">
+    Genera un borrador de respuesta con IA para las consultas de Reva pendientes. Revísalo, edítalo si hace falta, y cópialo a tu correo de respuesta — no se envía nada automáticamente al tripulante.
+  </p>
+
+  <div class="mb-5 flex items-center justify-between gap-3">
+    <button type="button" onclick="cargarConsultasPendientes()" id="cia-btn-cargar" class="rounded-lg bg-latam-estrellada px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-latam-coral disabled:cursor-not-allowed disabled:opacity-50">
+      Cargar consultas pendientes
+    </button>
+    <p id="cia-count" class="text-sm font-semibold text-slate-500"></p>
+  </div>
+
+  <div id="cia-error" class="mb-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700"></div>
+  <div id="cia-empty" class="hidden rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+    No hay consultas de Reva pendientes de borrador.
+  </div>
+  <div id="cia-list" class="flex flex-col gap-4"></div>
+</div>

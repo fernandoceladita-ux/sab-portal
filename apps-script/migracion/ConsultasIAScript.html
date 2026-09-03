@@ -1,0 +1,111 @@
+<script>
+  (function () {
+    function runServer(fnName) {
+      var args = Array.prototype.slice.call(arguments, 1)
+      return new Promise(function (resolve, reject) {
+        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+        runner[fnName].apply(runner, args)
+      })
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div')
+      div.textContent = str
+      return div.innerHTML
+    }
+
+    window.cargarConsultasPendientes = async function () {
+      var btn = document.getElementById('cia-btn-cargar')
+      var errorBox = document.getElementById('cia-error')
+      var emptyBox = document.getElementById('cia-empty')
+      var list = document.getElementById('cia-list')
+      var countEl = document.getElementById('cia-count')
+      errorBox.classList.add('hidden')
+      emptyBox.classList.add('hidden')
+      list.innerHTML = ''
+      countEl.textContent = ''
+      btn.disabled = true
+      var originalLabel = btn.textContent
+      btn.textContent = 'Cargando...'
+
+      try {
+        var pendientes = await runServer('listarConsultasRevaSinBorrador')
+        if (!pendientes.length) {
+          emptyBox.classList.remove('hidden')
+          return
+        }
+        countEl.textContent = pendientes.length + ' pendiente' + (pendientes.length === 1 ? '' : 's')
+        pendientes.forEach(function (item) {
+          list.appendChild(buildConsultaCard(item))
+        })
+      } catch (err) {
+        errorBox.textContent = 'Error al cargar consultas: ' + (err && err.message ? err.message : err)
+        errorBox.classList.remove('hidden')
+      } finally {
+        btn.disabled = false
+        btn.textContent = originalLabel
+      }
+    }
+
+    function buildConsultaCard(item) {
+      var card = document.createElement('div')
+      card.className = 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
+      card.innerHTML =
+        '<p class="mb-1 text-[11px] font-bold uppercase tracking-wide text-slate-400">ID ' + escapeHtml(item.id) + '</p>' +
+        '<p class="mb-4 text-sm leading-relaxed text-slate-700">' + escapeHtml(item.consulta) + '</p>' +
+        '<button type="button" class="cia-btn-generar rounded-lg bg-latam-coral px-4 py-2.5 text-sm font-extrabold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">Generar borrador IA</button>' +
+        '<p class="cia-card-error mt-3 hidden text-sm font-bold text-red-700"></p>' +
+        '<div class="cia-borrador-wrap mt-4 hidden">' +
+          '<label class="mb-2 block text-sm font-bold text-latam-estrellada">Borrador sugerido</label>' +
+          '<textarea class="cia-borrador-text w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" rows="6"></textarea>' +
+          '<button type="button" class="cia-btn-copiar mt-2 rounded-lg border-2 border-latam-estrellada bg-white px-4 py-2 text-sm font-extrabold text-latam-estrellada transition hover:bg-latam-estrellada hover:text-white">Copiar</button>' +
+        '</div>'
+
+      card.querySelector('.cia-btn-generar').addEventListener('click', function (e) {
+        generarBorrador(item.id, card, e.currentTarget)
+      })
+      card.querySelector('.cia-btn-copiar').addEventListener('click', function (e) {
+        copiarBorrador(card, e.currentTarget)
+      })
+      return card
+    }
+
+    async function generarBorrador(id, card, btn) {
+      var errorEl = card.querySelector('.cia-card-error')
+      errorEl.classList.add('hidden')
+      btn.disabled = true
+      var original = btn.textContent
+      btn.textContent = 'Generando...'
+      try {
+        var resultado = await runServer('generarBorradorRevaIA', id)
+        var wrap = card.querySelector('.cia-borrador-wrap')
+        card.querySelector('.cia-borrador-text').value = resultado.borrador
+        wrap.classList.remove('hidden')
+      } catch (err) {
+        errorEl.textContent = 'Error al generar: ' + (err && err.message ? err.message : err)
+        errorEl.classList.remove('hidden')
+      } finally {
+        btn.disabled = false
+        btn.textContent = original
+      }
+    }
+
+    async function copiarBorrador(card, btn) {
+      var textarea = card.querySelector('.cia-borrador-text')
+      var text = textarea.value
+      var copied = false
+      try {
+        await navigator.clipboard.writeText(text)
+        copied = true
+      } catch (e) {
+        // Mismo respaldo que ya usa Vacuna Fiebre Amarilla (ver Scripts.html)
+        // para cuando el permiso moderno de portapapeles no está disponible.
+        copied = typeof legacyCopyToClipboard === 'function' ? legacyCopyToClipboard(text) : false
+      }
+      if (!copied) return
+      var original = btn.textContent
+      btn.textContent = '¡Copiado!'
+      setTimeout(function () { btn.textContent = original }, 1500)
+    }
+  })()
+</script>

@@ -104,6 +104,10 @@ const MODULE_PAGES = {
   'gestion-personal': 'GestionPersonal',
   'mi-rol': 'MiRol',
   'gestion-operacional': 'GestionOperacional',
+  // Prototipo interno (borradores IA de Consultas Reva) — a propósito sin
+  // link en el menú ni tarjeta en Home, solo se llega por URL directa
+  // (?page=consultas-ia). Ver ConsultasIA.html / ConsultasIAScript.html.
+  'consultas-ia': 'ConsultasIA',
 }
 
 // Mismos hex que bg-latam-* en tailwind.config.js. Se inyectan como
@@ -916,6 +920,38 @@ function submitConsultaSoporte(data) {
   const codigoOperacion = id + '-LATAM-' + pais
   const coordinadorResponsable = resolveCoordinadorResponsable(temaConfig.temaSheet, pais)
 
+  // Solo para los temas en CONSULTAS_IA_INSTANTANEA_TEMAS (por ahora, solo
+  // Apto Médico): intenta responder al tripulante en el momento, basado en
+  // precedente real de la base de conocimiento. Un fallo de IA (o que la
+  // consulta no aplique) nunca debe impedir que la consulta se registre —
+  // por eso va envuelto en try/catch y solo agrega datos, no bloquea nada.
+  let respuestaIA = null
+  if (CONSULTAS_IA_INSTANTANEA_TEMAS.indexOf(data.tema) !== -1) {
+    try {
+      const resultado = generarRespuestaConsultaIA(temaConfig.label, String(data.consulta || '').trim())
+      if (resultado) {
+        respuestaIA = resultado.respuesta
+        // Solo en el registro de ejecución (Ver > Registros), no en el
+        // Sheet — mientras se decide si esto se persiste, sirve para
+        // verificar qué intención detectó el modelo en cada prueba.
+        Logger.log('Intención detectada: ' + resultado.intencion)
+      }
+    } catch (err) {
+      // No debe romper el envío de la consulta, pero sí queda rastro en
+      // Registros — sin esto, un error de acceso al Sheet de conocimiento o
+      // de BibliotecaVertexAI se ve exactamente igual que un NO_APLICA
+      // legítimo del modelo, y no hay forma de distinguirlos.
+      Logger.log('generarRespuestaConsultaIA falló: ' + (err && err.message ? err.message : err))
+      respuestaIA = null
+    }
+  }
+
+  // Ojo: a propósito NO se persiste respuestaIA/intencionDetectada en la
+  // fila todavía (decisión explícita: por ahora la fila de cada consulta se
+  // guarda igual que siempre, sin tocar su esquema — la respuesta de la IA
+  // solo se muestra al tripulante al instante en la misma página, vía el
+  // valor de retorno de esta función). Si más adelante se decide dejar
+  // registro de esto en el Sheet, agregar acá las columnas correspondientes.
   writeToSheetIn(CONSULTAS_SHEET_ID, gid, {
     [temaConfig.idColumnKey]: id,
     'codigo_operacion': codigoOperacion,
@@ -932,7 +968,7 @@ function submitConsultaSoporte(data) {
     'archivo_referencia': archivoUrl || '',
   })
 
-  return { status: 'ok' }
+  return respuestaIA ? { status: 'ok', respuestaIA: respuestaIA } : { status: 'ok' }
 }
 
 // Busca en la pestaña de Responsables (gid 297897581, misma spreadsheet que
@@ -954,6 +990,309 @@ function resolveCoordinadorResponsable(temaSheet, pais) {
     return tema === temaSheet && paises.includes(pais)
   })
   return match ? String(match[1]).trim() : ''
+}
+
+// ============================================================================
+// Respuesta instantánea con IA para Consultas Soporte SAB (fase 2).
+//
+// A diferencia del prototipo de Reva (borrador para que un humano revise),
+// acá SÍ hay respuestas verificadas de precedente real — vienen del análisis
+// "Analisis_Consultas_SAB_LP.xlsx" (hoja 6_Detalle_clasificado), que el
+// usuario sube a un Sheet aparte con columnas TIPO / CONSULTA / INTENCION /
+// RESPUESTA / CALIDAD_RESPUESTA. Por eso, SOLO para los temas listados en
+// CONSULTAS_IA_INSTANTANEA_TEMAS y SOLO para 4 intenciones consideradas
+// seguras (no requieren revisar datos puntuales del tripulante), la IA le
+// responde directo en la web — nunca inventa fechas ni datos de un caso
+// puntual: si no está segura, responde NO_APLICA y el flujo cae a lo de
+// siempre (consulta registrada, la ve el coordinador).
+// ============================================================================
+
+// Temas que reciben respuesta instantánea. Agregar una clave más acá (debe
+// existir en CONSULTAS_TEMAS) cuando se sume otro tipo, sin tocar el resto.
+const CONSULTAS_IA_INSTANTANEA_TEMAS = ['aptoMedico']
+
+// Apunta directo a la hoja "6_Detalle_clasificado" del Sheet de análisis que
+// arma el jefe (mismo contenido que Analisis_Consultas_SAB_LP.xlsx, pero
+// vivo en Sheets): ya trae los headers TIPO / CONSULTA / INTENCION /
+// RESPUESTA / CALIDAD_RESPUESTA que necesita buscarEjemplosConocimiento,
+// junto con otras columnas (CODIGO_OPERACION, COD_OBJETIVO, etc.) que
+// simplemente se ignoran. Ojo: esta hoja debe estar compartida (al menos
+// como Lector) con la cuenta que ejecuta este proyecto de Apps Script
+// ("Ejecutar como: Yo" del deploy).
+const CONOCIMIENTO_SHEET_ID = '1VG7IlMERaOXMFWiLUdkHNeUoLloLJ-qt'
+const CONOCIMIENTO_GID = 114081849
+
+// Las únicas 4 intenciones donde la IA puede responder sin revisar el caso
+// puntual del tripulante. Todo lo demás (Solicitar gestión/acción, Reportar
+// problema o error, Reclamar por incumplimiento/discrepancia, etc.) siempre
+// quedan para el coordinador — ojo con el espaciado exacto alrededor de "/"
+// en 2 de ellas, es tal cual aparece en la columna INTENCION del Excel.
+const CONSULTAS_INTENCIONES_SEGURAS = [
+  'Consultar información/procedimiento',
+  'Hacer seguimiento',
+  'Validar / confirmar',
+  'Notificar / informar',
+]
+
+// Hasta 3 ejemplos por intención segura, filtrados a este TIPO y a calidad
+// "Respondida completamente" — así el modelo solo ve precedente verificado,
+// nunca casos mal resueltos o sin relación.
+function buscarEjemplosConocimiento(tipoLabel) {
+  const ss = SpreadsheetApp.openById(CONOCIMIENTO_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === CONOCIMIENTO_GID)
+  if (!sheet) throw new Error('No se encontró la pestaña de la base de conocimiento (revisa CONOCIMIENTO_SHEET_ID/CONOCIMIENTO_GID)')
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
+  const tipoIdx = headers.indexOf('TIPO')
+  const consultaIdx = headers.indexOf('CONSULTA')
+  const intencionIdx = headers.indexOf('INTENCION')
+  const respuestaIdx = headers.indexOf('RESPUESTA')
+  const calidadIdx = headers.indexOf('CALIDAD_RESPUESTA')
+  if ([tipoIdx, consultaIdx, intencionIdx, respuestaIdx, calidadIdx].indexOf(-1) !== -1) {
+    throw new Error('Faltan columnas esperadas (TIPO/CONSULTA/INTENCION/RESPUESTA/CALIDAD_RESPUESTA) en la base de conocimiento')
+  }
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) return []
+  const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+
+  const porIntencion = {}
+  CONSULTAS_INTENCIONES_SEGURAS.forEach((i) => { porIntencion[i] = [] })
+
+  rows.forEach((row) => {
+    const tipo = String(row[tipoIdx] || '').trim()
+    const intencion = String(row[intencionIdx] || '').trim()
+    const calidad = String(row[calidadIdx] || '').trim()
+    if (tipo !== tipoLabel) return
+    if (calidad !== 'Respondida completamente') return
+    if (porIntencion[intencion] === undefined) return
+    if (porIntencion[intencion].length >= 3) return
+    const consulta = String(row[consultaIdx] || '').trim()
+    const respuesta = String(row[respuestaIdx] || '').trim()
+    if (!consulta || !respuesta) return
+    porIntencion[intencion].push({ intencion: intencion, consulta: consulta, respuesta: respuesta })
+  })
+
+  return Object.keys(porIntencion).reduce((acc, k) => acc.concat(porIntencion[k]), [])
+}
+
+// Clasifica la intención de la consulta y, si cae en una de las 4 seguras,
+// redacta una respuesta basada en los ejemplos. Devuelve null (nunca lanza)
+// si no aplica, si la base de conocimiento no tiene ejemplos para este tipo,
+// o si la IA no respetó el formato esperado — en cualquier duda, null.
+function generarRespuestaConsultaIA(tipoLabel, consultaTexto) {
+  if (!consultaTexto) return null
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel)
+  if (!ejemplos.length) return null
+
+  const ejemplosTexto = ejemplos.map((e) =>
+    'Intención: ' + e.intencion + '\nConsulta: "' + e.consulta + '"\nRespuesta: "' + e.respuesta + '"'
+  ).join('\n\n')
+
+  const prompt = [
+    'Eres el asistente de Soporte SAB de LATAM Airlines Perú, especializado en el trámite "' + tipoLabel + '".',
+    '',
+    'A continuación hay ejemplos REALES de consultas de tripulantes ya respondidas correctamente por el equipo de soporte, agrupados por la intención de quien consulta:',
+    '',
+    ejemplosTexto,
+    '',
+    'Ahora analiza esta consulta NUEVA de un tripulante:',
+    '"' + consultaTexto + '"',
+    '',
+    'Tu tarea:',
+    '1. Clasifica su intención en UNA de estas 4 categorías exactas: ' + CONSULTAS_INTENCIONES_SEGURAS.join(' | ') + '. Guíate ante todo por el patrón de los ejemplos de arriba, no por reglas rígidas: preguntar por datos de su propia cita ya agendada (fecha, hora, lugar, indicaciones) SÍ es "Consultar información/procedimiento" si hay un ejemplo similar arriba. En cambio, cuando pide que le cambien/reprogramen/cancelen algo, reporta un error o presenta un reclamo, esa NO es ninguna de las 4 — es otra intención.',
+    '2. Si SÍ clasifica en una de las 4, redacta una respuesta como las de los ejemplos: profesional, breve, en español, tono LATAM, basada en el procedimiento general (nunca inventes fechas, números ni datos específicos del caso del tripulante que no estén en su consulta).',
+    '3. Si NO clasifica en ninguna de las 4, o si para responder bien hace falta revisar datos puntuales del tripulante que no tienes, responde exactamente NO_APLICA (nada más, en ambos campos).',
+    '',
+    'Responde ÚNICAMENTE en este formato exacto, sin texto adicional antes ni después:',
+    'INTENCION: <una de las 4 categorías, o NO_APLICA>',
+    'RESPUESTA: <tu respuesta, o NO_APLICA>',
+  ].join('\n')
+
+  let salida
+  try {
+    salida = BibliotecaVertexAI.ejecutarPrompt(prompt)
+  } catch (err) {
+    Logger.log('BibliotecaVertexAI.ejecutarPrompt falló: ' + (err && err.message ? err.message : err))
+    return null
+  }
+  if (!salida) return null
+
+  const intencionMatch = salida.match(/INTENCION:\s*(.+)/i)
+  const respuestaMatch = salida.match(/RESPUESTA:\s*([\s\S]+)/i)
+  if (!intencionMatch || !respuestaMatch) {
+    Logger.log('Salida del modelo no respetó el formato esperado: ' + salida)
+    return null
+  }
+
+  const intencion = intencionMatch[1].trim()
+  const respuesta = respuestaMatch[1].trim()
+  if (intencion === 'NO_APLICA' || respuesta === 'NO_APLICA') {
+    Logger.log('Modelo clasificó como NO_APLICA para: "' + consultaTexto + '"')
+    return null
+  }
+  if (CONSULTAS_INTENCIONES_SEGURAS.indexOf(intencion) === -1) {
+    Logger.log('Modelo devolvió una intención fuera de las 4 seguras: "' + intencion + '"')
+    return null
+  }
+
+  return { intencion: intencion, respuesta: respuesta }
+}
+
+// Prueba manual: selecciona esta función en el desplegable de arriba del
+// editor de Apps Script y dale a "Ejecutar" — no pasa por el formulario web
+// ni requiere un despliegue nuevo (el editor siempre corre el código guardado
+// más reciente). Todo el resultado queda en Ver > Registros:
+//   - "Ejemplos encontrados: 0" -> problema de acceso/headers/TIPO en la hoja
+//     de conocimiento (6_Detalle_clasificado), no del modelo.
+//   - "BibliotecaVertexAI.ejecutarPrompt falló: ..." -> problema con la
+//     librería/credenciales de Vertex AI.
+//   - "Modelo clasificó como NO_APLICA..." -> el modelo sí corrió, pero no
+//     ubicó la consulta en ninguna de las 4 intenciones seguras.
+//   - "Resultado: {...}" con intencion/respuesta -> funcionó de punta a punta.
+function testGenerarRespuestaConsultaIA() {
+  const tipoLabel = 'Apto Médico'
+  const consultaTexto = 'Tengo apto médico mañana 4oct, pero aún no tengo las indicaciones, el lugar ni la hora, agradecería información'
+
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel)
+  Logger.log('Ejemplos encontrados: ' + ejemplos.length)
+  ejemplos.forEach((e) => Logger.log('  - [' + e.intencion + '] ' + e.consulta.slice(0, 90)))
+
+  const resultado = generarRespuestaConsultaIA(tipoLabel, consultaTexto)
+  Logger.log('Resultado: ' + JSON.stringify(resultado))
+}
+
+// ============================================================================
+// Prototipo: borrador de respuesta con IA para Consultas de Reva LP.
+//
+// Por qué "borrador" y no auto-respuesta: el Sheet de Consultas nunca guardó
+// la respuesta real que dio el coordinador a cada consulta (solo la
+// pregunta) — así que la IA no tiene de dónde aprender respuestas
+// verificadas. Genera un TEXTO SUGERIDO para que el coordinador (V.Sullca
+// hoy) lo revise, edite y recién ahí lo envíe por correo — nunca se manda
+// solo. Acotado a Reva LP por ahora; si funciona bien se puede repetir el
+// mismo patrón para los demás temas de CONSULTAS_TEMAS.
+//
+// Requiere la columna "borrador_respuesta_ia" en la fila 1 de la pestaña de
+// Reva (gid 1065806131) — agrégala a mano antes de correr esto; si no
+// existe, tira error claro en vez de escribir en la columna equivocada.
+// ============================================================================
+
+const REVA_BORRADOR_COLUMN = 'borrador_respuesta_ia'
+
+// Arma el prompt y llama a BibliotecaVertexAI para UNA consulta de Reva
+// (identificada por su reva_lp_id, ej. "fa5e8e41"), y escribe el resultado
+// en REVA_BORRADOR_COLUMN de esa misma fila.
+function generarBorradorRevaIA(revaLpId) {
+  const config = CONSULTAS_TEMAS.reva
+  const ss = SpreadsheetApp.openById(CONSULTAS_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === config.gidByPais.LP)
+  if (!sheet) throw new Error('No se encontró la pestaña de Reva')
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
+  const idColIdx = headers.indexOf(config.idColumnKey)
+  const consultaColIdx = headers.indexOf('consulta')
+  const nombreColIdx = headers.indexOf('nombre')
+  const categoriaColIdx = headers.indexOf('categoria')
+  const borradorColIdx = headers.indexOf(REVA_BORRADOR_COLUMN)
+  if (idColIdx === -1 || consultaColIdx === -1) {
+    throw new Error('Faltan columnas esperadas (' + config.idColumnKey + ' / consulta) en la pestaña de Reva')
+  }
+  if (borradorColIdx === -1) {
+    throw new Error('Falta la columna "' + REVA_BORRADOR_COLUMN + '" en la fila 1 de la pestaña de Reva — agrégala antes de correr esto')
+  }
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) throw new Error('La pestaña de Reva no tiene consultas todavía')
+  const allRows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+
+  const targetRowIdx = allRows.findIndex((row) => String(row[idColIdx]).trim() === revaLpId)
+  if (targetRowIdx === -1) throw new Error('No se encontró ninguna consulta de Reva con id ' + revaLpId)
+
+  const targetRow = allRows[targetRowIdx]
+  const consultaTexto = String(targetRow[consultaColIdx] || '').trim()
+  const nombre = String(targetRow[nombreColIdx] || '').trim()
+  const categoria = String(targetRow[categoriaColIdx] || '').trim()
+  if (!consultaTexto) throw new Error('Esa fila no tiene texto de consulta')
+
+  const borrador = generarBorradorConVertexAI(consultaTexto, nombre, categoria, allRows, consultaColIdx, targetRowIdx)
+
+  sheet.getRange(targetRowIdx + 2, borradorColIdx + 1).setValue(borrador)
+  return { status: 'ok', borrador: borrador }
+}
+
+// Arma el prompt (consulta actual + hasta 6 consultas recientes de Reva como
+// contexto de qué se suele preguntar, NUNCA como respuestas verificadas —
+// esa distinción se lo aclara al modelo explícitamente) y llama a
+// BibliotecaVertexAI.ejecutarPrompt.
+function generarBorradorConVertexAI(consultaTexto, nombre, categoria, allRows, consultaColIdx, excludeRowIdx) {
+  const otras = allRows
+    .filter((row, i) => i !== excludeRowIdx && String(row[consultaColIdx] || '').trim())
+    .slice(-6)
+    .map((row) => '- ' + String(row[consultaColIdx]).trim())
+    .join('\n')
+
+  const prompt = [
+    'Eres un asistente de soporte para tripulantes de cabina de LATAM Airlines Perú (SAB), especializado en el trámite "Curso Entrenamiento Periódico (Reva)": la revalidación periódica de la licencia/habilitación de tripulante de cabina (cursos en Academia Corporativa, examen médico ocupacional, día de prácticas en el CAE, chequeos de competencia en Airbus/Boeing).',
+    '',
+    'Redacta un BORRADOR de respuesta profesional, breve y en español para la siguiente consulta de un tripulante. Este borrador lo va a revisar y editar un coordinador humano antes de enviarlo — no se envía directo al tripulante, así que no hace falta saludo largo ni firma.',
+    '',
+    'Nombre del tripulante: ' + (nombre || 'No especificado'),
+    'Categoría: ' + (categoria || 'No especificada'),
+    'Consulta: "' + consultaTexto + '"',
+    otras ? '\nPara contexto, estas son otras consultas recientes sobre Reva (son solo ejemplo de qué se suele preguntar — NO asumas que ya fueron respondidas ni de qué forma, no están incluidas sus respuestas):\n' + otras : '',
+    '',
+    'Instrucciones:',
+    '- Si la consulta es sobre un problema técnico reconocible (ej. plataforma o examen que se cuelga, curso no cargado, error del sistema al enviar un examen), da una respuesta de troubleshooting directa y práctica.',
+    '- Si la consulta requiere verificar datos específicos del tripulante (programación de rol, fechas exactas, reprogramaciones, vencimientos individuales de licencia), NO inventes fechas ni datos — redacta la respuesta indicando que se está revisando su caso puntual, y termina el borrador con la etiqueta exacta "[REQUIERE REVISIÓN DE ROL]" en una línea aparte.',
+    '- Tono formal pero cercano, como se usa en LATAM.',
+  ].filter(Boolean).join('\n')
+
+  try {
+    return BibliotecaVertexAI.ejecutarPrompt(prompt)
+  } catch (err) {
+    throw new Error('Error al generar el borrador con IA: ' + err.message)
+  }
+}
+
+// Utilidad para probar cómodo desde el editor de Apps Script: lista las
+// consultas de Reva que todavía no tienen borrador generado, con su id y el
+// texto de la consulta — así no hay que abrir el Sheet para copiar un id.
+// Correr esta función (Ejecutar > listarConsultasRevaSinBorrador), revisar
+// el resultado en "Registro de ejecución" (Ver > Registros), y usar uno de
+// esos ids para probar generarBorradorRevaIA('ese-id') a mano.
+function listarConsultasRevaSinBorrador() {
+  const config = CONSULTAS_TEMAS.reva
+  const ss = SpreadsheetApp.openById(CONSULTAS_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === config.gidByPais.LP)
+  if (!sheet) throw new Error('No se encontró la pestaña de Reva')
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
+  const idColIdx = headers.indexOf(config.idColumnKey)
+  const consultaColIdx = headers.indexOf('consulta')
+  const borradorColIdx = headers.indexOf(REVA_BORRADOR_COLUMN)
+  if (borradorColIdx === -1) {
+    throw new Error('Falta la columna "' + REVA_BORRADOR_COLUMN + '" en la fila 1 de la pestaña de Reva — agrégala antes de correr esto')
+  }
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) return []
+  const allRows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+
+  const pendientes = allRows
+    .filter((row) => String(row[consultaColIdx] || '').trim() && !String(row[borradorColIdx] || '').trim())
+    .map((row) => ({ id: String(row[idColIdx]).trim(), consulta: String(row[consultaColIdx]).trim() }))
+
+  Logger.log(JSON.stringify(pendientes, null, 2))
+  return pendientes
+}
+
+// Wrapper sin parámetros para poder correrlo con el botón "Ejecutar" del
+// editor (que no permite pasar argumentos) — cambia el id de ejemplo por uno
+// real que te haya dado listarConsultasRevaSinBorrador().
+function testGenerarBorradorRevaIA() {
+  const resultado = generarBorradorRevaIA('CAMBIAR_POR_UN_ID_REAL')
+  Logger.log(resultado.borrador)
 }
 
 function uploadFileToDrive(base64, fileName, mimeType, folderId) {
