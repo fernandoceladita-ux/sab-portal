@@ -1,0 +1,64 @@
+<script>
+  (function () {
+    function runServer(fnName) {
+      var args = Array.prototype.slice.call(arguments, 1)
+      return new Promise(function (resolve, reject) {
+        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+        runner[fnName].apply(runner, args)
+      })
+    }
+
+    window.consultarEstadoForm = async function () {
+      var errorBox = document.getElementById('consulta-estado-error')
+      var resultadoBox = document.getElementById('consulta-estado-resultado')
+      errorBox.classList.add('hidden')
+      resultadoBox.classList.add('hidden')
+
+      var form = document.getElementById('form-consulta-estado')
+      var codigoOperacion = (new FormData(form).get('codigoOperacion') || '').toString().trim()
+      if (!codigoOperacion) {
+        errorBox.textContent = 'Ingresa tu código de operación.'
+        errorBox.classList.remove('hidden')
+        return
+      }
+
+      var btn = document.getElementById('consulta-estado-btn-consultar')
+      var label = document.getElementById('consulta-estado-btn-consultar-label')
+      btn.disabled = true
+      label.textContent = 'Consultando...'
+
+      try {
+        var resultado = await runServer('consultarEstadoPorCodigoOperacion', codigoOperacion)
+        if (!resultado || !resultado.encontrado) {
+          errorBox.textContent = 'No encontramos ninguna consulta con ese código de operación.'
+          errorBox.classList.remove('hidden')
+          return
+        }
+        document.getElementById('consulta-estado-valor').textContent = resultado.estado
+        document.getElementById('consulta-estado-tipo').textContent = resultado.tipo ? 'Tema: ' + resultado.tipo : ''
+        document.getElementById('consulta-estado-fecha').textContent = resultado.fechaPrevistaResolucion
+          ? 'Fecha prevista de resolución: ' + resultado.fechaPrevistaResolucion
+          : ''
+        resultadoBox.classList.remove('hidden')
+      } catch (err) {
+        errorBox.textContent = 'Ocurrió un error al consultar tu estado. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
+        errorBox.classList.remove('hidden')
+      } finally {
+        btn.disabled = false
+        label.textContent = 'Consultar'
+      }
+    }
+
+    // Llamada tanto al cerrar el modal (ver MODAL_RESET_FN en Scripts.html)
+    // como antes de cada consulta nueva — vuelve a su estado inicial.
+    window.resetConsultaEstadoForm = function () {
+      var form = document.getElementById('form-consulta-estado')
+      if (form) form.reset()
+
+      var errorBox = document.getElementById('consulta-estado-error')
+      var resultadoBox = document.getElementById('consulta-estado-resultado')
+      if (errorBox) errorBox.classList.add('hidden')
+      if (resultadoBox) resultadoBox.classList.add('hidden')
+    }
+  })()
+</script>

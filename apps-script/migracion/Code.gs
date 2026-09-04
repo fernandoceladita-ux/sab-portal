@@ -785,6 +785,14 @@ function buildDemoraFueraAvionRow(data, correo, id, codigoOperacion, pais, archi
 const CONSULTAS_SHEET_ID = '1nmB84XLrocV_MCYchPK5g1ypqj5mHQf0Pe_cY_eq7YM'
 const CONSULTAS_RESPONSABLES_GID = 297897581
 
+// Pestaña "Resumen_LP" del mismo Sheet de Consultas: consolida TODAS las
+// consultas de todos los temas (cada fila trae su codigo_operacion, que es
+// el mismo valor que se generó al guardarla en su pestaña por tema) y ahí es
+// donde el coordinador va marcando estado_rpta (Pendiente/Completado/etc.) a
+// mano. Es SOLO LECTURA desde acá — ver consultarEstadoPorCodigoOperacion:
+// nunca se escribe nada en esta pestaña desde el código.
+const CONSULTAS_RESUMEN_GID = 1228321511
+
 // Cada tema tiene su propio gid de Sheet y su propia carpeta de Drive, por
 // país. Por ahora solo LP está armado (gid/folder reales); cuando tengas los
 // de 4C y XL, se agregan como una clave más dentro de gidByPais/folderIdByPais
@@ -922,19 +930,31 @@ function submitConsultaSoporte(data) {
 
   // Solo para los temas en CONSULTAS_IA_INSTANTANEA_TEMAS (por ahora, solo
   // Apto Médico): intenta responder al tripulante en el momento, basado en
-  // precedente real de la base de conocimiento. Un fallo de IA (o que la
-  // consulta no aplique) nunca debe impedir que la consulta se registre —
-  // por eso va envuelto en try/catch y solo agrega datos, no bloquea nada.
+  // precedente real de la base de conocimiento, pero SOLO si el objetivo de
+  // su consulta cae en uno de los "verdes" de CONSULTAS_OBJETIVOS_SEGUROS
+  // (ver pestaña 2_Objetivos_por_TIPO del sheet de análisis). Un fallo de IA
+  // (o que la consulta no aplique) nunca debe impedir que la consulta se
+  // registre — por eso va envuelto en try/catch y solo agrega datos, no
+  // bloquea nada. `derivada` queda en true cuando SÍ se intentó clasificar
+  // (el tema está en la lista instantánea) pero no calificó para respuesta
+  // automática — ese es el caso que dispara el aviso al coordinador más abajo.
   let respuestaIA = null
+  let derivada = false
   if (CONSULTAS_IA_INSTANTANEA_TEMAS.indexOf(data.tema) !== -1) {
+    const objetivosSeguros = CONSULTAS_OBJETIVOS_SEGUROS[data.tema] || []
     try {
-      const resultado = generarRespuestaConsultaIA(temaConfig.label, String(data.consulta || '').trim())
+      const resultado = generarRespuestaConsultaIA(temaConfig.label, String(data.consulta || '').trim(), objetivosSeguros)
       if (resultado) {
-        respuestaIA = resultado.respuesta
+        // Saludo con el nombre tal cual lo escribió el tripulante (el campo
+        // es "Apellidos y Nombres" junto, sin separar — no hay forma
+        // confiable de sacar solo el primer nombre sin arriesgar adivinar mal).
+        respuestaIA = 'Hola ' + nombre + ',\n\n' + resultado.respuesta
         // Solo en el registro de ejecución (Ver > Registros), no en el
         // Sheet — mientras se decide si esto se persiste, sirve para
-        // verificar qué intención detectó el modelo en cada prueba.
-        Logger.log('Intención detectada: ' + resultado.intencion)
+        // verificar qué objetivo detectó el modelo en cada prueba.
+        Logger.log('Objetivo detectado: ' + resultado.objetivo)
+      } else {
+        derivada = true
       }
     } catch (err) {
       // No debe romper el envío de la consulta, pero sí queda rastro en
@@ -942,11 +962,11 @@ function submitConsultaSoporte(data) {
       // de BibliotecaVertexAI se ve exactamente igual que un NO_APLICA
       // legítimo del modelo, y no hay forma de distinguirlos.
       Logger.log('generarRespuestaConsultaIA falló: ' + (err && err.message ? err.message : err))
-      respuestaIA = null
+      derivada = true
     }
   }
 
-  // Ojo: a propósito NO se persiste respuestaIA/intencionDetectada en la
+  // Ojo: a propósito NO se persiste respuestaIA/objetivoDetectado en la
   // fila todavía (decisión explícita: por ahora la fila de cada consulta se
   // guarda igual que siempre, sin tocar su esquema — la respuesta de la IA
   // solo se muestra al tripulante al instante en la misma página, vía el
@@ -968,7 +988,59 @@ function submitConsultaSoporte(data) {
     'archivo_referencia': archivoUrl || '',
   })
 
-  return respuestaIA ? { status: 'ok', respuestaIA: respuestaIA } : { status: 'ok' }
+  // Consulta derivada (el tema tiene IA instantánea pero no se pudo responder
+  // sola): avisa por correo al coordinador de ese tema para que entre a
+  // responderla dentro de las 24 horas. Temporal:
+  // mientras no se conecta el correo real del coordinador (vía Responsables),
+  // usa CONSULTAS_COORDINADOR_EMAIL_TEMPORAL — si el tema no tiene correo ahí
+  // todavía, simplemente no se manda nada (nunca bloquea el registro).
+  if (derivada) {
+    avisarCoordinadorConsultaDerivada(data.tema, temaConfig.label, {
+      nombre: nombre,
+      bp: bp,
+      codigoOperacion: codigoOperacion,
+      consulta: String(data.consulta || '').trim(),
+    })
+  }
+
+  if (respuestaIA) return { status: 'ok', respuestaIA: respuestaIA }
+  if (derivada) return { status: 'ok', derivada: true }
+  return { status: 'ok' }
+}
+
+// Correo temporal de aviso al coordinador — mientras Responsables_Consultas
+// no tiene una columna de correo, se define acá a mano por tema. Reemplaza
+// el valor de 'aptoMedico' por tu correo real para probar el flujo completo
+// (acordado: Apto Médico primero, tú mismo haces de coordinador por ahora).
+const CONSULTAS_COORDINADOR_EMAIL_TEMPORAL = {
+  aptoMedico: 'fernando.celadita@latam.com',
+}
+
+// Nunca lanza: un fallo al mandar el correo no debe romper el envío de la
+// consulta (que ya se guardó antes de llegar acá). Si falla, queda en
+// Registros para poder revisarlo.
+function avisarCoordinadorConsultaDerivada(temaKey, tipoLabel, info) {
+  const correo = CONSULTAS_COORDINADOR_EMAIL_TEMPORAL[temaKey]
+  if (!correo || correo.indexOf('REEMPLAZAR') === 0) return
+  try {
+    MailApp.sendEmail({
+      to: correo,
+      subject: 'Nueva consulta de ' + tipoLabel + ' por responder (24h) — ' + info.codigoOperacion,
+      body: [
+        'Hola,',
+        '',
+        'Llegó una nueva consulta de "' + tipoLabel + '" que no pudo responderse automáticamente y quedó pendiente:',
+        '',
+        'Tripulante: ' + info.nombre + ' (BP ' + info.bp + ')',
+        'Código de operación: ' + info.codigoOperacion,
+        'Consulta: "' + info.consulta + '"',
+        '',
+        'Por favor ingresa a la hoja de Consultas y respóndela dentro de las próximas 24 horas.',
+      ].join('\n'),
+    })
+  } catch (err) {
+    Logger.log('avisarCoordinadorConsultaDerivada falló: ' + (err && err.message ? err.message : err))
+  }
 }
 
 // Busca en la pestaña de Responsables (gid 297897581, misma spreadsheet que
@@ -992,52 +1064,107 @@ function resolveCoordinadorResponsable(temaSheet, pais) {
   return match ? String(match[1]).trim() : ''
 }
 
+// Llamada desde ConsultaEstadoScript.html vía
+// `google.script.run.consultarEstadoPorCodigoOperacion(codigoOperacion)`.
+// Busca el código de operación en la pestaña "Resumen_LP" (consolida todos
+// los temas) y devuelve su estado_rpta — SOLO LECTURA, nunca escribe nada acá
+// (ver comentario de CONSULTAS_RESUMEN_GID). Por ahora el tripulante solo
+// tiene su código de operación para identificarse (no hay login todavía).
+function consultarEstadoPorCodigoOperacion(codigoOperacion) {
+  const codigo = String(codigoOperacion || '').trim()
+  if (!codigo) throw new Error('Ingresa tu código de operación')
+
+  const ss = SpreadsheetApp.openById(CONSULTAS_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === CONSULTAS_RESUMEN_GID)
+  if (!sheet) throw new Error('No se encontró la pestaña Resumen_LP (revisa CONSULTAS_RESUMEN_GID)')
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
+  const codigoIdx = headers.indexOf('codigo_operacion')
+  const estadoIdx = headers.indexOf('estado_rpta')
+  const tipoIdx = headers.indexOf('tipo')
+  const consultaIdx = headers.indexOf('consulta')
+  const fechaPrevistaIdx = headers.indexOf('fecha_prevista_resolucion')
+  if (codigoIdx === -1 || estadoIdx === -1) {
+    throw new Error('Faltan columnas esperadas (codigo_operacion/estado_rpta) en Resumen_LP')
+  }
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) return { encontrado: false }
+  const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+
+  const fila = rows.find((row) => String(row[codigoIdx] || '').trim().toLowerCase() === codigo.toLowerCase())
+  if (!fila) return { encontrado: false }
+
+  return {
+    encontrado: true,
+    estado: String(fila[estadoIdx] || '').trim() || 'Pendiente',
+    tipo: tipoIdx !== -1 ? String(fila[tipoIdx] || '').trim() : '',
+    consulta: consultaIdx !== -1 ? String(fila[consultaIdx] || '').trim() : '',
+    fechaPrevistaResolucion: fechaPrevistaIdx !== -1 && fila[fechaPrevistaIdx]
+      ? Utilities.formatDate(new Date(fila[fechaPrevistaIdx]), Session.getScriptTimeZone(), 'dd/MM/yyyy')
+      : '',
+  }
+}
+
 // ============================================================================
 // Respuesta instantánea con IA para Consultas Soporte SAB (fase 2).
 //
 // A diferencia del prototipo de Reva (borrador para que un humano revise),
 // acá SÍ hay respuestas verificadas de precedente real — vienen del análisis
-// "Analisis_Consultas_SAB_LP.xlsx" (hoja 6_Detalle_clasificado), que el
-// usuario sube a un Sheet aparte con columnas TIPO / CONSULTA / INTENCION /
-// RESPUESTA / CALIDAD_RESPUESTA. Por eso, SOLO para los temas listados en
-// CONSULTAS_IA_INSTANTANEA_TEMAS y SOLO para 4 intenciones consideradas
-// seguras (no requieren revisar datos puntuales del tripulante), la IA le
-// responde directo en la web — nunca inventa fechas ni datos de un caso
-// puntual: si no está segura, responde NO_APLICA y el flujo cae a lo de
-// siempre (consulta registrada, la ve el coordinador).
+// "Analisis_Consultas_SAB_LP.xlsx" (hoja 6_Detalle_clasificado), que el jefe
+// mantiene en un Sheet aparte con columnas TIPO / CONSULTA / COD_OBJETIVO /
+// OBJETIVO / INTENCION / RESPUESTA / CALIDAD_RESPUESTA. La clasificación NO
+// es solo por INTENCION (4 categorías) — es por OBJETIVO puntual dentro de
+// cada TIPO (ver pestaña "2_Objetivos_por_TIPO": ahí el jefe marcó en VERDE
+// los objetivos que son pura información/procedimiento general, respondibles
+// sin mirar el caso puntual, y en AMARILLO/blanco los que sí requieren
+// gestión o revisar datos puntuales del tripulante) — por eso
+// CONSULTAS_OBJETIVOS_SEGUROS es la lista, por TEMA, de los OBJETIVO exactos
+// en verde. Solo para los temas en CONSULTAS_IA_INSTANTANEA_TEMAS y SOLO si
+// el objetivo detectado está en esa lista, la IA responde directo en la web
+// — nunca inventa fechas ni datos de un caso puntual: si no está segura,
+// responde OTRO y el flujo cae a lo de siempre (consulta registrada, aviso
+// al coordinador, la ve él).
 // ============================================================================
 
 // Temas que reciben respuesta instantánea. Agregar una clave más acá (debe
-// existir en CONSULTAS_TEMAS) cuando se sume otro tipo, sin tocar el resto.
+// existir en CONSULTAS_TEMAS y en CONSULTAS_OBJETIVOS_SEGUROS) cuando se
+// sume otro tipo, sin tocar el resto.
 const CONSULTAS_IA_INSTANTANEA_TEMAS = ['aptoMedico']
 
 // Apunta directo a la hoja "6_Detalle_clasificado" del Sheet de análisis que
 // arma el jefe (mismo contenido que Analisis_Consultas_SAB_LP.xlsx, pero
-// vivo en Sheets): ya trae los headers TIPO / CONSULTA / INTENCION /
-// RESPUESTA / CALIDAD_RESPUESTA que necesita buscarEjemplosConocimiento,
-// junto con otras columnas (CODIGO_OPERACION, COD_OBJETIVO, etc.) que
+// vivo en Sheets): ya trae los headers TIPO / CONSULTA / OBJETIVO / RESPUESTA
+// / CALIDAD_RESPUESTA que necesita buscarEjemplosConocimiento, junto con
+// otras columnas (CODIGO_OPERACION, COD_OBJETIVO, INTENCION, etc.) que
 // simplemente se ignoran. Ojo: esta hoja debe estar compartida (al menos
 // como Lector) con la cuenta que ejecuta este proyecto de Apps Script
 // ("Ejecutar como: Yo" del deploy).
 const CONOCIMIENTO_SHEET_ID = '1VG7IlMERaOXMFWiLUdkHNeUoLloLJ-qt'
 const CONOCIMIENTO_GID = 114081849
 
-// Las únicas 4 intenciones donde la IA puede responder sin revisar el caso
-// puntual del tripulante. Todo lo demás (Solicitar gestión/acción, Reportar
-// problema o error, Reclamar por incumplimiento/discrepancia, etc.) siempre
-// quedan para el coordinador — ojo con el espaciado exacto alrededor de "/"
-// en 2 de ellas, es tal cual aparece en la columna INTENCION del Excel.
-const CONSULTAS_INTENCIONES_SEGURAS = [
-  'Consultar información/procedimiento',
-  'Hacer seguimiento',
-  'Validar / confirmar',
-  'Notificar / informar',
-]
+// Por TEMA: los OBJETIVO exactos (columna OBJETIVO de 6_Detalle_clasificado)
+// resaltados en VERDE en la pestaña "2_Objetivos_por_TIPO" — pura consulta de
+// información/procedimiento general, sin gestión ni revisión de caso puntual.
+// Todo objetivo que NO esté en esta lista (amarillo, blanco, o cualquiera que
+// el modelo no reconozca) siempre se deriva a un coordinador humano. El texto
+// debe ser IDÉNTICO al de la columna OBJETIVO del Excel/Sheet.
+const CONSULTAS_OBJETIVOS_SEGUROS = {
+  aptoMedico: [
+    'Consulta sobre observación, no apto, dispensa o levantamiento',
+    'Consulta general sobre el apto médico sin detalle especificado',
+    'Consulta sobre documentación requerida (F-001, DNI, informes)',
+    'Consulta sobre detalles de la cita (fecha, hora, lugar, indicaciones)',
+    'Consulta sobre vigencia del apto médico',
+    'Consulta de información no especificada',
+    'Consulta sobre licencia chilena u otro documento asociado',
+  ],
+}
 
-// Hasta 3 ejemplos por intención segura, filtrados a este TIPO y a calidad
+// Hasta 3 ejemplos por objetivo seguro, filtrados a este TIPO y a calidad
 // "Respondida completamente" — así el modelo solo ve precedente verificado,
 // nunca casos mal resueltos o sin relación.
-function buscarEjemplosConocimiento(tipoLabel) {
+function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros) {
   const ss = SpreadsheetApp.openById(CONOCIMIENTO_SHEET_ID)
   const sheet = ss.getSheets().find((s) => s.getSheetId() === CONOCIMIENTO_GID)
   if (!sheet) throw new Error('No se encontró la pestaña de la base de conocimiento (revisa CONOCIMIENTO_SHEET_ID/CONOCIMIENTO_GID)')
@@ -1045,68 +1172,71 @@ function buscarEjemplosConocimiento(tipoLabel) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
   const tipoIdx = headers.indexOf('TIPO')
   const consultaIdx = headers.indexOf('CONSULTA')
-  const intencionIdx = headers.indexOf('INTENCION')
+  const objetivoIdx = headers.indexOf('OBJETIVO')
   const respuestaIdx = headers.indexOf('RESPUESTA')
   const calidadIdx = headers.indexOf('CALIDAD_RESPUESTA')
-  if ([tipoIdx, consultaIdx, intencionIdx, respuestaIdx, calidadIdx].indexOf(-1) !== -1) {
-    throw new Error('Faltan columnas esperadas (TIPO/CONSULTA/INTENCION/RESPUESTA/CALIDAD_RESPUESTA) en la base de conocimiento')
+  if ([tipoIdx, consultaIdx, objetivoIdx, respuestaIdx, calidadIdx].indexOf(-1) !== -1) {
+    throw new Error('Faltan columnas esperadas (TIPO/CONSULTA/OBJETIVO/RESPUESTA/CALIDAD_RESPUESTA) en la base de conocimiento')
   }
 
   const lastRow = sheet.getLastRow()
   if (lastRow < 2) return []
   const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
 
-  const porIntencion = {}
-  CONSULTAS_INTENCIONES_SEGURAS.forEach((i) => { porIntencion[i] = [] })
+  const porObjetivo = {}
+  objetivosSeguros.forEach((o) => { porObjetivo[o] = [] })
 
   rows.forEach((row) => {
     const tipo = String(row[tipoIdx] || '').trim()
-    const intencion = String(row[intencionIdx] || '').trim()
+    const objetivo = String(row[objetivoIdx] || '').trim()
     const calidad = String(row[calidadIdx] || '').trim()
     if (tipo !== tipoLabel) return
     if (calidad !== 'Respondida completamente') return
-    if (porIntencion[intencion] === undefined) return
-    if (porIntencion[intencion].length >= 3) return
+    if (porObjetivo[objetivo] === undefined) return
+    if (porObjetivo[objetivo].length >= 3) return
     const consulta = String(row[consultaIdx] || '').trim()
     const respuesta = String(row[respuestaIdx] || '').trim()
     if (!consulta || !respuesta) return
-    porIntencion[intencion].push({ intencion: intencion, consulta: consulta, respuesta: respuesta })
+    porObjetivo[objetivo].push({ objetivo: objetivo, consulta: consulta, respuesta: respuesta })
   })
 
-  return Object.keys(porIntencion).reduce((acc, k) => acc.concat(porIntencion[k]), [])
+  return Object.keys(porObjetivo).reduce((acc, k) => acc.concat(porObjetivo[k]), [])
 }
 
-// Clasifica la intención de la consulta y, si cae en una de las 4 seguras,
-// redacta una respuesta basada en los ejemplos. Devuelve null (nunca lanza)
-// si no aplica, si la base de conocimiento no tiene ejemplos para este tipo,
-// o si la IA no respetó el formato esperado — en cualquier duda, null.
-function generarRespuestaConsultaIA(tipoLabel, consultaTexto) {
-  if (!consultaTexto) return null
-  const ejemplos = buscarEjemplosConocimiento(tipoLabel)
+// Clasifica el objetivo puntual de la consulta y, si cae en uno de los
+// seguros para este tema, redacta una respuesta basada en los ejemplos.
+// Devuelve null (nunca lanza) si no aplica, si la base de conocimiento no
+// tiene ejemplos para este tipo, o si la IA no respetó el formato esperado
+// — en cualquier duda, null (y la consulta cae al flujo normal de siempre).
+function generarRespuestaConsultaIA(tipoLabel, consultaTexto, objetivosSeguros) {
+  if (!consultaTexto || !objetivosSeguros || !objetivosSeguros.length) return null
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros)
   if (!ejemplos.length) return null
 
   const ejemplosTexto = ejemplos.map((e) =>
-    'Intención: ' + e.intencion + '\nConsulta: "' + e.consulta + '"\nRespuesta: "' + e.respuesta + '"'
+    'Objetivo: ' + e.objetivo + '\nConsulta: "' + e.consulta + '"\nRespuesta: "' + e.respuesta + '"'
   ).join('\n\n')
 
   const prompt = [
     'Eres el asistente de Soporte SAB de LATAM Airlines Perú, especializado en el trámite "' + tipoLabel + '".',
     '',
-    'A continuación hay ejemplos REALES de consultas de tripulantes ya respondidas correctamente por el equipo de soporte, agrupados por la intención de quien consulta:',
+    'A continuación hay ejemplos REALES de consultas de tripulantes ya respondidas correctamente por el equipo de soporte, agrupados por el objetivo puntual de quien consulta:',
     '',
     ejemplosTexto,
     '',
     'Ahora analiza esta consulta NUEVA de un tripulante:',
     '"' + consultaTexto + '"',
     '',
+    'REGLA MÁS IMPORTANTE: esto NO es un chat. El tripulante no puede responderte ni aclarar nada después — tu respuesta es la única que va a recibir, o se deriva a un coordinador. Por eso, NUNCA hagas una pregunta de vuelta ni le pidas un dato que le falta dar (motivo, fecha, archivo, etc.). Si para responder bien necesitarías terminar pidiéndole algo, eso significa que este caso NO es ninguno de los objetivos de la lista — es OTRO.',
+    '',
     'Tu tarea:',
-    '1. Clasifica su intención en UNA de estas 4 categorías exactas: ' + CONSULTAS_INTENCIONES_SEGURAS.join(' | ') + '. Guíate ante todo por el patrón de los ejemplos de arriba, no por reglas rígidas: preguntar por datos de su propia cita ya agendada (fecha, hora, lugar, indicaciones) SÍ es "Consultar información/procedimiento" si hay un ejemplo similar arriba. En cambio, cuando pide que le cambien/reprogramen/cancelen algo, reporta un error o presenta un reclamo, esa NO es ninguna de las 4 — es otra intención.',
-    '2. Si SÍ clasifica en una de las 4, redacta una respuesta como las de los ejemplos: profesional, breve, en español, tono LATAM, basada en el procedimiento general (nunca inventes fechas, números ni datos específicos del caso del tripulante que no estén en su consulta).',
-    '3. Si NO clasifica en ninguna de las 4, o si para responder bien hace falta revisar datos puntuales del tripulante que no tienes, responde exactamente NO_APLICA (nada más, en ambos campos).',
+    '1. Decide si su objetivo es EXACTAMENTE uno de estos (y solo estos):\n' + objetivosSeguros.map((o) => '   - ' + o).join('\n') + '\n   Guíate ante todo por el patrón de los ejemplos de arriba.\n   OJO: cualquier consulta que pida reprogramar, reagendar, cambiar, adelantar, atrasar o cancelar su cita/examen, o que presente un reclamo o reporte un error, NUNCA es ninguno de estos objetivos — aunque no explique el motivo o los detalles (eso NO la convierte en "consulta general sin detalle especificado": esa categoría es solo para quien pregunta de forma genérica por su apto médico, sin pedir ninguna acción puntual).',
+    '2. Si SÍ calza con uno de esos objetivos exactos, redacta una respuesta FINAL y completa como las de los ejemplos: profesional, breve, en español, tono LATAM, basada en el procedimiento general (nunca inventes fechas, números ni datos específicos del caso del tripulante que no estén en su consulta, y nunca saludes ni firmes — eso ya lo agrega el sistema).',
+    '3. Si NO calza con ninguno, responde exactamente OTRO (nada más, en ambos campos).',
     '',
     'Responde ÚNICAMENTE en este formato exacto, sin texto adicional antes ni después:',
-    'INTENCION: <una de las 4 categorías, o NO_APLICA>',
-    'RESPUESTA: <tu respuesta, o NO_APLICA>',
+    'OBJETIVO: <uno de los objetivos exactos de la lista, o OTRO>',
+    'RESPUESTA: <tu respuesta, o OTRO>',
   ].join('\n')
 
   let salida
@@ -1118,25 +1248,25 @@ function generarRespuestaConsultaIA(tipoLabel, consultaTexto) {
   }
   if (!salida) return null
 
-  const intencionMatch = salida.match(/INTENCION:\s*(.+)/i)
+  const objetivoMatch = salida.match(/OBJETIVO:\s*(.+)/i)
   const respuestaMatch = salida.match(/RESPUESTA:\s*([\s\S]+)/i)
-  if (!intencionMatch || !respuestaMatch) {
+  if (!objetivoMatch || !respuestaMatch) {
     Logger.log('Salida del modelo no respetó el formato esperado: ' + salida)
     return null
   }
 
-  const intencion = intencionMatch[1].trim()
+  const objetivo = objetivoMatch[1].trim()
   const respuesta = respuestaMatch[1].trim()
-  if (intencion === 'NO_APLICA' || respuesta === 'NO_APLICA') {
-    Logger.log('Modelo clasificó como NO_APLICA para: "' + consultaTexto + '"')
+  if (objetivo === 'OTRO' || respuesta === 'OTRO') {
+    Logger.log('Modelo clasificó como OTRO (se deriva) para: "' + consultaTexto + '"')
     return null
   }
-  if (CONSULTAS_INTENCIONES_SEGURAS.indexOf(intencion) === -1) {
-    Logger.log('Modelo devolvió una intención fuera de las 4 seguras: "' + intencion + '"')
+  if (objetivosSeguros.indexOf(objetivo) === -1) {
+    Logger.log('Modelo devolvió un objetivo fuera de la lista segura: "' + objetivo + '"')
     return null
   }
 
-  return { intencion: intencion, respuesta: respuesta }
+  return { objetivo: objetivo, respuesta: respuesta }
 }
 
 // Prueba manual: selecciona esta función en el desplegable de arriba del
@@ -1147,18 +1277,19 @@ function generarRespuestaConsultaIA(tipoLabel, consultaTexto) {
 //     de conocimiento (6_Detalle_clasificado), no del modelo.
 //   - "BibliotecaVertexAI.ejecutarPrompt falló: ..." -> problema con la
 //     librería/credenciales de Vertex AI.
-//   - "Modelo clasificó como NO_APLICA..." -> el modelo sí corrió, pero no
-//     ubicó la consulta en ninguna de las 4 intenciones seguras.
-//   - "Resultado: {...}" con intencion/respuesta -> funcionó de punta a punta.
+//   - "Modelo clasificó como OTRO..." -> el modelo sí corrió, pero no ubicó
+//     la consulta en ninguno de los objetivos seguros.
+//   - "Resultado: {...}" con objetivo/respuesta -> funcionó de punta a punta.
 function testGenerarRespuestaConsultaIA() {
   const tipoLabel = 'Apto Médico'
+  const objetivosSeguros = CONSULTAS_OBJETIVOS_SEGUROS.aptoMedico
   const consultaTexto = 'Tengo apto médico mañana 4oct, pero aún no tengo las indicaciones, el lugar ni la hora, agradecería información'
 
-  const ejemplos = buscarEjemplosConocimiento(tipoLabel)
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros)
   Logger.log('Ejemplos encontrados: ' + ejemplos.length)
-  ejemplos.forEach((e) => Logger.log('  - [' + e.intencion + '] ' + e.consulta.slice(0, 90)))
+  ejemplos.forEach((e) => Logger.log('  - [' + e.objetivo + '] ' + e.consulta.slice(0, 90)))
 
-  const resultado = generarRespuestaConsultaIA(tipoLabel, consultaTexto)
+  const resultado = generarRespuestaConsultaIA(tipoLabel, consultaTexto, objetivosSeguros)
   Logger.log('Resultado: ' + JSON.stringify(resultado))
 }
 

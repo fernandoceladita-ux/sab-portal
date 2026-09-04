@@ -67,10 +67,13 @@
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
       var iaBox = document.getElementById('consultas-ia-respuesta')
+      var derivadoBox = document.getElementById('consultas-derivado')
       errorBox.classList.add('hidden')
       successBox.classList.add('hidden')
       successBox.classList.remove('flex')
       iaBox.classList.add('hidden')
+      derivadoBox.classList.add('hidden')
+      derivadoBox.classList.remove('flex')
 
       if (!validateConsultaForm()) {
         errorBox.textContent = !consultaState.tema
@@ -103,6 +106,9 @@
         if (resultado && resultado.respuestaIA) {
           document.getElementById('consultas-ia-respuesta-texto').textContent = resultado.respuestaIA
           iaBox.classList.remove('hidden')
+        } else if (resultado && resultado.derivada) {
+          derivadoBox.classList.remove('hidden')
+          derivadoBox.classList.add('flex')
         } else {
           successBox.classList.remove('hidden')
           successBox.classList.add('flex')
@@ -137,12 +143,17 @@
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
       var iaBox = document.getElementById('consultas-ia-respuesta')
+      var derivadoBox = document.getElementById('consultas-derivado')
       if (errorBox) errorBox.classList.add('hidden')
       if (successBox) {
         successBox.classList.add('hidden')
         successBox.classList.remove('flex')
       }
       if (iaBox) iaBox.classList.add('hidden')
+      if (derivadoBox) {
+        derivadoBox.classList.add('hidden')
+        derivadoBox.classList.remove('flex')
+      }
     }
   })()
 </script>
