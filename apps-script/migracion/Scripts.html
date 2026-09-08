@@ -54,6 +54,7 @@
     { title: 'Domicilio DGAC', module: 'Gestión Personal', href: '?page=gestion-personal&item=domicilio-dgac', dot: 'bg-latam-diavivo' },
     { title: 'Vacuna Fiebre Amarilla', module: 'Gestión Personal', href: '?page=gestion-personal&item=vacuna-fiebre-amarilla', dot: 'bg-latam-diavivo' },
     { title: 'Procedimiento Visa / Pasaporte', module: 'Gestión Personal', href: '?page=gestion-personal&item=visa-pasaporte', dot: 'bg-latam-diavivo' },
+    { title: 'Evaluación de Desempeño 2026', module: 'Gestión Personal', href: '?page=gestion-personal&item=evaluacion-desempeno', dot: 'bg-latam-diavivo' },
     { title: 'Solicitud Mes Subsiguiente', module: 'Mi Rol', href: '?page=mi-rol&item=solicitud-mes-subsiguiente', dot: 'bg-latam-estrellada' },
     { title: 'Cambios Voluntarios', module: 'Mi Rol', href: '?page=mi-rol&item=cambios-voluntarios', dot: 'bg-latam-estrellada' },
     { title: 'Descanso Médico', module: 'Mi Rol', href: '?page=mi-rol&item=descanso-medico', dot: 'bg-latam-estrellada' },
@@ -65,6 +66,8 @@
     { title: 'Consultas Viáticos y Horas de Vuelo', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=consultas-viaticos', dot: 'bg-latam-profunda' },
     { title: 'Cambio de Uniforme', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=cambio-uniforme', dot: 'bg-latam-profunda' },
     { title: 'Registro de Equipos SUNAT', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=registro-sunat', dot: 'bg-latam-profunda' },
+    { title: 'Reembolsos SAP Concur', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=reembolsos-concur', dot: 'bg-latam-profunda' },
+    { title: 'Solicitud de Estacionamiento', module: 'Gestión Operacional', href: '?page=gestion-operacional&item=estacionamiento', dot: 'bg-latam-profunda' },
   ]
 
   function normalizeSearch(str) {
@@ -465,6 +468,7 @@
   const HUB_ITEM_RESET_FN = {
     'actualizacion-datos': 'clearTramiteForm',
     'domicilio-dgac': 'clearDomicilioForm',
+    'estacionamiento': 'clearEstacionamientoForm',
     'solicitud-mes-subsiguiente': 'clearMesForm',
     'descanso-medico': 'clearDmForm',
     'cesion-vacaciones': 'clearVacForm',
@@ -473,6 +477,8 @@
     'cambios-voluntarios': 'resetCambiosVoluntarios',
     'cambios-web-sab': 'resetCambiosWebSab',
     'instructivo-vales': 'resetInstructivoVales',
+    'reembolsos-concur': 'resetReembolsosConcur',
+    'evaluacion-desempeno': 'resetEvaluacionDesempeno',
   }
 
   function resetHubItemPanel(panelId, itemId) {

@@ -1,0 +1,176 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <div class="mb-6 flex items-start gap-3 p-5 text-slate-600">
+    <p class="text-sm leading-relaxed">
+      Completa el formulario para solicitar el acceso temporal al estacionamiento en el terreno del Aeropuerto
+      Internacional Jorge Chávez (AIJCH). <strong class="font-extrabold text-latam-coral">Las solicitudes están
+      sujetas a disponibilidad de espacio.</strong>
+    </p>
+  </div>
+
+  <form id="estacionamiento-form" novalidate>
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('esta-step-1-body','esta-step-1-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">1</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Datos Personales y Laborales</span>
+          <svg id="esta-step-1-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="esta-step-1-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Correo electrónico <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(@latam.com)</span></label>
+                <input type="email" name="correo" required pattern=".+@latam\.com$" title="Debe ser un correo corporativo @latam.com" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">Nombres y Apellidos <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(Tal cual aparece en tu DNI / Carnet de extranjería)</span></label>
+                <input type="text" name="nombre" required class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="mb-5">
+                <label class="mb-2 block text-sm font-bold text-latam-estrellada">DNI / Carnet de Extranjería <span class="text-latam-coral">*</span></label>
+                <input type="text" name="dni" required class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+              </div>
+              <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                <div class="mb-5">
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Cargo / Gerencia <span class="text-latam-coral">*</span></label>
+                  <input type="text" name="cargo" required placeholder="Ej. TC / Servicio a Bordo" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+                <div class="mb-5">
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Celular de Contacto <span class="text-latam-coral">*</span></label>
+                  <input type="tel" name="celular" required placeholder="Ej. 987654321" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('esta-step-2-body','esta-step-2-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">2</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Programación del Estacionamiento</span>
+          <svg id="esta-step-2-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="esta-step-2-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                <div class="mb-5 sm:mb-0">
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Ingreso al Estacionamiento <span class="text-latam-coral">*</span></label>
+                  <input type="date" name="fechaIngreso" required class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+                <div>
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Fecha de Salida del Estacionamiento <span class="text-latam-coral">*</span></label>
+                  <input type="date" name="fechaSalida" required class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <span class="absolute left-9 top-4 -z-10 h-[calc(100%+20px)] w-[3px] -translate-x-1/2 rounded-full bg-latam-coral"></span>
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('esta-step-3-body','esta-step-3-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">3</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Información del Vehículo</span>
+          <svg id="esta-step-3-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="esta-step-3-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-3">
+                <div class="mb-5 sm:mb-0">
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Marca de Vehículo <span class="text-latam-coral">*</span></label>
+                  <input type="text" name="marca" required placeholder="Ej. Toyota 2022" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+                <div class="mb-5 sm:mb-0">
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Modelo del Vehículo <span class="text-latam-coral">*</span></label>
+                  <input type="text" name="modelo" required placeholder="Ej. Corolla" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+                <div>
+                  <label class="mb-2 block text-sm font-bold text-latam-estrellada">Placa del Vehículo <span class="text-latam-coral">*</span></label>
+                  <input type="text" name="placa" required placeholder="Ej. ABC-123" style="text-transform:uppercase" class="esta-fld w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-latam-estrellada focus:bg-white focus:ring-4 focus:ring-latam-estrellada/10" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button type="button" onclick="toggleAccordion('esta-step-4-body','esta-step-4-chevron')" class="flex w-full items-center gap-3 px-5 py-4 text-left">
+          <span class="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-latam-coral text-sm font-extrabold text-white ring-4 ring-white">4</span>
+          <span class="flex-1 text-[15px] font-extrabold text-latam-profunda">Declaración de Conocimiento y Riesgo</span>
+          <svg id="esta-step-4-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0 text-latam-estrellada transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </button>
+        <div id="esta-step-4-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+          <div class="overflow-hidden">
+            <div class="border-t border-slate-100 px-5 py-5">
+              <div id="esta-reglas-check-wrap" class="rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all">
+                <label class="flex cursor-pointer items-start gap-3 text-sm font-bold text-slate-700">
+                  <input id="esta-chk-reglas" type="checkbox" required class="mt-0.5 h-[18px] w-[18px] flex-shrink-0 accent-latam-estrellada" />
+                  <span>ACEPTO las Reglas y recomendaciones para uso de estacionamiento en terreno LATAM (AIJCH) a cuenta propia. <span class="text-latam-coral">*</span></span>
+                </label>
+
+                <div class="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <button type="button" onclick="toggleAccordion('esta-reglas-body','esta-reglas-chevron')" class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-latam-estrellada transition hover:bg-slate-50">
+                    Ver Reglas y Recomendaciones del Estacionamiento (11 puntos)
+                    <svg id="esta-reglas-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 transition-transform duration-300"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </button>
+                  <div id="esta-reglas-body" class="grid transition-all duration-300 ease-out" style="grid-template-rows:0fr">
+                    <div class="overflow-hidden">
+                      <div class="max-h-[300px] overflow-y-auto border-t border-slate-100 px-4 py-4">
+                        <p class="mb-3 text-xs leading-relaxed text-slate-500">
+                          La finalidad de estas reglas es brindar apoyo a los colaboradores LATAM para el empleo del
+                          estacionamiento en el terreno del AIJCH, en forma controlada y con las medidas de seguridad
+                          adecuadas. <em>Nota: los ejecutivos no requieren enviar solicitud previa para el uso de
+                          estacionamientos pre asignados.</em>
+                        </p>
+                        <ol class="flex flex-col gap-2.5 pl-4 text-[13px] leading-relaxed text-slate-600" style="list-style: decimal;">
+                          <li>El estacionamiento podrá ser empleado temporalmente por colaboradores LATAM previa solicitud y disponibilidad por un <strong class="text-slate-800">máximo de 4 días continuos</strong>. El empleo por mayor tiempo o recurrente requiere aval del ejecutivo del área.</li>
+                          <li>Ya no se necesitará enviar correo de solicitud, basta llenar este formato.</li>
+                          <li>Para ingresar, el colaborador deberá identificarse ante el agente de seguridad. La cartola de acceso a calle LAP no exime de la presentación de la solicitud.</li>
+                          <li>El ingreso y retiro del vehículo deberá ser efectuado por el mismo colaborador identificado con su fotocheck LATAM.</li>
+                          <li>Los familiares podrán ingresar bajo responsabilidad única del colaborador.</li>
+                          <li>Si recibe mail de denegación o si al momento del ingreso no hay espacio disponible, no se permitirá el ingreso aun cuando la solicitud haya sido enviada con anticipación.</li>
+                          <li>Debido a las políticas cambiantes de LAP (calle LAP/Corpac), se recomienda tomar medidas de antelación para el acceso.</li>
+                          <li>LATAM no se hace responsable por accidentes, daños y/o pérdidas que se generen en el estacionamiento.</li>
+                          <li>LATAM no se hace responsable por tardanzas que puedan presentarse por el uso del estacionamiento.</li>
+                          <li>Se deben cumplir todas las normas de ética, seguridad y convivencia.</li>
+                          <li>Para solicitudes de usos especiales (fuera del reglamento), enviar correo con al menos 48 hrs de anticipación a: <strong class="text-slate-800">luis.gomez@latam.com</strong> y <strong class="text-slate-800">giovanni.incandela@latam.com</strong>.</li>
+                        </ol>
+                        <p class="mt-3 text-xs font-bold text-slate-500">Jefatura de Seguridad AVSEC e Instalaciones - LATAM Airlines Perú</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div id="estacionamiento-error" class="mb-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700 animate-fadeUp"></div>
+  <div id="estacionamiento-success" class="mb-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700 animate-fadeUp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    ¡Solicitud enviada con éxito! Recibirás la confirmación de disponibilidad en tu correo corporativo.
+  </div>
+
+  <div class="flex justify-end">
+    <button type="button" onclick="submitEstacionamientoForm()" id="estacionamiento-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-estrellada px-8 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:bg-latam-coral enabled:hover:shadow-card disabled:cursor-not-allowed disabled:opacity-50">
+      <span id="estacionamiento-btn-enviar-label">Enviar Solicitud de Estacionamiento</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+</div>

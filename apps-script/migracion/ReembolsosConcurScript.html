@@ -1,0 +1,139 @@
+<script>
+  (function () {
+    function runServer(fnName) {
+      var args = Array.prototype.slice.call(arguments, 1)
+      return new Promise(function (resolve, reject) {
+        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)
+        runner[fnName].apply(runner, args)
+      })
+    }
+
+    function fileToBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader()
+        reader.onload = function () { resolve(String(reader.result).split(',')[1] || '') }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    }
+
+    function clearReembolsoConcurFieldErrors() {
+      document.querySelectorAll('.scr-fld').forEach(function (el) {
+        el.classList.remove('border-red-400', 'ring-4', 'ring-red-400/20')
+      })
+      var motivoWrap = document.getElementById('scr-motivo-radios')
+      if (motivoWrap) motivoWrap.classList.remove('ring-2', 'ring-red-400')
+    }
+
+    // A diferencia de los otros formularios del sitio, este mezcla campos de
+    // texto/fecha/archivo (validados por la clase .scr-fld, igual que
+    // siempre) con un grupo de radios (motivo) — un radio individual
+    // siempre tiene "value" truthy exista o no selección, así que se valida
+    // aparte con :checked en vez de sumarlo al loop genérico.
+    function validateReembolsoConcurForm() {
+      clearReembolsoConcurFieldErrors()
+      var form = document.getElementById('form-reembolso-concur')
+      var ok = true
+      var firstInvalid = null
+
+      form.querySelectorAll('.scr-fld[required]').forEach(function (el) {
+        var val = (el.value || '').trim()
+        var invalid = !val
+        if (!invalid && el.type === 'email') invalid = !/.+@latam\.com$/i.test(val)
+        if (invalid) {
+          ok = false
+          el.classList.add('border-red-400', 'ring-4', 'ring-red-400/20')
+          if (!firstInvalid) firstInvalid = el
+        }
+      })
+
+      if (!form.querySelector('input[name="motivo"]:checked')) {
+        ok = false
+        var motivoWrap = document.getElementById('scr-motivo-radios')
+        if (motivoWrap) motivoWrap.classList.add('ring-2', 'ring-red-400')
+      }
+
+      if (firstInvalid) firstInvalid.focus()
+      return ok
+    }
+
+    window.submitReembolsoConcurForm = async function () {
+      var errorBox = document.getElementById('scr-form-error')
+      var successBox = document.getElementById('scr-form-success')
+      errorBox.classList.add('hidden')
+      successBox.classList.add('hidden')
+      successBox.classList.remove('flex')
+
+      if (!validateReembolsoConcurForm()) {
+        errorBox.textContent = 'Por favor completa todos los campos obligatorios (incluido el motivo y el voucher).'
+        errorBox.classList.remove('hidden')
+        return
+      }
+
+      var form = document.getElementById('form-reembolso-concur')
+      var formData = new FormData(form)
+      var fileInput = document.getElementById('reembolso-file-input')
+      var file = fileInput.files && fileInput.files[0]
+
+      var btn = document.getElementById('scr-btn-enviar')
+      var label = document.getElementById('scr-btn-enviar-label')
+      btn.disabled = true
+      label.textContent = 'Enviando...'
+
+      try {
+        var archivo = file ? await fileToBase64(file) : ''
+        var payload = {
+          correo: formData.get('correo'),
+          motivo: formData.get('motivo'),
+          monto: formData.get('monto'),
+          vuelo: formData.get('vuelo'),
+          fechaGasto: formData.get('fechaGasto'),
+          comentarios: formData.get('comentarios'),
+          archivo: archivo,
+          archivoNombre: file ? file.name : '',
+          archivoTipo: file ? file.type : '',
+        }
+        await runServer('submitReembolsoConcur', payload)
+        resetReembolsoConcurForm()
+        successBox.classList.remove('hidden')
+        successBox.classList.add('flex')
+      } catch (err) {
+        errorBox.textContent = 'Ocurrió un error al enviar tu solicitud. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
+        errorBox.classList.remove('hidden')
+      } finally {
+        btn.disabled = false
+        label.textContent = 'Enviar Solicitud'
+      }
+    }
+
+    // Llamado desde los botones "Solicitar aprobación" de cada motivo (ver
+    // ReembolsosConcurView.html): deja ese motivo pre-marcado en el
+    // formulario y lo lleva a la vista, sin obligar al tripulante a
+    // volver a elegirlo.
+    window.abrirSolicitudAprobacion = function (motivoId) {
+      var radio = document.querySelector('input[name="motivo"][value="' + motivoId + '"]')
+      if (radio) radio.checked = true
+      var motivoWrap = document.getElementById('scr-motivo-radios')
+      if (motivoWrap) motivoWrap.classList.remove('ring-2', 'ring-red-400')
+      var formSection = document.getElementById('scr-form-aprobacion')
+      if (formSection) formSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    // Llamado desde window.resetReembolsosConcur (ver ReembolsosConcurView.html)
+    // al salir de esta sección — vuelve el formulario a su estado inicial.
+    window.resetReembolsoConcurForm = function () {
+      var form = document.getElementById('form-reembolso-concur')
+      if (form) form.reset()
+      clearReembolsoConcurFieldErrors()
+      if (typeof clearFile === 'function') clearFile('reembolso')
+
+      var errorBox = document.getElementById('scr-form-error')
+      var successBox = document.getElementById('scr-form-success')
+      if (errorBox) errorBox.classList.add('hidden')
+      if (successBox) {
+        successBox.classList.add('hidden')
+        successBox.classList.remove('flex')
+      }
+    }
+  })()
+</script>

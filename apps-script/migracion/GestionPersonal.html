@@ -90,6 +90,21 @@
           <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
         </div>
       </button>
+
+      <button type="button" id="carousel-item-evaluacion-desempeno" data-hub-card onclick="selectHubItem('evaluacion-desempeno')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="<?= driveImg('evaluacionDesempenoCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Evaluación de Desempeño 2026</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Metas del periodo y políticas de línea de carrera y funciones en cargo superior.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Metas & Desempeño</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>PDF</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
     </div>
 
     <button onclick="hubScrollBy(1)" aria-label="Siguiente" class="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
@@ -118,11 +133,15 @@
   <div id="detalle-visa-pasaporte" class="hidden">
     <?!= include('VisaPasaporteView') ?>
   </div>
+
+  <div id="detalle-evaluacion-desempeno" class="hidden">
+    <?!= include('EvaluacionDesempenoView') ?>
+  </div>
 </section>
 
 <script>
   (function () {
-    var HUB_IDS = ['actualizacion-datos', 'domicilio-dgac', 'vacuna-fiebre-amarilla', 'visa-pasaporte']
+    var HUB_IDS = ['actualizacion-datos', 'domicilio-dgac', 'vacuna-fiebre-amarilla', 'visa-pasaporte', 'evaluacion-desempeno']
     var currentHubItem = null
 
     window.hubScrollBy = function (dir) {

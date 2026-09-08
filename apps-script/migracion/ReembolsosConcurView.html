@@ -1,0 +1,292 @@
+<div class="mx-auto max-w-3xl animate-fadeUp">
+  <h2 class="text-2xl font-extrabold text-latam-estrellada sm:text-[28px]">Reembolsos SAP Concur</h2>
+  <p class="mt-2 mb-5 text-sm leading-relaxed text-slate-600">
+    Selecciona el motivo de tu reembolso para identificar la categoría exacta que debes buscar en SAP Concur y si
+    necesita autorización previa antes de rendir.
+  </p>
+
+  <!-- Plazo de ingreso -->
+  <div class="mb-3 flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-5 w-5 flex-shrink-0 text-latam-estrellada"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <p class="text-sm leading-relaxed text-slate-600">
+      <strong class="text-latam-estrellada">Plazo máximo de ingreso:</strong> tu solicitud de rendición debe
+      ingresarse dentro de los <strong>30 días consecutivos</strong> siguientes a la fecha de emisión del
+      comprobante de pago. Una vez aprobada la autorización (respuesta en un plazo de hasta 5 días hábiles),
+      adjúntala a tu informe en SAP Concur.
+    </p>
+  </div>
+
+  <!-- Importante: Devolver a Empleado -->
+  <div class="mb-6 rounded-2xl border border-latam-coral/25 bg-latam-coral/5 p-4">
+    <div class="flex items-center gap-2 text-latam-coral">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-5 w-5 flex-shrink-0"><path d="M12 3.5 2.5 20h19L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /><path d="M12 10v4.3" stroke-linecap="round" /><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none" /></svg>
+      <p class="text-sm font-extrabold uppercase tracking-wide">Importante</p>
+    </div>
+    <p class="mt-2 text-sm leading-relaxed text-slate-600">
+      Si en el status de tu rendición aparece <strong class="text-latam-estrellada">"Devolver a Empleado"</strong>,
+      debes realizar las correcciones indicadas y volver a enviar tu informe.
+    </p>
+  </div>
+
+  <!-- Selector de motivo -->
+  <p class="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-latam-coral">Motivo del reembolso</p>
+  <div class="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+    <button type="button" data-scr-motivo="visa" onclick="selectScrMotivo('visa')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Visa Crew / Pasaporte
+    </button>
+    <button type="button" data-scr-motivo="cma" onclick="selectScrMotivo('cma')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Examen Médico Aeronáutico
+    </button>
+    <button type="button" data-scr-motivo="licencia" onclick="selectScrMotivo('licencia')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Licencia Peruana
+    </button>
+    <button type="button" data-scr-motivo="equipaje" onclick="selectScrMotivo('equipaje')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Equipaje
+    </button>
+    <button type="button" data-scr-motivo="alimentacion" onclick="selectScrMotivo('alimentacion')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Contingencia Alimentación
+    </button>
+    <button type="button" data-scr-motivo="movilizacion" onclick="selectScrMotivo('movilizacion')" class="scr-motivo-btn flex items-center gap-3 rounded-xl border p-3.5 text-left text-sm font-bold transition border-slate-200 bg-white text-slate-700 hover:border-latam-estrellada/40">
+      <span class="scr-motivo-dot flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 border-slate-300"></span>
+      Contingencia Movilización
+    </button>
+  </div>
+
+  <!-- Detalle del motivo elegido -->
+  <div id="scr-panel-empty" class="rounded-2xl bg-slate-50 p-6 text-center text-sm font-medium text-slate-400">
+    Elige un motivo arriba para ver su detalle.
+  </div>
+
+  <div id="scr-panel-visa" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Visa Crew / Pasaporte</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos generados por el pago de pasaporte y/o visa.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">Pasaporte / Visa</code></p>
+  </div>
+
+  <div id="scr-panel-cma" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Examen Médico Aeronáutico</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos relacionados al Examen Médico Aeronáutico, incluye duplicados.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">CMA / MAE</code></p>
+    <div class="mt-3 flex items-start gap-2 rounded-lg border border-latam-coral/25 bg-latam-coral/5 p-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M4 4h16v16H4z" stroke-linejoin="round" /><path d="m4 5 8 7 8-7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="min-w-0">
+        <p class="text-[13px] leading-relaxed text-slate-600">Requiere autorización previa del focal de Soporte SAB (yoko.noborikawa@latam.com) antes de rendir.</p>
+        <button type="button" onclick="abrirSolicitudAprobacion('cma')" class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          Solicitar aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scr-panel-licencia" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Licencia Peruana</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos generados por la solicitud de actualización o duplicado de licencia peruana.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">Licencias / Certificaciones (Vuelo / Operacionales / Mannto)</code></p>
+    <div class="mt-3 flex items-start gap-2 rounded-lg border border-latam-coral/25 bg-latam-coral/5 p-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M4 4h16v16H4z" stroke-linejoin="round" /><path d="m4 5 8 7 8-7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="min-w-0">
+        <p class="text-[13px] leading-relaxed text-slate-600">Requiere autorización previa del focal de Soporte SAB (yoko.noborikawa@latam.com) antes de rendir.</p>
+        <button type="button" onclick="abrirSolicitudAprobacion('licencia')" class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          Solicitar aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scr-panel-equipaje" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Equipaje</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos realizados por la demora o pérdida del equipaje.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">Reclamo Equipaje</code></p>
+    <div class="mt-3 flex items-start gap-2 rounded-lg border border-latam-coral/25 bg-latam-coral/5 p-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M4 4h16v16H4z" stroke-linejoin="round" /><path d="m4 5 8 7 8-7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="min-w-0">
+        <p class="text-[13px] leading-relaxed text-slate-600">Requiere autorización previa del focal de Soporte SAB (yoko.noborikawa@latam.com) antes de rendir.</p>
+        <button type="button" onclick="abrirSolicitudAprobacion('equipaje')" class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          Solicitar aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scr-panel-alimentacion" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Contingencia - Alimentación Tripulación</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos en alimentación por contingencia operativa.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">Contingencia - Alimentación Tripulación</code></p>
+    <div class="mt-3 flex items-start gap-2 rounded-lg border border-latam-coral/25 bg-latam-coral/5 p-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M4 4h16v16H4z" stroke-linejoin="round" /><path d="m4 5 8 7 8-7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="min-w-0">
+        <p class="text-[13px] leading-relaxed text-slate-600">Requiere autorización previa del focal de Soporte SAB (yoko.noborikawa@latam.com) antes de rendir.</p>
+        <button type="button" onclick="abrirSolicitudAprobacion('alimentacion')" class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          Solicitar aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scr-panel-movilizacion" class="scr-panel hidden animate-fadeUp rounded-2xl border border-slate-200 bg-white p-5">
+    <h4 class="text-[15px] font-extrabold text-latam-estrellada">Contingencia - Movilización</h4>
+    <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Gastos generados por quiebres en movilización.</p>
+    <p class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-slate-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5 flex-shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" stroke-linecap="round" /></svg>Encuéntralo en Concur como: <code class="rounded bg-white px-1.5 py-0.5 font-mono text-slate-800">Contingencia - Movilizacion CREW</code></p>
+    <div class="mt-3 flex items-start gap-2 rounded-lg border border-latam-coral/25 bg-latam-coral/5 p-3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="mt-0.5 h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M4 4h16v16H4z" stroke-linejoin="round" /><path d="m4 5 8 7 8-7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="min-w-0">
+        <p class="text-[13px] leading-relaxed text-slate-600">Requiere autorización previa del focal de Soporte SAB (yoko.noborikawa@latam.com) antes de rendir.</p>
+        <button type="button" onclick="abrirSolicitudAprobacion('movilizacion')" class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-latam-estrellada/10 px-3 py-1.5 text-xs font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:bg-latam-estrellada hover:text-white">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-3.5 w-3.5"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          Solicitar aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Solicitud de aprobación: reemplaza al Google Form que hoy usa el botón
+       "Solicita el correo de aprobación" — mismos campos, mismo destino
+       (yoko.noborikawa@latam.com, ver REEMBOLSOS_CONCUR_FOCAL_EMAIL en
+       Code.gs), pero ahora dentro del portal. Ver ReembolsosConcurScript.html
+       para el envío. -->
+  <div id="scr-form-aprobacion" class="mt-8 scroll-mt-[84px] rounded-2xl border border-slate-200 bg-white p-5">
+    <h3 class="text-[15px] font-extrabold text-latam-estrellada">Solicitar aprobación por correo</h3>
+    <p class="mt-1 text-sm leading-relaxed text-slate-600">Completa estos datos para que el focal de Soporte SAB te responda con la autorización — recuerda que el plazo de respuesta es de hasta 5 días hábiles.</p>
+
+    <div id="scr-form-success" class="mt-4 hidden items-center gap-2 rounded-xl bg-green-50 px-4 py-3.5 text-sm font-bold text-green-700 animate-fadeUp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Solicitud enviada correctamente. Recibirás la aprobación en tu correo corporativo en un plazo máximo de 5 días hábiles.
+    </div>
+    <div id="scr-form-error" class="mt-4 hidden rounded-xl bg-red-50 px-4 py-3.5 text-sm font-bold text-red-700 animate-fadeUp"></div>
+
+    <form id="form-reembolso-concur" novalidate class="mt-4">
+      <div class="mb-4">
+        <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Correo electrónico corporativo <span class="text-latam-coral">*</span> <span class="ml-1 text-xs font-normal text-slate-400">(@latam.com)</span></label>
+        <input type="email" name="correo" required pattern=".+@latam\.com$" class="scr-fld w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:ring-4 focus:ring-latam-estrellada/10" />
+      </div>
+
+      <div class="mb-4">
+        <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Motivo <span class="text-latam-coral">*</span></label>
+        <div id="scr-motivo-radios" class="flex flex-col gap-2 p-1">
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="radio" name="motivo" value="cma" class="h-4 w-4 accent-latam-estrellada" /> Examen Médico Aeronáutico</label>
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="radio" name="motivo" value="licencia" class="h-4 w-4 accent-latam-estrellada" /> Licencia Peruana</label>
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="radio" name="motivo" value="equipaje" class="h-4 w-4 accent-latam-estrellada" /> Equipaje</label>
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="radio" name="motivo" value="alimentacion" class="h-4 w-4 accent-latam-estrellada" /> Contingencia - Alimentación Tripulación</label>
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="radio" name="motivo" value="movilizacion" class="h-4 w-4 accent-latam-estrellada" /> Contingencia - Movilización</label>
+        </div>
+      </div>
+
+      <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+          <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Monto solicitado <span class="text-latam-coral">*</span></label>
+          <input type="text" name="monto" required placeholder="Ej. S/. 150.00" class="scr-fld w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Vuelo (si corresponde)</label>
+          <input type="text" name="vuelo" placeholder="Ej. LA2456 / LIM-CUN" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:ring-4 focus:ring-latam-estrellada/10" />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Fecha del gasto <span class="text-latam-coral">*</span></label>
+        <input type="date" name="fechaGasto" required class="scr-fld w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:ring-4 focus:ring-latam-estrellada/10" />
+      </div>
+
+      <div class="mb-4">
+        <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Adjunta el Voucher / Comprobante <span class="text-latam-coral">*</span></label>
+        <div id="reembolso-file-idle">
+          <button type="button" onclick="document.getElementById('reembolso-file-input').click()" class="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center transition-all hover:border-latam-estrellada/40 hover:bg-white">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-6 w-6 text-slate-400"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="text-sm font-semibold text-slate-700"><span class="rounded bg-latam-estrellada/10 px-1.5 py-0.5 text-latam-estrellada">Haz clic aquí</span> para subir el archivo</span>
+            <span class="text-xs text-slate-400">Formatos: PDF, PNG, JPG (Máx. 10MB)</span>
+          </button>
+        </div>
+        <div id="reembolso-file-done" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex min-w-0 items-center gap-2.5">
+            <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-600"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+            <p id="reembolso-file-name" class="truncate text-sm font-bold text-slate-800"></p>
+          </div>
+          <button type="button" onclick="clearFile('reembolso')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-latam-coral">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+          </button>
+        </div>
+        <input id="reembolso-file-input" name="archivo" type="file" required class="scr-fld sr-only" accept=".pdf,.png,.jpg,.jpeg" onchange="handleFileChange(this, 'reembolso')" />
+      </div>
+
+      <div class="mb-4">
+        <label class="mb-1.5 block text-sm font-bold text-latam-estrellada">Comentarios adicionales</label>
+        <textarea name="comentarios" rows="2" class="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[14px] text-slate-800 outline-none transition-all focus:border-latam-estrellada focus:ring-4 focus:ring-latam-estrellada/10"></textarea>
+      </div>
+
+      <div class="flex justify-end border-t border-slate-100 pt-4">
+        <button type="button" onclick="submitReembolsoConcurForm()" id="scr-btn-enviar" class="rounded-xl bg-latam-coral px-6 py-2.5 text-sm font-extrabold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">
+          <span id="scr-btn-enviar-label">Enviar Solicitud</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Política de Fondos por Rendir: único link real que se dio para esta
+       vista. "Manual SAP Concur" y "Video explicativo" quedan con href="#"
+       (mismo patrón que ival-modal-qr en Modals.html) hasta que se tenga la
+       URL real — reemplázalos cuando los tengas. -->
+  <div class="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+    <a href="https://drive.google.com/file/d/1UJ8GlcvBruzfpCTSLWk8BolIScRXdae6/view" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-[13px] font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:border-latam-estrellada/40 hover:shadow-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9V4Z" /><path d="M8.5 12h7M8.5 15.5h4.5" stroke-linecap="round" /></svg>
+      Descargar Política de Fondos por Rendir
+    </a>
+    <!-- TODO: reemplazar "#" por el link real del Manual SAP Concur. -->
+    <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-[13px] font-extrabold text-latam-estrellada transition hover:-translate-y-0.5 hover:border-latam-estrellada/40 hover:shadow-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.7" stroke-linecap="round" /><circle cx="12" cy="16.5" r=".9" fill="currentColor" stroke="none" /></svg>
+      Revisar Manual SAP Concur
+    </a>
+  </div>
+</div>
+
+<script>
+  window.selectScrMotivo = function (id) {
+    document.getElementById('scr-panel-empty').classList.add('hidden')
+    document.querySelectorAll('.scr-panel').forEach(function (panel) {
+      panel.classList.toggle('hidden', panel.id !== 'scr-panel-' + id)
+    })
+    document.querySelectorAll('.scr-motivo-btn').forEach(function (btn) {
+      var active = btn.getAttribute('data-scr-motivo') === id
+      btn.classList.toggle('border-latam-coral', active)
+      btn.classList.toggle('bg-latam-coral/5', active)
+      btn.classList.toggle('text-latam-estrellada', active)
+      btn.classList.toggle('border-slate-200', !active)
+      btn.classList.toggle('text-slate-700', !active)
+      var dot = btn.querySelector('.scr-motivo-dot')
+      if (dot) {
+        dot.classList.toggle('border-latam-coral', active)
+        dot.classList.toggle('bg-latam-coral', active)
+        dot.classList.toggle('border-slate-300', !active)
+      }
+    })
+  }
+
+  // Llamado desde resetHubItemPanel (ver Scripts.html) al salir de esta
+  // sección — vuelve a "sin motivo elegido" para la próxima visita, y de
+  // paso limpia el formulario de solicitud de aprobación (ver
+  // resetReembolsoConcurForm en ReembolsosConcurScript.html).
+  window.resetReembolsosConcur = function () {
+    document.getElementById('scr-panel-empty').classList.remove('hidden')
+    document.querySelectorAll('.scr-panel').forEach(function (panel) { panel.classList.add('hidden') })
+    document.querySelectorAll('.scr-motivo-btn').forEach(function (btn) {
+      btn.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'text-latam-estrellada')
+      btn.classList.add('border-slate-200', 'text-slate-700')
+      var dot = btn.querySelector('.scr-motivo-dot')
+      if (dot) {
+        dot.classList.remove('border-latam-coral', 'bg-latam-coral')
+        dot.classList.add('border-slate-300')
+      }
+    })
+    if (typeof resetReembolsoConcurForm === 'function') resetReembolsoConcurForm()
+  }
+</script>

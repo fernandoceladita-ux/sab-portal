@@ -75,6 +75,36 @@
           <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
         </div>
       </button>
+
+      <button type="button" id="carousel-item-go-reembolsos-concur" data-hub-card-go onclick="selectHubItemGestionOperacional('reembolsos-concur')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="<?= driveImg('reembolsosConcur', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Reembolsos SAP Concur</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Identifica la categoría correcta y los requisitos para rendir tus gastos operacionales.</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Viáticos y Alimentación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Consulta</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
+
+      <button type="button" id="carousel-item-go-estacionamiento" data-hub-card-go onclick="selectHubItemGestionOperacional('estacionamiento')" class="hub-card group flex w-[250px] flex-shrink-0 snap-center flex-col overflow-hidden rounded-2xl border bg-white text-left transition sm:w-[270px] border-slate-200 shadow-sm hover:border-latam-estrellada/40">
+        <div class="h-32 w-full overflow-hidden bg-slate-100">
+          <img src="<?= driveImg('estacionamientoCard', 700) ?>" alt="" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+        </div>
+        <div class="flex flex-1 flex-col p-4">
+          <h3 class="hub-card-title mb-1.5 text-[15px] font-extrabold text-latam-estrellada">Solicitud de Estacionamiento</h3>
+          <p class="mb-3 flex-1 text-[13px] leading-relaxed text-slate-500">Solicita el acceso temporal al estacionamiento en terreno del AIJCH (ATO Lima).</p>
+          <div class="mb-4 flex flex-col gap-1">
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Viáticos y Alimentación</span>
+            <span class="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-latam-coral"></span>Formulario</span>
+          </div>
+          <span class="hub-card-cta mt-auto rounded-lg px-4 py-2.5 text-center text-[13px] font-extrabold transition bg-slate-100 text-latam-estrellada group-hover:bg-latam-estrellada group-hover:text-white">Ingresar</span>
+        </div>
+      </button>
     </div>
 
     <button onclick="hubScrollByGestionOperacional(1)" aria-label="Siguiente" class="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-latam-estrellada shadow-card md:flex">
@@ -103,11 +133,19 @@
   <div id="detalle-go-registro-sunat" class="hidden">
     <?!= include('RegistroSunatView') ?>
   </div>
+
+  <div id="detalle-go-reembolsos-concur" class="hidden">
+    <?!= include('ReembolsosConcurView') ?>
+  </div>
+
+  <div id="detalle-go-estacionamiento" class="hidden">
+    <?!= include('EstacionamientoView') ?>
+  </div>
 </section>
 
 <script>
   (function () {
-    var HUB_IDS_GO = ['instructivo-vales', 'consultas-viaticos', 'cambio-uniforme', 'registro-sunat']
+    var HUB_IDS_GO = ['instructivo-vales', 'consultas-viaticos', 'cambio-uniforme', 'registro-sunat', 'reembolsos-concur', 'estacionamiento']
     var currentHubItemGO = null
 
     window.hubScrollByGestionOperacional = function (dir) {

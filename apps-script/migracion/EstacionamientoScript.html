@@ -1,0 +1,126 @@
+<script>
+  // ============================================================================
+  // Solicitud de Estacionamiento en Terreno - ATO Lima (Gestión Personal).
+  // Mismo patrón visual que Domicilio DGAC (pasos numerados en acordeón, ver
+  // DomicilioDgacScript.html) pero acá los 4 pasos SON el formulario — no hay
+  // acciones externas intermedias, así que el <form> envuelve los 4 pasos
+  // completos y el botón de enviar queda fuera, al final. Reutiliza
+  // runServer (ActualizacionDatosScript.html) y toggleAccordion (Scripts.html),
+  // siempre presentes junto a esta vista.
+  // ============================================================================
+
+  function estaMarkInvalid(name) {
+    var el = document.querySelector('#estacionamiento-form [name="' + name + '"]')
+    if (!el) return
+    el.classList.add('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+    el.classList.remove('border-slate-200', 'bg-slate-50')
+  }
+
+  function estaClearInvalidStyles() {
+    document.querySelectorAll('#estacionamiento-form .esta-fld').forEach(function (el) {
+      el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+      el.classList.add('border-slate-200', 'bg-slate-50')
+    })
+    var reglasWrap = document.getElementById('esta-reglas-check-wrap')
+    if (reglasWrap) reglasWrap.classList.remove('ring-2', 'ring-latam-coral')
+  }
+
+  function estaShowError(msg) {
+    var el = document.getElementById('estacionamiento-error')
+    el.textContent = msg
+    el.classList.remove('hidden')
+  }
+  function estaHideError() {
+    document.getElementById('estacionamiento-error').classList.add('hidden')
+  }
+  function estaShowSuccess() {
+    var el = document.getElementById('estacionamiento-success')
+    el.classList.remove('hidden')
+    el.classList.add('flex')
+    setTimeout(function () {
+      el.classList.add('hidden')
+      el.classList.remove('flex')
+    }, 3500)
+  }
+
+  function estaSetSending(val) {
+    document.getElementById('estacionamiento-btn-enviar').disabled = val
+    document.getElementById('estacionamiento-btn-enviar-label').textContent = val ? 'Enviando...' : 'Enviar Solicitud de Estacionamiento'
+  }
+
+  // Llamada desde resetHubItemPanel (ver Scripts.html) al salir de esta
+  // sección, y por el propio submit tras un envío exitoso.
+  window.clearEstacionamientoForm = function () {
+    var form = document.getElementById('estacionamiento-form')
+    if (form) form.reset()
+    var chk = document.getElementById('esta-chk-reglas')
+    if (chk) chk.checked = false
+    estaClearInvalidStyles()
+    estaHideError()
+  }
+
+  window.submitEstacionamientoForm = async function () {
+    estaHideError()
+    estaClearInvalidStyles()
+
+    var form = document.getElementById('estacionamiento-form')
+    var invalidNames = []
+    for (var i = 0; i < form.elements.length; i++) {
+      var el = form.elements[i]
+      if (el.offsetParent === null) continue
+      if (el.type === 'checkbox') continue
+      if (el.name && typeof el.checkValidity === 'function' && !el.checkValidity()) invalidNames.push(el.name)
+    }
+
+    var acepta = document.getElementById('esta-chk-reglas').checked
+    if (invalidNames.length > 0 || !acepta) {
+      invalidNames.forEach(estaMarkInvalid)
+      if (!acepta) {
+        var reglasWrap = document.getElementById('esta-reglas-check-wrap')
+        if (reglasWrap) reglasWrap.classList.add('ring-2', 'ring-latam-coral')
+      }
+      estaShowError(invalidNames.length > 0
+        ? 'Revisa los campos marcados: son obligatorios.'
+        : 'Debes aceptar las Reglas y recomendaciones para proceder con el envío.')
+      return
+    }
+
+    var formData = new FormData(form)
+    estaSetSending(true)
+    try {
+      await runServer('submitEstacionamiento', {
+        correo: formData.get('correo'),
+        nombre: formData.get('nombre'),
+        dni: formData.get('dni'),
+        cargo: formData.get('cargo'),
+        celular: formData.get('celular'),
+        fechaIngreso: formData.get('fechaIngreso'),
+        fechaSalida: formData.get('fechaSalida'),
+        marca: formData.get('marca'),
+        modelo: formData.get('modelo'),
+        placa: formData.get('placa'),
+        aceptaReglas: acepta,
+      })
+      estaShowSuccess()
+      clearEstacionamientoForm()
+    } catch (err) {
+      estaShowError((err && err.message) || String(err) || 'Ocurrió un error al enviar. Intenta de nuevo.')
+    } finally {
+      estaSetSending(false)
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('estacionamiento-form')
+    if (!form) return
+    ;['input', 'change'].forEach(function (evt) {
+      form.addEventListener(evt, function (e) {
+        var el = e.target
+        if (el.classList && el.classList.contains('esta-fld')) {
+          el.classList.remove('border-latam-coral', 'bg-latam-coral/5', 'ring-4', 'ring-latam-coral/15', 'animate-shake')
+          el.classList.add('border-slate-200', 'bg-slate-50')
+        }
+      })
+    })
+  })
+</script>

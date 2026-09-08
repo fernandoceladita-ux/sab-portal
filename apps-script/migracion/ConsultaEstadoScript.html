@@ -1,5 +1,7 @@
 <script>
   (function () {
+    var estadoState = { modo: 'codigo' }
+
     function runServer(fnName) {
       var args = Array.prototype.slice.call(arguments, 1)
       return new Promise(function (resolve, reject) {
@@ -8,16 +10,88 @@
       })
     }
 
+    function escapeHtml(str) {
+      var div = document.createElement('div')
+      div.textContent = str || ''
+      return div.innerHTML
+    }
+
+    function pintarBotonesModo() {
+      var activoClases = ['bg-latam-coral', 'text-white']
+      var inactivoClases = ['text-white/70']
+      var btnCodigo = document.getElementById('consulta-estado-modo-btn-codigo')
+      var btnBp = document.getElementById('consulta-estado-modo-btn-bp')
+      var activo = estadoState.modo === 'codigo' ? btnCodigo : btnBp
+      var inactivo = estadoState.modo === 'codigo' ? btnBp : btnCodigo
+      activoClases.forEach(function (c) { activo.classList.add(c); inactivo.classList.remove(c) })
+      inactivoClases.forEach(function (c) { inactivo.classList.add(c); activo.classList.remove(c) })
+    }
+
+    // Cambia entre buscar por código de operación (una consulta) o por BP
+    // (todas las consultas de ese BP, en una lista) — ver consultarEstadoForm.
+    window.setModoConsultaEstado = function (modo) {
+      estadoState.modo = modo
+      pintarBotonesModo()
+
+      var label = document.getElementById('consulta-estado-label')
+      var input = document.getElementById('consulta-estado-input')
+      var subtitulo = document.getElementById('consulta-estado-subtitulo')
+      if (modo === 'bp') {
+        label.innerHTML = 'BP <span class="text-latam-coral">*</span>'
+        input.placeholder = 'Ej. 1234567'
+        subtitulo.textContent = 'Ingresa tu BP para ver todas tus consultas.'
+      } else {
+        label.innerHTML = 'Código de operación <span class="text-latam-coral">*</span>'
+        input.placeholder = 'Ej. 5c7035e4-LATAM-LP'
+        subtitulo.textContent = 'Ingresa el código de operación que te quedó al enviar tu consulta.'
+      }
+
+      document.getElementById('consulta-estado-error').classList.add('hidden')
+      document.getElementById('consulta-estado-resultado').classList.add('hidden')
+      document.getElementById('consulta-estado-lista').classList.add('hidden')
+      input.value = ''
+      input.focus()
+    }
+
+    function pintarResultadoUnico(resultado) {
+      document.getElementById('consulta-estado-valor').textContent = resultado.estado
+      document.getElementById('consulta-estado-tipo').textContent = resultado.tipo ? 'Tema: ' + resultado.tipo : ''
+      document.getElementById('consulta-estado-fecha').textContent = resultado.fechaPrevistaResolucion
+        ? 'Fecha prevista de resolución: ' + resultado.fechaPrevistaResolucion
+        : ''
+      document.getElementById('consulta-estado-resultado').classList.remove('hidden')
+    }
+
+    function pintarLista(resultados) {
+      var lista = document.getElementById('consulta-estado-lista')
+      lista.innerHTML = ''
+      resultados.forEach(function (r) {
+        var card = document.createElement('div')
+        card.className = 'rounded-xl border-t-4 border-latam-coral bg-white/10 px-4 py-3.5'
+        card.innerHTML =
+          '<div class="flex items-center justify-between gap-2">' +
+            '<p class="text-xs font-extrabold uppercase tracking-wide text-latam-coral">' + escapeHtml(r.estado) + '</p>' +
+            '<p class="text-[11px] text-white/50">' + escapeHtml(r.fechaHora) + '</p>' +
+          '</div>' +
+          '<p class="mt-1 text-sm font-bold text-white">' + escapeHtml(r.tipo) + '</p>' +
+          '<p class="mt-1 text-xs text-white/60">' + escapeHtml(r.codigoOperacion) + '</p>' +
+          (r.fechaPrevistaResolucion ? '<p class="mt-1 text-xs text-white/50">Fecha prevista de resolución: ' + escapeHtml(r.fechaPrevistaResolucion) + '</p>' : '')
+        lista.appendChild(card)
+      })
+      lista.classList.remove('hidden')
+    }
+
     window.consultarEstadoForm = async function () {
       var errorBox = document.getElementById('consulta-estado-error')
       var resultadoBox = document.getElementById('consulta-estado-resultado')
+      var listaBox = document.getElementById('consulta-estado-lista')
       errorBox.classList.add('hidden')
       resultadoBox.classList.add('hidden')
+      listaBox.classList.add('hidden')
 
-      var form = document.getElementById('form-consulta-estado')
-      var codigoOperacion = (new FormData(form).get('codigoOperacion') || '').toString().trim()
-      if (!codigoOperacion) {
-        errorBox.textContent = 'Ingresa tu código de operación.'
+      var valor = (document.getElementById('consulta-estado-input').value || '').trim()
+      if (!valor) {
+        errorBox.textContent = estadoState.modo === 'bp' ? 'Ingresa tu BP.' : 'Ingresa tu código de operación.'
         errorBox.classList.remove('hidden')
         return
       }
@@ -28,18 +102,23 @@
       label.textContent = 'Consultando...'
 
       try {
-        var resultado = await runServer('consultarEstadoPorCodigoOperacion', codigoOperacion)
-        if (!resultado || !resultado.encontrado) {
-          errorBox.textContent = 'No encontramos ninguna consulta con ese código de operación.'
-          errorBox.classList.remove('hidden')
-          return
+        if (estadoState.modo === 'bp') {
+          var resultados = await runServer('consultarEstadoPorBP', valor)
+          if (!resultados || !resultados.length) {
+            errorBox.textContent = 'No encontramos ninguna consulta con ese BP.'
+            errorBox.classList.remove('hidden')
+            return
+          }
+          pintarLista(resultados)
+        } else {
+          var resultado = await runServer('consultarEstadoPorCodigoOperacion', valor)
+          if (!resultado || !resultado.encontrado) {
+            errorBox.textContent = 'No encontramos ninguna consulta con ese código de operación.'
+            errorBox.classList.remove('hidden')
+            return
+          }
+          pintarResultadoUnico(resultado)
         }
-        document.getElementById('consulta-estado-valor').textContent = resultado.estado
-        document.getElementById('consulta-estado-tipo').textContent = resultado.tipo ? 'Tema: ' + resultado.tipo : ''
-        document.getElementById('consulta-estado-fecha').textContent = resultado.fechaPrevistaResolucion
-          ? 'Fecha prevista de resolución: ' + resultado.fechaPrevistaResolucion
-          : ''
-        resultadoBox.classList.remove('hidden')
       } catch (err) {
         errorBox.textContent = 'Ocurrió un error al consultar tu estado. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
         errorBox.classList.remove('hidden')
@@ -55,10 +134,19 @@
       var form = document.getElementById('form-consulta-estado')
       if (form) form.reset()
 
+      estadoState.modo = 'codigo'
+      pintarBotonesModo()
+
       var errorBox = document.getElementById('consulta-estado-error')
       var resultadoBox = document.getElementById('consulta-estado-resultado')
+      var listaBox = document.getElementById('consulta-estado-lista')
       if (errorBox) errorBox.classList.add('hidden')
       if (resultadoBox) resultadoBox.classList.add('hidden')
+      if (listaBox) listaBox.classList.add('hidden')
     }
+
+    // Pinta los botones de modo apenas carga la página (antes de abrir el
+    // modal por primera vez), para que no se vean ambos "apagados".
+    pintarBotonesModo()
   })()
 </script>

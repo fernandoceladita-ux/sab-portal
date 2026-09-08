@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    <!-- Panel 1:  Cambios en hoteles MVD y MBJ  -->
+    <!-- Panel 1: HVC Stars -->
     <div data-news-panel="1" class="news-panel hidden">
       <div class="sticky top-0 z-30 h-0">
         <button type="button" onclick="closeModal('modal-news')" aria-label="Cerrar" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20">
@@ -106,73 +106,42 @@
         <div class="relative h-40 w-full overflow-hidden">
           <div class="absolute inset-0 z-10 bg-gradient-to-t from-[#0F004F] via-[#0F004F]/50 to-transparent"></div>
           <div class="absolute inset-0 z-10 bg-gradient-to-r from-[#0F004F]/60 to-transparent"></div>
-          <img src="<?= driveImg('hero', 800) ?>" alt="" class="h-full w-full scale-105 object-cover object-[center_65%]" />
+          <img src="<?= driveImg('hvcStarsHero', 800) ?>" alt="" class="h-full w-full scale-105 object-cover object-[center_65%]" />
           <span class="absolute left-5 top-4 z-20 text-[10px] font-bold uppercase tracking-[3px] text-slate-300">Comunicados</span>
         </div>
         <div class="relative z-10 space-y-4 px-6 pb-7 pt-3">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Actualización de Hoteles</span>
+            <span class="rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Nuevo Programa de Reconocimiento</span>
           </div>
-          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">¡Cambios en hoteles MVD y MBJ!</h2>
-          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Se actualizaron las condiciones de hospedaje para las bases de Montevideo (MVD) y Montego Bay (MBJ). Revisa los detalles de cada hotel a continuación:</p>
+          <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">Evolucionamos el Rol Premium: ¡Te presentamos HVC STARS!</h2>
+          <p class="text-[13.5px] font-light leading-relaxed text-slate-200">Reconocemos a quienes brillan con un Crew Care HVC extraordinario.</p>
 
-          <div class="grid grid-cols-1 gap-3">
-            <div class="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
-              <img src="<?= driveImg('hotelDazzlerMvd', 700) ?>" alt="MVD: Hotel Dazzler" class="block aspect-video w-full object-cover" />
-              <div class="p-3.5">
-                <h4 class="text-[13px] font-extrabold text-white">MVD: Hotel Dazzler</h4>
-                <p class="mt-0.5 text-[12px] italic text-slate-300">Contrato hasta el 31 de julio del 2029.</p>
-                <ul class="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Incluye desayuno o desayuno de madrugada / to go.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Wi-Fi incluido.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Por día, 1 botella de agua por cada tripulante.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Room service.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    20% de descuento en F&amp;B.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Servicio de Lavandería (2 prendas de uniforme pernocte).
-                  </li>
-                </ul>
-              </div>
+          <div class="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+            <div class="mb-2.5 flex items-center gap-2 border-b border-white/10 pb-2.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
+              <h4 class="text-[13px] font-extrabold text-white">¿Cómo ganar?</h4>
             </div>
-
-            <div class="overflow-hidden rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 backdrop-blur-sm">
-              <img src="<?= driveImg('hotelGrandPalladiumMbj', 700) ?>" alt="MBJ: Hotel Grand Palladium" class="block aspect-video w-full object-cover" />
-              <div class="p-3.5">
-                <h4 class="text-[13px] font-extrabold text-white">MBJ: Hotel Grand Palladium</h4>
-                <p class="mt-0.5 text-[12px] italic text-slate-300">Tarifas para acompañantes — del 1 de agosto al 19 de diciembre de 2026.</p>
-                <ul class="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Acompañante 1: USD 86.36 + 10% + GART USD 4 per room per night.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Acompañante 2: USD 136.36 + 10% + GART USD 4 per room per night.
-                  </li>
-                  <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    Niños 3-12 años: USD 86.36 + 10% + GART USD 4 per room per night.
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <p class="text-[12.5px] leading-relaxed text-slate-200">Cada mes premiamos a <strong class="text-white">2 JSB + 2 TC</strong> con el mejor resultado en Crew Care HVC, con un mínimo de <strong class="text-white">10 respuestas</strong>.</p>
           </div>
+
+          <div class="rounded-xl border border-latam-coral/35 bg-latam-estrellada/40 p-3.5 backdrop-blur-sm">
+            <div class="mb-2.5 flex items-center gap-2 border-b border-white/10 pb-2.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="M12 3.5 4 6.5v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-5L12 3.5Z" stroke-linejoin="round" /><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <h4 class="text-[13px] font-extrabold text-white">Premio: Arma tu Rol</h4>
+            </div>
+            <ul class="flex flex-col gap-1.5">
+              <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                10 días libres (tú eliges las fechas exactas).
+              </li>
+              <li class="flex items-start gap-2 text-[12.5px] leading-relaxed text-slate-200">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-latam-coral"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                4 vuelos confirmados de tu preferencia (2 máx. sin destino y sin indicar fecha).
+              </li>
+            </ul>
+          </div>
+
+          <p class="text-center text-[13px] font-extrabold italic text-white">¡Tú puedes ser el próximo ganador!</p>
         </div>
       </div>
     </div>
@@ -420,27 +389,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
         Consulta enviada correctamente.
       </div>
-      <!-- Respuesta instantánea de IA (fase 2, ver generarRespuestaConsultaIA
-           en Code.gs) — reemplaza a consultas-success cuando el backend
-           devuelve respuestaIA. Nunca se muestra sin el aviso de que es
-           automática. -->
-      <div id="consultas-ia-respuesta" class="mt-6 hidden animate-fadeUp overflow-hidden rounded-xl border-t-4 border-latam-coral bg-white/10">
-        <div class="flex items-center gap-2 bg-latam-coral/20 px-4 py-2.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4 flex-shrink-0 text-latam-coral"><path d="m12 3.5 2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3.5Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
-          <p class="text-xs font-extrabold uppercase tracking-wide text-latam-coral">Respuesta automática</p>
-        </div>
-        <div class="px-4 py-3.5">
-          <p id="consultas-ia-respuesta-texto" class="text-sm leading-relaxed text-white"></p>
-          <p class="mt-3 text-xs leading-relaxed text-white/50">Esta respuesta se generó automáticamente según el procedimiento general. Tu consulta también quedó registrada — si no resuelve tu duda o tu caso es particular, el equipo de soporte se pondrá en contacto contigo.</p>
-        </div>
-      </div>
-      <!-- Consulta derivada a un coordinador (ver submitConsultaSoporte en
-           Code.gs): el objetivo detectado no calificó para respuesta
-           automática. Reemplaza a consultas-success en ese caso puntual. -->
-      <div id="consultas-derivado" class="mt-6 hidden items-center gap-2 rounded-xl bg-white/10 px-4 py-3.5 text-sm font-bold text-white animate-fadeUp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-        Tu consulta se derivará a un coordinador y será respondida en las próximas 24 horas. ¡Muchas gracias!
-      </div>
+      <!-- La respuesta instantánea de IA (consultas-ia-respuesta / consultas-derivado,
+           ver generarRespuestaConsultaIA en Code.gs) queda pausada por ahora
+           — se retoma más adelante. El formulario vuelve a su flujo simple:
+           se guarda la consulta y listo, sin clasificar nada acá. -->
       <div id="consultas-error" class="mt-6 hidden rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-200 animate-fadeUp"></div>
 
       <form id="form-consultas" novalidate class="mt-6">
@@ -541,12 +493,35 @@
             <label class="mb-2 block text-sm font-bold text-white">Detalla tu consulta <span class="text-latam-coral">*</span></label>
             <textarea name="consulta" rows="3" required class="consultas-fld w-full resize-none rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20"></textarea>
           </div>
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-bold text-white">Archivo de referencia (opcional)</label>
+            <div id="consulta-file-idle">
+              <button type="button" onclick="document.getElementById('consulta-file-input').click()" class="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/20 bg-white/5 px-4 py-7 text-center transition-all hover:border-white/40 hover:bg-white/10">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-7 w-7 text-white/70"><path d="M12 15V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="text-sm font-semibold text-white/90"><span class="rounded bg-latam-coral/30 px-1.5 py-0.5">Haz clic aquí</span> para subir el archivo</span>
+                <span class="text-xs text-white/40">Formatos: PDF, PNG, JPG (Máx. 10MB)</span>
+              </button>
+            </div>
+            <div id="consulta-file-done" class="hidden animate-fadeUp items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/10">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </span>
+                <p id="consulta-file-name" class="truncate text-sm font-bold text-white"></p>
+              </div>
+              <button type="button" onclick="clearFile('consulta')" aria-label="Quitar archivo" class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-latam-coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
+              </button>
+            </div>
+            <input id="consulta-file-input" name="archivo" type="file" accept=".pdf,.png,.jpg,.jpeg" class="sr-only" onchange="handleFileChange(this, 'consulta')" />
+          </div>
         </div>
 
         <div class="mt-2 flex flex-col-reverse justify-end gap-3 border-t border-white/10 pt-5 sm:flex-row">
           <button type="button" onclick="closeModal('modal-consultas')" class="rounded-xl border-2 border-white/20 bg-transparent px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 sm:w-auto">Cancelar</button>
-          <button type="button" onclick="submitConsultaForm()" id="consultas-btn-enviar" class="rounded-xl bg-latam-coral px-6 py-3 text-sm font-extrabold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+          <button type="button" onclick="submitConsultaForm()" id="consultas-btn-enviar" class="flex items-center justify-center gap-2 rounded-xl bg-latam-coral px-6 py-3 text-sm font-extrabold text-white shadow-soft transition enabled:hover:-translate-y-0.5 enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
             <span id="consultas-btn-enviar-label">Enviar Consulta</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" stroke-linejoin="round" stroke-linecap="round" /></svg>
           </button>
         </div>
       </form>
@@ -556,33 +531,43 @@
 
 <!-- ============ Modal: Consultar estado de mi consulta ============ -->
 <!-- Demo simple: el tripulante todavía no tiene login, así que se identifica
-     solo con su código de operación (el mismo que se le mostró/quedó en la
-     consulta original). Lee SOLO LECTURA de Resumen_LP (ver
-     consultarEstadoPorCodigoOperacion en Code.gs) — no guarda nada acá. -->
+     con su código de operación (una sola consulta) o su BP (todas sus
+     consultas). Lee SOLO LECTURA de Resumen_LP (ver consultarEstadoPorCodigoOperacion
+     / consultarEstadoPorBP en Code.gs) — no guarda nada acá. -->
 <div id="modal-consulta-estado" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center bg-latam-profunda/60 p-4 backdrop-blur-sm" onclick="closeModalBackdrop(event, 'modal-consulta-estado')">
-  <div class="relative w-full max-w-md overflow-y-auto rounded-2xl bg-latam-estrellada text-white shadow-card" onclick="event.stopPropagation()">
+  <div class="relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl bg-latam-estrellada text-white shadow-card" onclick="event.stopPropagation()">
     <button type="button" onclick="closeModal('modal-consulta-estado')" aria-label="Cerrar" class="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-4 w-4"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" stroke-width="2" /></svg>
     </button>
     <div class="px-6 pb-7 pt-6 sm:px-7">
       <span class="mb-4 inline-flex items-center rounded-full bg-latam-coral px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-sm">Soporte</span>
       <h2 class="text-2xl font-extrabold leading-tight tracking-tight text-white">Estado de tu consulta</h2>
-      <p class="mt-1 text-sm text-slate-300">Ingresa el código de operación que te quedó al enviar tu consulta.</p>
+      <p id="consulta-estado-subtitulo" class="mt-1 text-sm text-slate-300">Ingresa el código de operación que te quedó al enviar tu consulta.</p>
+
+      <!-- Modo de búsqueda: por código (una consulta) o por BP (todas las suyas). -->
+      <div class="mt-4 flex gap-1.5 rounded-xl bg-white/10 p-1">
+        <button type="button" id="consulta-estado-modo-btn-codigo" onclick="setModoConsultaEstado('codigo')" class="flex-1 rounded-lg px-3 py-2 text-xs font-extrabold uppercase tracking-wide transition">Por código</button>
+        <button type="button" id="consulta-estado-modo-btn-bp" onclick="setModoConsultaEstado('bp')" class="flex-1 rounded-lg px-3 py-2 text-xs font-extrabold uppercase tracking-wide transition">Por BP</button>
+      </div>
 
       <div id="consulta-estado-error" class="mt-5 hidden rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-200 animate-fadeUp"></div>
 
       <form id="form-consulta-estado" novalidate class="mt-5" onsubmit="event.preventDefault(); consultarEstadoForm()">
         <div class="mb-5">
-          <label class="mb-2 block text-sm font-bold text-white">Código de operación <span class="text-latam-coral">*</span></label>
-          <input type="text" name="codigoOperacion" required placeholder="Ej. 5c7035e4-LATAM-LP" class="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
+          <label id="consulta-estado-label" class="mb-2 block text-sm font-bold text-white">Código de operación <span class="text-latam-coral">*</span></label>
+          <input id="consulta-estado-input" type="text" required placeholder="Ej. 5c7035e4-LATAM-LP" class="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
         </div>
 
+        <!-- Resultado único (modo "código"). -->
         <div id="consulta-estado-resultado" class="mb-5 hidden rounded-xl border-t-4 border-latam-coral bg-white/10 px-4 py-3.5 animate-fadeUp">
           <p class="text-xs font-extrabold uppercase tracking-wide text-latam-coral">Estado</p>
           <p id="consulta-estado-valor" class="mt-1 text-lg font-extrabold text-white"></p>
           <p id="consulta-estado-tipo" class="mt-2 text-sm text-white/70"></p>
           <p id="consulta-estado-fecha" class="mt-1 text-xs text-white/50"></p>
         </div>
+
+        <!-- Lista de resultados (modo "BP") — una tarjeta por consulta. -->
+        <div id="consulta-estado-lista" class="mb-5 hidden space-y-3"></div>
 
         <div class="mt-2 flex flex-col-reverse justify-end gap-3 border-t border-white/10 pt-5 sm:flex-row">
           <button type="button" onclick="closeModal('modal-consulta-estado')" class="rounded-xl border-2 border-white/20 bg-transparent px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 sm:w-auto">Cerrar</button>

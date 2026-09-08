@@ -80,6 +80,7 @@
     <? if (page === 'home' || modulePageFile === 'GestionPersonal' || modulePageFile === 'MiRol' || modulePageFile === 'GestionOperacional') { ?>
       <?!= include('ActualizacionDatosScript') ?>
       <?!= include('DomicilioDgacScript') ?>
+      <?!= include('EstacionamientoScript') ?>
       <?!= include('SolicitudMesSubsiguienteScript') ?>
       <?!= include('DescansoMedicoScript') ?>
       <?!= include('VacacionesScript') ?>
@@ -89,6 +90,7 @@
       <?!= include('ReportesScript') ?>
       <?!= include('ConsultasScript') ?>
       <?!= include('ConsultaEstadoScript') ?>
+      <?!= include('ReembolsosConcurScript') ?>
     <? } ?>
     <? if (page === 'consultas-ia') { ?>
       <?!= include('ConsultasIAScript') ?>

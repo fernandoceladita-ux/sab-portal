@@ -61,6 +61,9 @@ const DRIVE_ASSETS = {
   personaMariaSeoane: '1Ks8xq3BKNDrA_RD7p0-2z6xraBYTbpy2',
   hotelDazzlerMvd: '1ykw6lsb-QtdbYbwUMsV0GYxZXZRg6gJk',
   hotelGrandPalladiumMbj: '1LeCy-cwv3a4RbRU23OCMQdLWOmTMYXxF',
+  // TODO: pega el ID de Drive de la imagen/gráfica de HVC STARS (panel 1 del
+  // modal de noticias, ver Modals.html) y reemplaza este valor.
+  hvcStarsHero: 'REEMPLAZAR_ID_IMAGEN_HVC_STARS',
   // TODO: subir a Drive las 6 imágenes de public/img/gestion-operativa/instructivo_vales/
   // (paso1.png, paso2.png, paso3.png, paso4.png, "codigo QR de la app.png",
   // restaurantes_autorizados.png), compartir cada una como "Cualquier persona
@@ -80,6 +83,10 @@ const DRIVE_ASSETS = {
   domicilioDgacCard: '19AGy4MCn9oWQZAbWdVPZro5TTcERvN30',
   vacunaFiebreAmarillaCard: '1MNnQJ6uPQxIFLxQGcsHPk4er3NqM251v',
   visaPasaporteCard: '1ecYhyLPIbYTdJd2g9CFXDDjfSpRbjrsQ',
+  // TODO: sube una imagen para la tarjeta de Solicitud de Estacionamiento y
+  // reemplaza este ID (driveImg() devuelve '' mientras empiece con
+  // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
+  estacionamientoCard: 'REEMPLAZAR_ID_IMAGEN_ESTACIONAMIENTO',
   // TODO: pegar los IDs reales de Drive para el header y las 7 tarjetas de
   // Mi Rol (mismo orden que HUB_IDS_MIROL en MiRol.html).
   miRolHero: '1netm7cZDkTjG70sBgjQlHhd5eeI0Nrbi',
@@ -90,12 +97,20 @@ const DRIVE_ASSETS = {
   cesionVacacionesCard: '1VAiyzD-sRC7Y0g3xRG-lMYl0j3tZzKeP',
   gruposPbsCard: '1ipjHwJ5UjsrBVdO5jFya3FpYPnZW8KlK',
   cambiosWebSabCard: '1pG7nm3IP8lIWPf0ges_W0cTRxasKJ77T',
+  // TODO: sube una imagen para la tarjeta de Evaluación de Desempeño y
+  // reemplaza este ID (driveImg() devuelve '' mientras empiece con
+  // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
+  evaluacionDesempenoCard: 'REEMPLAZAR_ID_IMAGEN_EVALUACION_DESEMPENO',
 
   gestionOperacionalHero: '1PZ9-miuYDUaibtYeKgFiFqN7tHZ-hyb9',
   instructivoVales: '1zWVWc9-Xg2iIsAR7c7WyIqe_iNTIkDtF',
   consultasViaticos: '1xagbBQxoOrgcff-3DzNlAXzAeTxS3y27',
   cambioUniforme: '1pG7nm3IP8lIWPf0ges_W0cTRxasKJ77T',
-  registroEquipos: '1HKAyaA4E6zprT4RJ9Gq5QAazjKRcXTA1'
+  registroEquipos: '1HKAyaA4E6zprT4RJ9Gq5QAazjKRcXTA1',
+  // TODO: sube una imagen para la tarjeta de Reembolsos SAP Concur y
+  // reemplaza este ID (driveImg() devuelve '' mientras empiece con
+  // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
+  reembolsosConcur: 'REEMPLAZAR_ID_IMAGEN_REEMBOLSOS_CONCUR'
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no
@@ -228,6 +243,16 @@ const ACTUALIZACION_LICENCIA_FOLDER_ID = '1_vfAxpYceoOUxkw5fXsBFtoAzwcDnfKQ'
 // el trámite "Domicilio DGAC" — comparten el mismo Sheet y Drive reales.
 const DOMICILIO_DGAC_GID = 1159770071
 const DOMICILIO_DGAC_FOLDER_ID = '1SAGqcibpIRcBgceY1y7D_GxalFzug4do'
+
+// TODO: crea una pestaña en el mismo Sheet (SHEET_ID) para "Solicitud de
+// Estacionamiento ATO Lima" con estos headers en la fila 1, y reemplaza el
+// -1 de abajo por su gid real (el número después de #gid= en la URL de esa
+// pestaña) — mientras siga en -1, el envío falla con un error claro en vez
+// de escribir en la pestaña equivocada:
+//   Marca temporal | Correo | Nombres y Apellidos | DNI / Carnet de Extranjería |
+//   Cargo / Gerencia | Celular de Contacto | Fecha de Ingreso | Fecha de Salida |
+//   Marca de Vehículo | Modelo del Vehículo | Placa del Vehículo
+const ESTACIONAMIENTO_GID = -1
 
 // Mismos GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
 // los trámites del módulo "Mi Rol" — comparten el mismo Sheet y Drive reales.
@@ -363,6 +388,53 @@ function buildDomicilioDgacRow(data, correo, licenciaUrl) {
     'Coordenadas': sanitizeValue(data.coordenadas),
     'Foto Nueva Licencia DGAC': licenciaUrl || '',
   }
+}
+
+// Llamada desde EstacionamientoScript.html vía
+// `google.script.run.submitEstacionamiento(payload)`. Sin adjunto: el
+// formulario original (ver referencia) no pide ningún archivo, solo datos y
+// la aceptación de las reglas.
+function submitEstacionamiento(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const nombre = String(data.nombre || '').trim()
+  const dni = String(data.dni || '').trim()
+  const cargo = String(data.cargo || '').trim()
+  const celular = String(data.celular || '').trim()
+  const fechaIngreso = String(data.fechaIngreso || '').trim()
+  const fechaSalida = String(data.fechaSalida || '').trim()
+  const marca = String(data.marca || '').trim()
+  const modelo = String(data.modelo || '').trim()
+  const placa = String(data.placa || '').trim()
+  if (!nombre || !dni || !cargo || !celular || !fechaIngreso || !fechaSalida || !marca || !modelo || !placa) {
+    throw new Error('Completa todos los campos obligatorios')
+  }
+  if (!data.aceptaReglas) {
+    throw new Error('Debes aceptar las Reglas y recomendaciones para proceder con el envío')
+  }
+
+  writeToSheet(ESTACIONAMIENTO_GID, {
+    'Marca temporal': new Date(),
+    'Correo': sanitizeValue(correo),
+    'Nombres y Apellidos': sanitizeValue(nombre),
+    'DNI / Carnet de Extranjería': sanitizeValue(dni),
+    'Cargo / Gerencia': sanitizeValue(cargo),
+    'Celular de Contacto': sanitizeValue(celular),
+    'Fecha de Ingreso': sanitizeValue(fechaIngreso),
+    'Fecha de Salida': sanitizeValue(fechaSalida),
+    'Marca de Vehículo': sanitizeValue(marca),
+    'Modelo del Vehículo': sanitizeValue(modelo),
+    'Placa del Vehículo': sanitizeValue(placa.toUpperCase()),
+  })
+
+  return { status: 'ok' }
 }
 
 // Llamada desde SolicitudMesSubsiguienteScript.html vía
@@ -766,6 +838,129 @@ function buildDemoraFueraAvionRow(data, correo, id, codigoOperacion, pais, archi
 }
 
 // ============================================================================
+// Reembolsos SAP Concur — solicitud de aprobación previa (Gestión
+// Operacional). Reemplaza al Google Form que antes usaba el botón "Solicita
+// el correo de aprobación" en la vista de referencia: el tripulante llena el
+// motivo/monto/voucher acá mismo, y lo que de verdad importa es que le llega
+// un correo al focal de Soporte SAB para que revise y responda con la
+// aprobación — guardar la fila en un Sheet es solo un registro opcional (ver
+// REEMBOLSOS_CONCUR_GID). Visa/Pasaporte no requiere aprobación (por eso no
+// aparece como motivo acá, igual que en el Google Form original).
+// ============================================================================
+
+// TODO: crea una carpeta en Drive para los vouchers de este formulario,
+// compártela como "Cualquier persona con el enlace: Lector", y pega el ID
+// acá (ver DEMORA_ARCHIVO_FOLDER_ID más arriba para el formato). Mientras no
+// se reemplace, la subida del voucher falla — pero eso NUNCA bloquea el
+// envío: el correo al focal se manda igual, solo que sin adjunto.
+const REEMBOLSOS_CONCUR_FOLDER_ID = '1I4ZGop__3zzF6UFyTu8jZ6PL51lerVJk'
+
+// TODO (opcional): crea una pestaña con estos headers EXACTOS en la fila 1
+// — los mismos que deja un Google Form normal (marca temporal + una columna
+// por pregunta, en el mismo orden que el formulario) — y pega su Sheet ID +
+// gid acá para llevar un registro. Mientras GID siga en -1, simplemente no
+// se guarda ninguna fila (el correo al focal se manda igual):
+//   Marca temporal | Correo electrónico | Motivo | Monto |
+//   Vuelo (en caso corresponda) | Fecha del gasto | Adjunta el Voucher | Comentarios
+const REEMBOLSOS_CONCUR_SHEET_ID = '1WSl5ChIUUzCNO4jcV3UHxVlELuKtja1hHDSZdPJia8U'
+const REEMBOLSOS_CONCUR_GID = 352305686
+
+const REEMBOLSOS_CONCUR_FOCAL_EMAIL = 'yoko.noborikawa@latam.com'
+
+// Debe calzar EXACTO con los value="..." de los radios "motivo" en
+// ReembolsosConcurView.html.
+const REEMBOLSOS_CONCUR_MOTIVO_LABELS = {
+  cma: 'Examen Médico Aeronáutico',
+  licencia: 'Licencia Peruana',
+  equipaje: 'Equipaje',
+  alimentacion: 'Contingencia - Alimentación Tripulación',
+  movilizacion: 'Contingencia - Movilización',
+}
+
+// Llamada desde ReembolsosConcurScript.html vía
+// `google.script.run.submitReembolsoConcur(payload)`.
+function submitReembolsoConcur(data) {
+  if (!checkRateLimit()) {
+    throw new Error('Demasiadas solicitudes en poco tiempo. Intenta de nuevo en un minuto.')
+  }
+
+  const correo = String(data.correo || '').trim().toLowerCase()
+  if (!correo.endsWith('@latam.com')) {
+    throw new Error('El correo debe ser una cuenta corporativa @latam.com')
+  }
+
+  const motivoLabel = REEMBOLSOS_CONCUR_MOTIVO_LABELS[data.motivo]
+  if (!motivoLabel) {
+    throw new Error('Selecciona el motivo de tu reembolso')
+  }
+
+  const monto = String(data.monto || '').trim()
+  const fechaGasto = String(data.fechaGasto || '').trim()
+  if (!monto || !fechaGasto) {
+    throw new Error('Monto y fecha del gasto son obligatorios')
+  }
+
+  // Igual que en submitConsultaSoporte: un fallo al subir el voucher
+  // (típicamente porque falta reemplazar REEMBOLSOS_CONCUR_FOLDER_ID) nunca
+  // debe impedir que la solicitud llegue igual al focal por correo — solo
+  // queda sin adjunto y con rastro en Registros.
+  let archivoUrl = ''
+  if (data.archivo) {
+    try {
+      archivoUrl = uploadFileToDrive(data.archivo, data.archivoNombre, data.archivoTipo, REEMBOLSOS_CONCUR_FOLDER_ID)
+    } catch (err) {
+      Logger.log('submitReembolsoConcur: falló la subida del voucher: ' + (err && err.message ? err.message : err))
+    }
+  }
+
+  if (REEMBOLSOS_CONCUR_GID !== -1) {
+    try {
+      writeToSheetIn(REEMBOLSOS_CONCUR_SHEET_ID, REEMBOLSOS_CONCUR_GID, {
+        'Marca temporal': new Date(),
+        'Correo electrónico': sanitizeValue(correo),
+        'Motivo': motivoLabel,
+        'Monto': sanitizeValue(monto),
+        'Vuelo (en caso corresponda)': sanitizeValue(data.vuelo),
+        'Fecha del gasto': sanitizeValue(fechaGasto),
+        'Adjunta el Voucher': archivoUrl || '',
+        'Comentarios': sanitizeValue(data.comentarios),
+      })
+    } catch (err) {
+      Logger.log('submitReembolsoConcur: falló el registro en Sheet: ' + (err && err.message ? err.message : err))
+    }
+  }
+
+  // El correo es lo que de verdad cumple el propósito de este formulario —
+  // igual que avisarCoordinadorConsultaDerivada, nunca lanza: un fallo acá
+  // solo queda en Registros, sin romper la respuesta al tripulante.
+  try {
+    MailApp.sendEmail({
+      to: REEMBOLSOS_CONCUR_FOCAL_EMAIL,
+      subject: 'Solicitud de aprobación - Reembolso ' + motivoLabel + ' (' + correo + ')',
+      body: [
+        'Hola,',
+        '',
+        'Un tripulante solicitó autorización para un reembolso de SAP Concur:',
+        '',
+        'Correo: ' + correo,
+        'Motivo: ' + motivoLabel,
+        'Monto: ' + monto,
+        data.vuelo ? 'Vuelo: ' + data.vuelo : '',
+        'Fecha del gasto: ' + fechaGasto,
+        data.comentarios ? 'Comentarios: ' + data.comentarios : '',
+        archivoUrl ? 'Voucher: ' + archivoUrl : 'Voucher: (no se pudo adjuntar automáticamente, pídeselo al tripulante por correo)',
+        '',
+        'Por favor responde la aprobación al correo del tripulante dentro del plazo de 5 días hábiles.',
+      ].filter(Boolean).join('\n'),
+    })
+  } catch (err) {
+    Logger.log('submitReembolsoConcur: falló el correo al focal: ' + (err && err.message ? err.message : err))
+  }
+
+  return { status: 'ok' }
+}
+
+// ============================================================================
 // Consultas Soporte SAB — modal en Home (Centro de Ayuda y Reportes). Antes
 // vivía en AppSheet, con una vista distinta por filial (LP/4C/XL) y ~25
 // temas, cada uno resuelto por un responsable fijo. Se migra de a poco: por
@@ -928,50 +1123,14 @@ function submitConsultaSoporte(data) {
   const codigoOperacion = id + '-LATAM-' + pais
   const coordinadorResponsable = resolveCoordinadorResponsable(temaConfig.temaSheet, pais)
 
-  // Solo para los temas en CONSULTAS_IA_INSTANTANEA_TEMAS (por ahora, solo
-  // Apto Médico): intenta responder al tripulante en el momento, basado en
-  // precedente real de la base de conocimiento, pero SOLO si el objetivo de
-  // su consulta cae en uno de los "verdes" de CONSULTAS_OBJETIVOS_SEGUROS
-  // (ver pestaña 2_Objetivos_por_TIPO del sheet de análisis). Un fallo de IA
-  // (o que la consulta no aplique) nunca debe impedir que la consulta se
-  // registre — por eso va envuelto en try/catch y solo agrega datos, no
-  // bloquea nada. `derivada` queda en true cuando SÍ se intentó clasificar
-  // (el tema está en la lista instantánea) pero no calificó para respuesta
-  // automática — ese es el caso que dispara el aviso al coordinador más abajo.
-  let respuestaIA = null
-  let derivada = false
-  if (CONSULTAS_IA_INSTANTANEA_TEMAS.indexOf(data.tema) !== -1) {
-    const objetivosSeguros = CONSULTAS_OBJETIVOS_SEGUROS[data.tema] || []
-    try {
-      const resultado = generarRespuestaConsultaIA(temaConfig.label, String(data.consulta || '').trim(), objetivosSeguros)
-      if (resultado) {
-        // Saludo con el nombre tal cual lo escribió el tripulante (el campo
-        // es "Apellidos y Nombres" junto, sin separar — no hay forma
-        // confiable de sacar solo el primer nombre sin arriesgar adivinar mal).
-        respuestaIA = 'Hola ' + nombre + ',\n\n' + resultado.respuesta
-        // Solo en el registro de ejecución (Ver > Registros), no en el
-        // Sheet — mientras se decide si esto se persiste, sirve para
-        // verificar qué objetivo detectó el modelo en cada prueba.
-        Logger.log('Objetivo detectado: ' + resultado.objetivo)
-      } else {
-        derivada = true
-      }
-    } catch (err) {
-      // No debe romper el envío de la consulta, pero sí queda rastro en
-      // Registros — sin esto, un error de acceso al Sheet de conocimiento o
-      // de BibliotecaVertexAI se ve exactamente igual que un NO_APLICA
-      // legítimo del modelo, y no hay forma de distinguirlos.
-      Logger.log('generarRespuestaConsultaIA falló: ' + (err && err.message ? err.message : err))
-      derivada = true
-    }
-  }
-
-  // Ojo: a propósito NO se persiste respuestaIA/objetivoDetectado en la
-  // fila todavía (decisión explícita: por ahora la fila de cada consulta se
-  // guarda igual que siempre, sin tocar su esquema — la respuesta de la IA
-  // solo se muestra al tripulante al instante en la misma página, vía el
-  // valor de retorno de esta función). Si más adelante se decide dejar
-  // registro de esto en el Sheet, agregar acá las columnas correspondientes.
+  // La respuesta instantánea con IA (generarRespuestaConsultaIA, más abajo)
+  // queda pausada por ahora — decisión explícita del usuario mientras se
+  // retoma más adelante. Todo ese código (clasificación por objetivo, log
+  // aparte, aviso al coordinador) sigue completo y sin tocar, simplemente
+  // esta función ya no lo llama. Para reactivarlo: reemplazar el bloque de
+  // abajo por el que arma respuestaIA/derivada/objetivoDetectado y llama a
+  // generarRespuestaConsultaIA + registrarLogIA + avisarCoordinadorConsultaDerivada
+  // (ver historial de este archivo).
   writeToSheetIn(CONSULTAS_SHEET_ID, gid, {
     [temaConfig.idColumnKey]: id,
     'codigo_operacion': codigoOperacion,
@@ -988,24 +1147,40 @@ function submitConsultaSoporte(data) {
     'archivo_referencia': archivoUrl || '',
   })
 
-  // Consulta derivada (el tema tiene IA instantánea pero no se pudo responder
-  // sola): avisa por correo al coordinador de ese tema para que entre a
-  // responderla dentro de las 24 horas. Temporal:
-  // mientras no se conecta el correo real del coordinador (vía Responsables),
-  // usa CONSULTAS_COORDINADOR_EMAIL_TEMPORAL — si el tema no tiene correo ahí
-  // todavía, simplemente no se manda nada (nunca bloquea el registro).
-  if (derivada) {
-    avisarCoordinadorConsultaDerivada(data.tema, temaConfig.label, {
-      nombre: nombre,
-      bp: bp,
-      codigoOperacion: codigoOperacion,
-      consulta: String(data.consulta || '').trim(),
-    })
-  }
-
-  if (respuestaIA) return { status: 'ok', respuestaIA: respuestaIA }
-  if (derivada) return { status: 'ok', derivada: true }
   return { status: 'ok' }
+}
+
+// Pestaña APARTE (no toca ninguno de los sheets de consultas de siempre) que
+// mapea cada intento de la IA: qué objetivo detectó y qué respondió (o que
+// se derivó). Reemplaza estos dos valores por los de una pestaña que crees
+// a mano —en cualquier Sheet, puede ser uno nuevo— con estos headers exactos
+// en la fila 1: fecha_hora / codigo_operacion / tema / correo / bp / nombre /
+// consulta / objetivo_detectado / respuesta_ia / derivada.
+const CONSULTAS_IA_LOG_SHEET_ID = '1VG7IlMERaOXMFWiLUdkHNeUoLloLJ-qt'
+const CONSULTAS_IA_LOG_GID = 2089341002
+
+// Nunca lanza: igual que avisarCoordinadorConsultaDerivada, un fallo acá
+// (típicamente porque todavía falta reemplazar CONSULTAS_IA_LOG_SHEET_ID/GID)
+// no debe romper el envío de la consulta, que ya se guardó antes de llegar
+// acá — solo queda rastro en Registros para poder revisarlo.
+function registrarLogIA(info) {
+  if (CONSULTAS_IA_LOG_GID === -1) return
+  try {
+    writeToSheetIn(CONSULTAS_IA_LOG_SHEET_ID, CONSULTAS_IA_LOG_GID, {
+      'fecha_hora': new Date(),
+      'codigo_operacion': info.codigoOperacion,
+      'tema': info.tema,
+      'correo': sanitizeValue(info.correo),
+      'bp': sanitizeValue(info.bp),
+      'nombre': sanitizeValue(info.nombre),
+      'consulta': sanitizeValue(info.consulta),
+      'objetivo_detectado': info.objetivoDetectado,
+      'respuesta_ia': sanitizeValue(info.respuestaIA),
+      'derivada': info.derivada ? 'Sí' : 'No',
+    })
+  } catch (err) {
+    Logger.log('registrarLogIA falló: ' + (err && err.message ? err.message : err))
+  }
 }
 
 // Correo temporal de aviso al coordinador — mientras Responsables_Consultas
@@ -1064,46 +1239,77 @@ function resolveCoordinadorResponsable(temaSheet, pais) {
   return match ? String(match[1]).trim() : ''
 }
 
-// Llamada desde ConsultaEstadoScript.html vía
-// `google.script.run.consultarEstadoPorCodigoOperacion(codigoOperacion)`.
-// Busca el código de operación en la pestaña "Resumen_LP" (consolida todos
-// los temas) y devuelve su estado_rpta — SOLO LECTURA, nunca escribe nada acá
-// (ver comentario de CONSULTAS_RESUMEN_GID). Por ahora el tripulante solo
-// tiene su código de operación para identificarse (no hay login todavía).
-function consultarEstadoPorCodigoOperacion(codigoOperacion) {
-  const codigo = String(codigoOperacion || '').trim()
-  if (!codigo) throw new Error('Ingresa tu código de operación')
-
+// Abre la pestaña "Resumen_LP" (consolida todos los temas) y devuelve sus
+// headers + filas ya leídas — usado tanto por consultarEstadoPorCodigoOperacion
+// como por consultarEstadoPorBP para no repetir la lectura del Sheet.
+// SOLO LECTURA, nunca escribe nada acá (ver comentario de CONSULTAS_RESUMEN_GID).
+function leerResumenLP() {
   const ss = SpreadsheetApp.openById(CONSULTAS_SHEET_ID)
   const sheet = ss.getSheets().find((s) => s.getSheetId() === CONSULTAS_RESUMEN_GID)
   if (!sheet) throw new Error('No se encontró la pestaña Resumen_LP (revisa CONSULTAS_RESUMEN_GID)')
 
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map((h) => h.toString().trim())
-  const codigoIdx = headers.indexOf('codigo_operacion')
-  const estadoIdx = headers.indexOf('estado_rpta')
-  const tipoIdx = headers.indexOf('tipo')
-  const consultaIdx = headers.indexOf('consulta')
-  const fechaPrevistaIdx = headers.indexOf('fecha_prevista_resolucion')
-  if (codigoIdx === -1 || estadoIdx === -1) {
+  const idx = {
+    codigo: headers.indexOf('codigo_operacion'),
+    bp: headers.indexOf('bp'),
+    estado: headers.indexOf('estado_rpta'),
+    tipo: headers.indexOf('tipo'),
+    consulta: headers.indexOf('consulta'),
+    fechaHora: headers.indexOf('fecha_hora'),
+    fechaPrevista: headers.indexOf('fecha_prevista_resolucion'),
+  }
+  if (idx.codigo === -1 || idx.estado === -1) {
     throw new Error('Faltan columnas esperadas (codigo_operacion/estado_rpta) en Resumen_LP')
   }
 
   const lastRow = sheet.getLastRow()
-  if (lastRow < 2) return { encontrado: false }
-  const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+  const rows = lastRow < 2 ? [] : sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+  return { idx: idx, rows: rows }
+}
 
-  const fila = rows.find((row) => String(row[codigoIdx] || '').trim().toLowerCase() === codigo.toLowerCase())
-  if (!fila) return { encontrado: false }
-
+function filaAResultado(fila, idx) {
   return {
     encontrado: true,
-    estado: String(fila[estadoIdx] || '').trim() || 'Pendiente',
-    tipo: tipoIdx !== -1 ? String(fila[tipoIdx] || '').trim() : '',
-    consulta: consultaIdx !== -1 ? String(fila[consultaIdx] || '').trim() : '',
-    fechaPrevistaResolucion: fechaPrevistaIdx !== -1 && fila[fechaPrevistaIdx]
-      ? Utilities.formatDate(new Date(fila[fechaPrevistaIdx]), Session.getScriptTimeZone(), 'dd/MM/yyyy')
+    codigoOperacion: String(fila[idx.codigo] || '').trim(),
+    estado: String(fila[idx.estado] || '').trim() || 'Pendiente',
+    tipo: idx.tipo !== -1 ? String(fila[idx.tipo] || '').trim() : '',
+    consulta: idx.consulta !== -1 ? String(fila[idx.consulta] || '').trim() : '',
+    fechaHora: idx.fechaHora !== -1 && fila[idx.fechaHora]
+      ? Utilities.formatDate(new Date(fila[idx.fechaHora]), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm')
+      : '',
+    fechaPrevistaResolucion: idx.fechaPrevista !== -1 && fila[idx.fechaPrevista]
+      ? Utilities.formatDate(new Date(fila[idx.fechaPrevista]), Session.getScriptTimeZone(), 'dd/MM/yyyy')
       : '',
   }
+}
+
+// Llamada desde ConsultaEstadoScript.html vía
+// `google.script.run.consultarEstadoPorCodigoOperacion(codigoOperacion)`.
+// Por ahora el tripulante solo tiene su código de operación (o su BP, ver
+// consultarEstadoPorBP) para identificarse — no hay login todavía.
+function consultarEstadoPorCodigoOperacion(codigoOperacion) {
+  const codigo = String(codigoOperacion || '').trim()
+  if (!codigo) throw new Error('Ingresa tu código de operación')
+
+  const { idx, rows } = leerResumenLP()
+  const fila = rows.find((row) => String(row[idx.codigo] || '').trim().toLowerCase() === codigo.toLowerCase())
+  return fila ? filaAResultado(fila, idx) : { encontrado: false }
+}
+
+// Llamada desde ConsultaEstadoScript.html vía
+// `google.script.run.consultarEstadoPorBP(bp)`. Devuelve TODAS las consultas
+// de ese BP (de cualquier tema), más recientes primero.
+function consultarEstadoPorBP(bp) {
+  const bpBuscado = String(bp || '').trim()
+  if (!bpBuscado) throw new Error('Ingresa tu BP')
+
+  const { idx, rows } = leerResumenLP()
+  if (idx.bp === -1) throw new Error('Falta la columna "bp" en Resumen_LP')
+
+  return rows
+    .filter((row) => String(row[idx.bp] || '').trim().toLowerCase() === bpBuscado.toLowerCase())
+    .map((row) => filaAResultado(row, idx))
+    .reverse()
 }
 
 // ============================================================================
@@ -1145,26 +1351,83 @@ const CONOCIMIENTO_GID = 114081849
 
 // Por TEMA: los OBJETIVO exactos (columna OBJETIVO de 6_Detalle_clasificado)
 // resaltados en VERDE en la pestaña "2_Objetivos_por_TIPO" — pura consulta de
-// información/procedimiento general, sin gestión ni revisión de caso puntual.
-// Todo objetivo que NO esté en esta lista (amarillo, blanco, o cualquiera que
-// el modelo no reconozca) siempre se deriva a un coordinador humano. El texto
-// debe ser IDÉNTICO al de la columna OBJETIVO del Excel/Sheet.
+// información/procedimiento general, sin gestión ni revisión de caso puntual,
+// Y que además ya se pueden responder solo con el procedimiento general (no
+// requieren mirar el estado real de un trámite puntual — ver
+// CONSULTAS_OBJETIVOS_VERDES_PENDIENTES más abajo para los que sí). Todo
+// objetivo que NO esté en esta lista (amarillo, blanco, verde pendiente, o
+// cualquiera que el modelo no reconozca) siempre se deriva a un coordinador
+// humano. El texto debe ser IDÉNTICO al de la columna OBJETIVO del Excel/Sheet.
 const CONSULTAS_OBJETIVOS_SEGUROS = {
   aptoMedico: [
-    'Consulta sobre observación, no apto, dispensa o levantamiento',
     'Consulta general sobre el apto médico sin detalle especificado',
     'Consulta sobre documentación requerida (F-001, DNI, informes)',
+    'Notificación de vencimiento próximo del apto médico',
     'Consulta sobre detalles de la cita (fecha, hora, lugar, indicaciones)',
     'Consulta sobre vigencia del apto médico',
-    'Consulta de información no especificada',
-    'Consulta sobre licencia chilena u otro documento asociado',
   ],
 }
 
-// Hasta 3 ejemplos por objetivo seguro, filtrados a este TIPO y a calidad
-// "Respondida completamente" — así el modelo solo ve precedente verificado,
-// nunca casos mal resueltos o sin relación.
-function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros) {
+// Objetivos que el jefe marcó en VERDE (son pura consulta, no gestión) pero
+// que la IA TODAVÍA no puede responder sola: requieren revisar el estado real
+// del trámite del tripulante (si ya se entregó/recogió su apto médico, si su
+// reprogramación ya solicitada tiene fecha, si su renovación por vencimiento
+// ya se programó) y eso vive en otro sistema que todavía no está conectado
+// acá. Mientras tanto se derivan igual que los amarillos. Cuando se conecte
+// esa fuente de datos, mover la clave correspondiente a
+// CONSULTAS_OBJETIVOS_SEGUROS — no se usa en ninguna lógica todavía, es solo
+// para no perder de vista cuáles faltan.
+const CONSULTAS_OBJETIVOS_VERDES_PENDIENTES = {
+  aptoMedico: [
+    'Seguimiento de la entrega o recojo del apto médico',
+    'Solicitud de programación o renovación por vencimiento próximo',
+    'Seguimiento de una reprogramación ya solicitada',
+  ],
+}
+
+// Tokeniza en español para comparar similitud de texto: minúsculas, sin
+// tildes, sin puntuación, y descarta palabras muy cortas o stopwords — así
+// "quiero reprogramar mi apto médico" y "necesito reprogramar mi apto
+// médico" comparten casi todos sus tokens relevantes.
+const CONOCIMIENTO_STOPWORDS_ES = ['de', 'la', 'el', 'los', 'las', 'en', 'y', 'a', 'que', 'un', 'una', 'unos', 'unas',
+  'para', 'con', 'mi', 'mis', 'su', 'sus', 'al', 'del', 'por', 'es', 'me', 'lo', 'le', 'les', 'se', 'no', 'si', 'ya',
+  'o', 'como', 'esta', 'este', 'esto', 'estas', 'estos', 'soy', 'ser', 'muy', 'the']
+
+function tokenizarConsulta(texto) {
+  const normalizado = String(texto || '')
+    .toLowerCase()
+    .normalize('NFD').replace(new RegExp('[̀-ͯ]', 'g'), '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+  const set = {}
+  normalizado.split(/\s+/).forEach((palabra) => {
+    if (palabra.length > 2 && CONOCIMIENTO_STOPWORDS_ES.indexOf(palabra) === -1) set[palabra] = true
+  })
+  return set
+}
+
+// Similitud simple (Jaccard sobre tokens) entre dos textos — no requiere
+// llamar a ningún servicio de embeddings, alcanza para encontrar el
+// precedente real más parecido a la consulta nueva dentro de este TIPO.
+function similitudTexto(tokensA, tokensB) {
+  const clavesA = Object.keys(tokensA)
+  const clavesB = Object.keys(tokensB)
+  if (!clavesA.length || !clavesB.length) return 0
+  let interseccion = 0
+  clavesA.forEach((t) => { if (tokensB[t]) interseccion++ })
+  const union = new Set(clavesA.concat(clavesB)).size
+  return union ? interseccion / union : 0
+}
+
+// Devuelve { porCategoria, similares }:
+//  - porCategoria: hasta 3 ejemplos por cada objetivo seguro (precedente
+//    "de manual", para que el modelo vea el patrón típico de cada categoría).
+//  - similares: hasta 3 ejemplos, de CUALQUIER objetivo (seguro o no), que
+//    son los más parecidos EN TEXTO a esta consulta puntual — el ancla más
+//    fuerte para decidir el caso, porque es precedente real de un caso
+//    prácticamente igual, no un promedio de la categoría.
+// Ambos, filtrados a este TIPO y a calidad "Respondida completamente" —
+// así el modelo solo ve precedente verificado, nunca casos mal resueltos.
+function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros, consultaTexto) {
   const ss = SpreadsheetApp.openById(CONOCIMIENTO_SHEET_ID)
   const sheet = ss.getSheets().find((s) => s.getSheetId() === CONOCIMIENTO_GID)
   if (!sheet) throw new Error('No se encontró la pestaña de la base de conocimiento (revisa CONOCIMIENTO_SHEET_ID/CONOCIMIENTO_GID)')
@@ -1180,11 +1443,12 @@ function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros) {
   }
 
   const lastRow = sheet.getLastRow()
-  if (lastRow < 2) return []
+  if (lastRow < 2) return { porCategoria: [], similares: [] }
   const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
 
   const porObjetivo = {}
   objetivosSeguros.forEach((o) => { porObjetivo[o] = [] })
+  const pool = []
 
   rows.forEach((row) => {
     const tipo = String(row[tipoIdx] || '').trim()
@@ -1192,15 +1456,30 @@ function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros) {
     const calidad = String(row[calidadIdx] || '').trim()
     if (tipo !== tipoLabel) return
     if (calidad !== 'Respondida completamente') return
-    if (porObjetivo[objetivo] === undefined) return
-    if (porObjetivo[objetivo].length >= 3) return
     const consulta = String(row[consultaIdx] || '').trim()
     const respuesta = String(row[respuestaIdx] || '').trim()
     if (!consulta || !respuesta) return
-    porObjetivo[objetivo].push({ objetivo: objetivo, consulta: consulta, respuesta: respuesta })
+    const ejemplo = { objetivo: objetivo, consulta: consulta, respuesta: respuesta }
+    pool.push(ejemplo)
+    if (porObjetivo[objetivo] !== undefined && porObjetivo[objetivo].length < 3) {
+      porObjetivo[objetivo].push(ejemplo)
+    }
   })
 
-  return Object.keys(porObjetivo).reduce((acc, k) => acc.concat(porObjetivo[k]), [])
+  const porCategoria = Object.keys(porObjetivo).reduce((acc, k) => acc.concat(porObjetivo[k]), [])
+
+  let similares = []
+  if (consultaTexto) {
+    const tokensQuery = tokenizarConsulta(consultaTexto)
+    similares = pool
+      .map((ejemplo) => ({ ejemplo: ejemplo, score: similitudTexto(tokensQuery, tokenizarConsulta(ejemplo.consulta)) }))
+      .filter((p) => p.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((p) => p.ejemplo)
+  }
+
+  return { porCategoria: porCategoria, similares: similares }
 }
 
 // Clasifica el objetivo puntual de la consulta y, si cae en uno de los
@@ -1210,19 +1489,29 @@ function buscarEjemplosConocimiento(tipoLabel, objetivosSeguros) {
 // — en cualquier duda, null (y la consulta cae al flujo normal de siempre).
 function generarRespuestaConsultaIA(tipoLabel, consultaTexto, objetivosSeguros) {
   if (!consultaTexto || !objetivosSeguros || !objetivosSeguros.length) return null
-  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros)
-  if (!ejemplos.length) return null
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros, consultaTexto)
+  if (!ejemplos.porCategoria.length) return null
 
-  const ejemplosTexto = ejemplos.map((e) =>
+  const ejemplosTexto = ejemplos.porCategoria.map((e) =>
     'Objetivo: ' + e.objetivo + '\nConsulta: "' + e.consulta + '"\nRespuesta: "' + e.respuesta + '"'
   ).join('\n\n')
+
+  const similaresTexto = ejemplos.similares.length
+    ? ejemplos.similares.map((e) =>
+        'Objetivo: ' + e.objetivo + '\nConsulta: "' + e.consulta + '"\nRespuesta: "' + e.respuesta + '"'
+      ).join('\n\n')
+    : '(No se encontró ningún caso real parecido en texto a esta consulta.)'
 
   const prompt = [
     'Eres el asistente de Soporte SAB de LATAM Airlines Perú, especializado en el trámite "' + tipoLabel + '".',
     '',
-    'A continuación hay ejemplos REALES de consultas de tripulantes ya respondidas correctamente por el equipo de soporte, agrupados por el objetivo puntual de quien consulta:',
+    'A continuación hay ejemplos REALES de consultas de tripulantes ya respondidas correctamente por el equipo de soporte, agrupados por el objetivo puntual de quien consulta (precedente típico de cada categoría):',
     '',
     ejemplosTexto,
+    '',
+    'Estos otros son los casos reales MÁS PARECIDOS EN TEXTO a la consulta nueva de más abajo (pueden ser de cualquier objetivo, incluido alguno que normalmente se deriva) — son el mejor indicio de cómo se trató un caso prácticamente igual:',
+    '',
+    similaresTexto,
     '',
     'Ahora analiza esta consulta NUEVA de un tripulante:',
     '"' + consultaTexto + '"',
@@ -1230,7 +1519,7 @@ function generarRespuestaConsultaIA(tipoLabel, consultaTexto, objetivosSeguros) 
     'REGLA MÁS IMPORTANTE: esto NO es un chat. El tripulante no puede responderte ni aclarar nada después — tu respuesta es la única que va a recibir, o se deriva a un coordinador. Por eso, NUNCA hagas una pregunta de vuelta ni le pidas un dato que le falta dar (motivo, fecha, archivo, etc.). Si para responder bien necesitarías terminar pidiéndole algo, eso significa que este caso NO es ninguno de los objetivos de la lista — es OTRO.',
     '',
     'Tu tarea:',
-    '1. Decide si su objetivo es EXACTAMENTE uno de estos (y solo estos):\n' + objetivosSeguros.map((o) => '   - ' + o).join('\n') + '\n   Guíate ante todo por el patrón de los ejemplos de arriba.\n   OJO: cualquier consulta que pida reprogramar, reagendar, cambiar, adelantar, atrasar o cancelar su cita/examen, o que presente un reclamo o reporte un error, NUNCA es ninguno de estos objetivos — aunque no explique el motivo o los detalles (eso NO la convierte en "consulta general sin detalle especificado": esa categoría es solo para quien pregunta de forma genérica por su apto médico, sin pedir ninguna acción puntual).',
+    '1. Decide si su objetivo es EXACTAMENTE uno de estos (y solo estos):\n' + objetivosSeguros.map((o) => '   - ' + o).join('\n') + '\n   Prioriza SIEMPRE el patrón de los casos "MÁS PARECIDOS" de arriba por encima de cualquier intuición general tuya: si el caso real más parecido a este fue tratado como uno de los objetivos seguros (aunque mencione de paso un problema técnico, un trámite o falte un detalle), trata este igual; si el más parecido fue derivado o pide una gestión/acción puntual sobre SU caso individual (que le cambien, resuelvan o inicien algo puntual), este probablemente también debe derivarse.',
     '2. Si SÍ calza con uno de esos objetivos exactos, redacta una respuesta FINAL y completa como las de los ejemplos: profesional, breve, en español, tono LATAM, basada en el procedimiento general (nunca inventes fechas, números ni datos específicos del caso del tripulante que no estén en su consulta, y nunca saludes ni firmes — eso ya lo agrega el sistema).',
     '3. Si NO calza con ninguno, responde exactamente OTRO (nada más, en ambos campos).',
     '',
@@ -1285,9 +1574,11 @@ function testGenerarRespuestaConsultaIA() {
   const objetivosSeguros = CONSULTAS_OBJETIVOS_SEGUROS.aptoMedico
   const consultaTexto = 'Tengo apto médico mañana 4oct, pero aún no tengo las indicaciones, el lugar ni la hora, agradecería información'
 
-  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros)
-  Logger.log('Ejemplos encontrados: ' + ejemplos.length)
-  ejemplos.forEach((e) => Logger.log('  - [' + e.objetivo + '] ' + e.consulta.slice(0, 90)))
+  const ejemplos = buscarEjemplosConocimiento(tipoLabel, objetivosSeguros, consultaTexto)
+  Logger.log('Ejemplos por categoría: ' + ejemplos.porCategoria.length)
+  ejemplos.porCategoria.forEach((e) => Logger.log('  - [' + e.objetivo + '] ' + e.consulta.slice(0, 90)))
+  Logger.log('Más parecidos a esta consulta: ' + ejemplos.similares.length)
+  ejemplos.similares.forEach((e) => Logger.log('  - [' + e.objetivo + '] ' + e.consulta.slice(0, 90)))
 
   const resultado = generarRespuestaConsultaIA(tipoLabel, consultaTexto, objetivosSeguros)
   Logger.log('Resultado: ' + JSON.stringify(resultado))
