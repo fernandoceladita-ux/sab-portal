@@ -63,7 +63,10 @@ const DRIVE_ASSETS = {
   hotelGrandPalladiumMbj: '1LeCy-cwv3a4RbRU23OCMQdLWOmTMYXxF',
   // TODO: pega el ID de Drive de la imagen/gráfica de HVC STARS (panel 1 del
   // modal de noticias, ver Modals.html) y reemplaza este valor.
-  hvcStarsHero: 'REEMPLAZAR_ID_IMAGEN_HVC_STARS',
+  hvcStarsHero: '1uFe-c2xlCzF4ngFYViVRamynls4-E2jJ',
+  // TODO: pega el ID de Drive de la infografía de la nueva ruta Cusco - São
+  // Paulo (panel 3 del modal de noticias, se muestra completa sin recortar).
+  nuevaRutaCuscoSaoPaulo: '1tkJEvAFQuIRUnEUCt4Z7i4czs_QUZJsc',
   // TODO: subir a Drive las 6 imágenes de public/img/gestion-operativa/instructivo_vales/
   // (paso1.png, paso2.png, paso3.png, paso4.png, "codigo QR de la app.png",
   // restaurantes_autorizados.png), compartir cada una como "Cualquier persona
@@ -86,7 +89,7 @@ const DRIVE_ASSETS = {
   // TODO: sube una imagen para la tarjeta de Solicitud de Estacionamiento y
   // reemplaza este ID (driveImg() devuelve '' mientras empiece con
   // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
-  estacionamientoCard: 'REEMPLAZAR_ID_IMAGEN_ESTACIONAMIENTO',
+  estacionamientoCard: '1iMJx7WhLaShyMkkVPGhP0cvfjpuIIpKT',
   // TODO: pegar los IDs reales de Drive para el header y las 7 tarjetas de
   // Mi Rol (mismo orden que HUB_IDS_MIROL en MiRol.html).
   miRolHero: '1netm7cZDkTjG70sBgjQlHhd5eeI0Nrbi',
@@ -100,7 +103,7 @@ const DRIVE_ASSETS = {
   // TODO: sube una imagen para la tarjeta de Evaluación de Desempeño y
   // reemplaza este ID (driveImg() devuelve '' mientras empiece con
   // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
-  evaluacionDesempenoCard: 'REEMPLAZAR_ID_IMAGEN_EVALUACION_DESEMPENO',
+  evaluacionDesempenoCard: '1RuKe20hwJJlLPvZx0owSlLcYU6AsgCQP',
 
   gestionOperacionalHero: '1PZ9-miuYDUaibtYeKgFiFqN7tHZ-hyb9',
   instructivoVales: '1zWVWc9-Xg2iIsAR7c7WyIqe_iNTIkDtF',
@@ -110,7 +113,7 @@ const DRIVE_ASSETS = {
   // TODO: sube una imagen para la tarjeta de Reembolsos SAP Concur y
   // reemplaza este ID (driveImg() devuelve '' mientras empiece con
   // "REEMPLAZAR", así que la tarjeta simplemente no rompe con esto puesto).
-  reembolsosConcur: 'REEMPLAZAR_ID_IMAGEN_REEMBOLSOS_CONCUR'
+  reembolsosConcur: '103vYpUed_q9uzqShzHRbGg4OmSL5EwxE'
 }
 
 // Páginas de módulo ya migradas (con su propio archivo .html). Las que no
@@ -252,7 +255,7 @@ const DOMICILIO_DGAC_FOLDER_ID = '1SAGqcibpIRcBgceY1y7D_GxalFzug4do'
 //   Marca temporal | Correo | Nombres y Apellidos | DNI / Carnet de Extranjería |
 //   Cargo / Gerencia | Celular de Contacto | Fecha de Ingreso | Fecha de Salida |
 //   Marca de Vehículo | Modelo del Vehículo | Placa del Vehículo
-const ESTACIONAMIENTO_GID = -1
+const ESTACIONAMIENTO_GID = 2039975077
 
 // Mismos GID/carpeta que usa la app React (ver /apps-script/Code.gs) para
 // los trámites del módulo "Mi Rol" — comparten el mismo Sheet y Drive reales.
