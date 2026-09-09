@@ -8,9 +8,9 @@
     var consultaState = { tema: null }
 
     // Temas que tienen su propio cuadro de recomendación (ver
-    // #consulta-reco-<tema> en Modals.html). Los que no están acá (Apto
-    // Médico, Licencia Local) simplemente no muestran ningún cuadro.
-    var CONSULTA_TEMAS_CON_RECO = ['reva', 'experienciaReciente', 'lck']
+    // #consulta-reco-<tema> en Modals.html). Los que no están acá (Licencia
+    // Local) simplemente no muestran ningún cuadro.
+    var CONSULTA_TEMAS_CON_RECO = ['reva', 'experienciaReciente', 'lck', 'aptoMedico']
 
     window.selectConsultaTema = function (tema) {
       consultaState.tema = tema
@@ -22,6 +22,14 @@
         var reco = document.getElementById('consulta-reco-' + tema)
         if (reco) reco.classList.remove('hidden')
       }
+
+      // Apto Médico se resuelve solo con correo/BP/nombre + el detalle de la
+      // consulta (ver resolverCitaReprogramacionAptoMedico en Code.gs) —
+      // categoría y correo CPL no se usan para nada acá, así que se ocultan
+      // para que el formulario se sienta simple, casi solo "detalla tu
+      // consulta". El resto de temas los sigue pidiendo igual que siempre.
+      var categoriaCplWrap = document.getElementById('consulta-categoria-cpl-wrap')
+      if (categoriaCplWrap) categoriaCplWrap.classList.toggle('hidden', tema === 'aptoMedico')
 
       document.getElementById('consulta-panel').classList.remove('hidden')
     }
@@ -75,9 +83,13 @@
     window.submitConsultaForm = async function () {
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
+      var iaBox = document.getElementById('consultas-ia-respuesta')
+      var derivadoBox = document.getElementById('consultas-derivado')
       errorBox.classList.add('hidden')
       successBox.classList.add('hidden')
       successBox.classList.remove('flex')
+      iaBox.classList.add('hidden')
+      derivadoBox.classList.add('hidden')
 
       if (!validateConsultaForm()) {
         errorBox.textContent = !consultaState.tema
@@ -111,10 +123,17 @@
           archivoNombre: file ? file.name : '',
           archivoTipo: file ? file.type : '',
         }
-        await runServer('submitConsultaSoporte', payload)
+        var resultado = await runServer('submitConsultaSoporte', payload)
         resetConsultaForm()
-        successBox.classList.remove('hidden')
-        successBox.classList.add('flex')
+        if (resultado && resultado.respuestaIA) {
+          document.getElementById('consultas-ia-respuesta-texto').textContent = resultado.respuestaIA
+          iaBox.classList.remove('hidden')
+        } else if (resultado && resultado.derivada) {
+          derivadoBox.classList.remove('hidden')
+        } else {
+          successBox.classList.remove('hidden')
+          successBox.classList.add('flex')
+        }
       } catch (err) {
         errorBox.textContent = 'Ocurrió un error al enviar tu consulta. Por favor intenta nuevamente. (' + (err && err.message ? err.message : err) + ')'
         errorBox.classList.remove('hidden')
@@ -138,15 +157,22 @@
       if (panel) panel.classList.add('hidden')
       if (typeof clearFile === 'function') clearFile('consulta')
 
+      var categoriaCplWrap = document.getElementById('consulta-categoria-cpl-wrap')
+      if (categoriaCplWrap) categoriaCplWrap.classList.remove('hidden')
+
       consultaState.tema = null
 
       var errorBox = document.getElementById('consultas-error')
       var successBox = document.getElementById('consultas-success')
+      var iaBox = document.getElementById('consultas-ia-respuesta')
+      var derivadoBox = document.getElementById('consultas-derivado')
       if (errorBox) errorBox.classList.add('hidden')
       if (successBox) {
         successBox.classList.add('hidden')
         successBox.classList.remove('flex')
       }
+      if (iaBox) iaBox.classList.add('hidden')
+      if (derivadoBox) derivadoBox.classList.add('hidden')
     }
   })()
 </script>

@@ -407,10 +407,23 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0 text-green-400"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
         Consulta enviada correctamente.
       </div>
-      <!-- La respuesta instantánea de IA (consultas-ia-respuesta / consultas-derivado,
-           ver generarRespuestaConsultaIA en Code.gs) queda pausada por ahora
-           — se retoma más adelante. El formulario vuelve a su flujo simple:
-           se guarda la consulta y listo, sin clasificar nada acá. -->
+      <!-- Respuesta automática de la Rama 1 de Apto Médico (cita/reprogramación,
+           ver resolverCitaReprogramacionAptoMedico en Code.gs): si la IA
+           puede resolverlo solo comparando fechas reales de Sheets, la
+           respuesta se muestra acá mismo arriba; si no, se deriva a Kari y se
+           avisa con el cuadro de abajo. El resto de temas sigue el flujo
+           simple de siempre (se guarda la consulta y listo). -->
+      <div id="consultas-ia-respuesta" class="mt-6 hidden rounded-xl border-t-4 border-latam-coral bg-white/10 px-4 py-4 text-sm leading-relaxed text-white animate-fadeUp">
+        <p class="mb-1.5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-latam-coral">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke-linecap="round" /></svg>
+          Respuesta automática
+        </p>
+        <p id="consultas-ia-respuesta-texto" class="whitespace-pre-line text-white/90"></p>
+      </div>
+      <div id="consultas-derivado" class="mt-6 hidden items-center gap-2 rounded-xl bg-white/10 px-4 py-3.5 text-sm font-bold text-white animate-fadeUp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-5 w-5 flex-shrink-0 text-latam-coral"><path d="M12 8v5l3 2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12" cy="12" r="9" /></svg>
+        Tu consulta necesita revisión de un coordinador — ya se le avisó y te responderá pronto.
+      </div>
       <div id="consultas-error" class="mt-6 hidden rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-200 animate-fadeUp"></div>
 
       <form id="form-consultas" novalidate class="mt-6">
@@ -428,7 +441,13 @@
             <input type="text" name="nombre" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20" />
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+        <!-- Se oculta para Apto Médico (ver selectConsultaTema en
+             ConsultasScript.html): la Rama 1 no usa categoría ni correo CPL
+             para nada, así que no tiene sentido pedírselos al tripulante —
+             el resto de temas los sigue mostrando igual que siempre. Al
+             estar oculto (offsetParent null), validateConsultaForm ya lo
+             salta solo, aunque el <select> siga marcado "required". -->
+        <div id="consulta-categoria-cpl-wrap" class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
           <div class="mb-5">
             <label class="mb-2 block text-sm font-bold text-white">Categoría <span class="text-latam-coral">*</span></label>
             <select name="categoria" required class="consultas-fld w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white outline-none transition-all focus:border-latam-coral focus:bg-white/15 focus:ring-4 focus:ring-latam-coral/20">
@@ -505,6 +524,9 @@
             <br />- El mes de prórroga
             <br /><br />Si tu actividad no fue agendada durante el mes base, aún puedes ser programado durante el mes de prórroga, sin que esto implique la pérdida de tu chequeo.
             <br /><br /><strong>Importante:</strong> te pedimos solo ingresar tu consulta si te encuentras en tu mes de prórroga y aún no has sido programado, para poder brindarte apoyo en la programación.
+          </div>
+          <div id="consulta-reco-aptoMedico" class="consulta-reco mb-5 hidden rounded-xl border border-white/15 bg-white/5 p-4 text-sm leading-relaxed text-white/90">
+            Si tu consulta es sobre la <strong>cita o reprogramación</strong> de tu apto médico, la revisamos al instante con tu información registrada: si podemos resolverla sola, te respondemos apenas envíes el formulario; si no, la derivamos directo a Kari.
           </div>
 
           <div class="mb-5">
