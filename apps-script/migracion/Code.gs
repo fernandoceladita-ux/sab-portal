@@ -964,40 +964,80 @@ function submitReembolsoConcur(data) {
 }
 
 // ============================================================================
-// Apto Médico — Rama 1: Cita / Reprogramación (+ Vigencia / Vencimiento).
+// Apto Médico + EMO — Autoconsultas IA.
 //
-// Mikife quiere que la IA se autogestione leyendo Sheets reales (no
-// precedente histórico como el sistema de objetivos de más abajo, que sigue
-// pausado). Kari agrupó las 5 consultas típicas de Apto Médico en 3 ramas;
-// esta era la primera. La "Rama 3" (Vencimiento/Vigencia) que iba a ir
-// aparte se terminó fusionando acá (ver esConsultaVigenciaAptoMedico más
-// abajo): usa exactamente la misma lógica de fechas (Filtro 2: apto
-// vencido/vence este mes, luego EMO), así que no tenía sentido duplicarla
-// — esta rama ahora responde tanto "¿cuándo es mi cita?" como "¿está
-// vigente mi apto médico?". La decisión final es 100% determinística
-// (comparar fechas) — la IA solo se usa para detectar si la consulta cae en
-// alguna de las dos puertas de entrada. Nunca inventa una fecha; si algo no
-// se puede verificar con certeza, se deriva.
+// Arquitectura confirmada por Kari (coordinadora) tras revisar el flujo real
+// del área. 3 ramas, cada una con su propia puerta de entrada (clasificador
+// de IA) y su propia lógica 100% determinística (comparar fechas/estados
+// leídos de Sheets reales) — la IA NUNCA decide fechas ni inventa datos; si
+// algo no se puede verificar con certeza, se deriva:
+//
+//   Rama A — Cita / Vencimiento de Apto Médico (resolverCitaYVencimientoApto)
+//     "¿Cuándo es mi cita?" / "¿Está vigente mi apto?" / solicitudes de
+//     reprogramar una cita ya asignada (esto último SIEMPRE se deriva a Kari,
+//     nunca se resuelve solo, aunque ya tenga fecha).
+//
+//   Rama B — Vigencia / Programación de EMO (resolverVigenciaOProgramacionEmo)
+//     "¿Cuándo me toca pasar mi EMO?" / "¿está vigente mi EMO?". Compara el
+//     vencimiento del EMO (fecha de emisión + 1 año) contra el vencimiento
+//     del próximo RTI del tripulante para decidir el mensaje.
+//
+//   Rama C — Entrega / Recojo del apto médico físico (resolverEntregaRecojoAptoMedico)
+//     "¿Ya se solicitó ante la DGC?" / "¿Dónde recojo mi apto?" — 5 estados
+//     numerados en "Status doc", más el caso "Observado por clínica"
+//     (incluye subsanaciones/descargos, que SIEMPRE se derivan a Kari — la
+//     IA no puede validar si un documento médico realmente resuelve la
+//     observación).
+//
+// Si una consulta de tema "Apto Médico" no calza con NINGUNA de las 3 ramas
+// (fuera del alcance de esta matriz automática), se deriva igual pero con el
+// aviso genérico de siempre (avisarCoordinadorConsultaDerivada, plazo 24h) —
+// ver el dispatcher resolverConsultaAptoMedicoAutomatica más abajo, que es
+// lo único que llama submitConsultaSoporte.
 // ============================================================================
 
 const APTO_2026_SHEET_ID = '1i5T7ce0GYazei1EgqY5Y22gcadFPR-iJ-cMsPYLJi44'
 const APTO_2026_GID = 1996855301
 // Confirmado con el usuario: encabezados en la fila 2, datos desde la fila 3.
 const APTO_2026_DATA_START_ROW = 3
-// Columnas 0-indexadas (A=0): A=BP, E=Fecha Cita programada, O=Observaciones,
-// P=Status doc (columna de gestión ante la DGC, usada por la Rama 2 —
-// entrega/recojo, ver resolverEntregaRecojoAptoMedico más abajo). El
-// vencimiento de apto YA NO se lee de acá (columna J) — se movió a la
-// pestaña "BASE FINAL APTO" (ver BASE_FINAL_APTO_COL más abajo).
-const APTO_2026_COL = { bp: 0, fechaCitaProgramada: 4, observaciones: 14, statusDoc: 15 }
+// Columnas 0-indexadas (A=0) de "APTO 2026" confirmadas por Kari: A=BP,
+// E=Fecha Cita programada, H=Junta Médica (manda sobre Centro Médico si
+// está llena — si está vacía, se usa Centro Médico), K=Centro Médico,
+// L=Tipo (APTO / APTO + EMO / EMO — si es "EMO" puro, la clínica real no
+// sale de acá sino de la hoja "EMO 2026", ver EMO_2026_COL),
+// O=Observaciones, P=Status doc (columna de gestión ante la DGC, Rama C —
+// ver resolverEntregaRecojoAptoMedico más abajo). El vencimiento de apto YA
+// NO se lee de acá (columna J) — se lee de "BASE FINAL APTO", ver
+// BASE_FINAL_APTO_COL más abajo.
+const APTO_2026_COL = {
+  bp: 0,
+  fechaCitaProgramada: 4,
+  juntaMedica: 7,
+  centroMedico: 10,
+  tipo: 11,
+  observaciones: 14,
+  statusDoc: 15,
+}
 
-// El vencimiento del EMO vive en OTRA pestaña del mismo Sheet — no es la
-// pestaña "EMO 2026" que se ve a simple vista (esa trae otra cosa, fechas de
-// examen realizado). Confirmado con el usuario: encabezados en la fila 3,
-// datos desde la fila 4. Columnas: C=BP, G=Fecha Vencimiento EMO.
+// "BASE FINAL EMO" vive en OTRA pestaña del mismo Sheet — no es la pestaña
+// "EMO 2026" que se ve a simple vista (esa solo se usa para saber la
+// clínica, ver EMO_2026_GID más abajo). Confirmado por Kari: encabezados en
+// la fila 3, datos desde la fila 4. Columnas 0-indexadas (A=0): C=BP,
+// K=Fecha emisión FINAL EMO (hay que sumarle 1 año para saber cuándo vence,
+// ver sumarUnAnio más abajo), N=RTI restrictivo (VCTO) — la fecha del
+// próximo RTI del tripulante, que decide cuándo se le programa el EMO (ver
+// resolverVigenciaOProgramacionEmo).
 const EMO_VENCIMIENTO_GID = 1009628324
 const EMO_VENCIMIENTO_DATA_START_ROW = 4
-const EMO_VENCIMIENTO_COL = { bp: 2, fechaVencimiento: 6 }
+const EMO_VENCIMIENTO_COL = { bp: 2, fechaEmisionEmo: 10, rtiVencimiento: 13 }
+
+// "EMO 2026" — SOLO se usa para saber en qué clínica le toca el EMO a un
+// tripulante cuya cita en APTO 2026 es de Tipo "EMO" puro (sin apto médico,
+// ver APTO_2026_COL.tipo). Confirmado por Kari: encabezados en la fila 1,
+// datos desde la fila 2. Columnas 0-indexadas (A=0): A=BP, I=Clínica.
+const EMO_2026_GID = 1734744505
+const EMO_2026_DATA_START_ROW = 2
+const EMO_2026_COL = { bp: 0, clinica: 8 }
 
 // El vencimiento del apto médico se lee de la pestaña "BASE FINAL APTO"
 // (misma spreadsheet, otra pestaña) — columna H ("FECHA VENCIMIENTO" del
@@ -1071,6 +1111,19 @@ function formatearFechaDDMMYYYY(fecha) {
   return Utilities.formatDate(fecha, obtenerTimeZoneHojaAptoMedico(), 'dd/MM/yyyy')
 }
 
+// "BASE FINAL EMO" solo guarda la fecha de EMISIÓN del último EMO — el
+// vencimiento (1 año de vigencia) se calcula acá, nunca se lee directo de
+// ninguna celda (ver Rama B, resolverVigenciaOProgramacionEmo).
+function sumarUnAnio(fecha) {
+  const nueva = new Date(fecha.getTime())
+  nueva.setFullYear(nueva.getFullYear() + 1)
+  return nueva
+}
+
+// ============================================================================
+// Rama A — Cita / Vencimiento de Apto Médico.
+// ============================================================================
+
 // Único uso de IA en toda esta rama: clasificar si la consulta libre del
 // tripulante es sobre cita/reprogramación de su apto médico (para saber si
 // esta rama aplica) — nunca decide fechas ni redacta la respuesta final.
@@ -1094,19 +1147,18 @@ function esConsultaCitaOReprogramacionAptoMedico(consultaTexto) {
   return /^\s*s[ií]/i.test(String(salida || ''))
 }
 
-// Cubre lo que iba a ser una "Rama 3" aparte (Vencimiento/Vigencia) — se
-// fusiona acá porque usa exactamente los mismos datos y la misma lógica de
-// fechas que ya calcula esta rama (Filtro 2: apto vencido/vence este mes,
-// luego EMO), así que no tiene sentido duplicarla. Puerta de entrada
-// alternativa a esConsultaCitaOReprogramacionAptoMedico: si el tripulante
-// pregunta directo por la vigencia/vencimiento (no por la cita), esta rama
-// igual aplica y responde con la misma información de fechas.
-function esConsultaVigenciaAptoMedico(consultaTexto) {
+// Segunda puerta de entrada a esta rama, independiente de
+// esConsultaCitaOReprogramacionAptoMedico: si el tripulante pregunta directo
+// por la vigencia/vencimiento de su APTO (no de su EMO — eso es la Rama B),
+// esta rama igual aplica y responde con la misma información de fechas.
+function esConsultaVigenciaApto(consultaTexto) {
   const prompt = [
     'Un tripulante de LATAM Airlines escribió esta consulta sobre su trámite de Apto Médico:',
     '"' + consultaTexto + '"',
     '',
-    '¿Esta consulta trata específicamente sobre la VIGENCIA o VENCIMIENTO de su apto médico o de su EMO (examen médico ocupacional)? (ejemplos que SÍ cuentan: pregunta si su apto médico está vigente, cuándo vence, si ya venció, si necesita renovarlo pronto).',
+    '¿Esta consulta trata específicamente sobre la VIGENCIA o VENCIMIENTO de su APTO MÉDICO (no de su EMO)? (ejemplos que SÍ cuentan: pregunta si su apto médico está vigente, cuándo vence, si ya venció, si necesita renovarlo pronto).',
+    '',
+    'Responde NO si la consulta es sobre su EMO (examen médico ocupacional) específicamente.',
     '',
     'Responde ÚNICAMENTE "SI" o "NO", nada más.',
   ].join('\n')
@@ -1115,14 +1167,14 @@ function esConsultaVigenciaAptoMedico(consultaTexto) {
   try {
     salida = BibliotecaVertexAI.ejecutarPrompt(prompt)
   } catch (err) {
-    Logger.log('esConsultaVigenciaAptoMedico falló: ' + (err && err.message ? err.message : err))
+    Logger.log('esConsultaVigenciaApto falló: ' + (err && err.message ? err.message : err))
     return false
   }
   return /^\s*s[ií]/i.test(String(salida || ''))
 }
 
 // Segundo uso de IA de esta rama — solo se llama cuando YA hay una fecha
-// programada (ver Filtro 1 en resolverCitaReprogramacionAptoMedico), para
+// programada (ver Filtro 1 en resolverCitaYVencimientoApto), para
 // distinguir dos casos que antes se trataban igual por error:
 //  - "¿Cuándo es mi cita?" (solo quiere la información) -> se responde sola.
 //  - "Necesito reprogramar mi cita" (quiere CAMBIAR la fecha ya asignada)
@@ -1152,23 +1204,51 @@ function esSolicitudDeCambioDeCitaYaProgramada(consultaTexto) {
   return /^\s*s[ií]/i.test(String(salida || ''))
 }
 
+// Determina qué mostrarle al tripulante como lugar de su cita, según el
+// Tipo de esa fila (columna L de APTO 2026):
+//  - "EMO" puro: la clínica real sale de la hoja "EMO 2026" (columna I),
+//    buscada por BP — Centro Médico de APTO 2026 no aplica acá.
+//  - "APTO" o "APTO + EMO": manda Junta Médica (columna H) si tiene algo
+//    escrito; si está vacía, se usa Centro Médico (columna K).
+// Devuelve '' si no se pudo determinar nada confiable — el llamador decide
+// qué hacer (nunca se inventa un lugar).
+function resolverLugarDeCita(filaApto, bp) {
+  const tipo = String(filaApto[APTO_2026_COL.tipo] || '').trim()
+  if (/^emo$/i.test(tipo)) {
+    let filaEmo2026
+    try {
+      filaEmo2026 = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_2026_GID, EMO_2026_COL.bp, EMO_2026_DATA_START_ROW, bp)
+    } catch (err) {
+      Logger.log('resolverLugarDeCita: falló la lectura de EMO 2026: ' + (err && err.message ? err.message : err))
+      return ''
+    }
+    return filaEmo2026 ? String(filaEmo2026[EMO_2026_COL.clinica] || '').trim() : ''
+  }
+  const junta = String(filaApto[APTO_2026_COL.juntaMedica] || '').trim()
+  if (junta) return junta
+  return String(filaApto[APTO_2026_COL.centroMedico] || '').trim()
+}
+
 // Devuelve null si la consulta no es de esta rama (sigue el flujo normal de
-// siempre), o { tipo: 'auto', respuesta } / { tipo: 'escalar', motivo }.
-// Nunca lanza hacia afuera lo inesperado de las lecturas de Sheet — ver
-// try/catch en cada lectura, siempre resuelve a 'escalar' ante la duda.
-function resolverCitaReprogramacionAptoMedico(consultaTexto, bp) {
+// siempre), o { tipo: 'auto', respuesta } / { tipo: 'escalar', motivo,
+// esReprogramacion? }. `esReprogramacion` le indica al dispatcher
+// (resolverConsultaAptoMedicoAutomatica) que use el correo de derivación de
+// reprogramación en vez del genérico. Nunca lanza hacia afuera lo
+// inesperado de las lecturas de Sheet — ver try/catch en cada lectura,
+// siempre resuelve a 'escalar' ante la duda.
+function resolverCitaYVencimientoApto(consultaTexto, bp) {
   if (!consultaTexto || !bp) return null
   // Dos puertas de entrada independientes: cita/reprogramación, o vigencia/
-  // vencimiento directo (ver esConsultaVigenciaAptoMedico) — cualquiera de
-  // las dos activa esta misma rama, porque comparten exactamente la misma
-  // lógica de fechas de acá abajo.
-  if (!esConsultaCitaOReprogramacionAptoMedico(consultaTexto) && !esConsultaVigenciaAptoMedico(consultaTexto)) return null
+  // vencimiento directo del APTO (ver esConsultaVigenciaApto) — cualquiera
+  // de las dos activa esta misma rama, porque comparten exactamente la
+  // misma lógica de fechas de acá abajo.
+  if (!esConsultaCitaOReprogramacionAptoMedico(consultaTexto) && !esConsultaVigenciaApto(consultaTexto)) return null
 
   let filaApto
   try {
     filaApto = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, APTO_2026_GID, APTO_2026_COL.bp, APTO_2026_DATA_START_ROW, bp)
   } catch (err) {
-    Logger.log('resolverCitaReprogramacionAptoMedico: falló la lectura de APTO 2026: ' + (err && err.message ? err.message : err))
+    Logger.log('resolverCitaYVencimientoApto: falló la lectura de APTO 2026: ' + (err && err.message ? err.message : err))
     return { tipo: 'escalar', motivo: 'No se pudo leer la base de Apto Médico (' + (err && err.message ? err.message : err) + ')' }
   }
   if (!filaApto) {
@@ -1176,31 +1256,40 @@ function resolverCitaReprogramacionAptoMedico(consultaTexto, bp) {
   }
 
   // Filtro 1: ¿la cita ya está programada? (columna "Fecha Cita programada").
-  // La hora es siempre el horario estándar (8:00 a.m. a 12:30 p.m.) y el
-  // lugar exacto va en el correo de convocatoria que ya le llega al
-  // tripulante — nunca se inventa ni se lee de ninguna hoja.
+  // La hora es siempre el horario estándar (8:00 a.m. a 12:30 p.m.); el
+  // lugar se resuelve con resolverLugarDeCita — nunca se inventa.
   const fechaCitaProgramada = filaApto[APTO_2026_COL.fechaCitaProgramada]
   if (esFechaValida(fechaCitaProgramada)) {
     // Si lo que pide es CAMBIAR esa fecha (no solo saber cuál es), repetirle
     // la fecha que ya tiene no responde su consulta — necesita gestión
     // manual de Kari para reprogramar.
     if (esSolicitudDeCambioDeCitaYaProgramada(consultaTexto)) {
-      return { tipo: 'escalar', motivo: 'El tripulante ya tiene cita programada (' + formatearFechaDDMMYYYY(fechaCitaProgramada) + ') pero solicita reprogramarla' }
+      return {
+        tipo: 'escalar',
+        motivo: 'El tripulante ya tiene cita programada (' + formatearFechaDDMMYYYY(fechaCitaProgramada) + ') pero solicita reprogramarla',
+        esReprogramacion: true,
+      }
     }
+    const tipo = String(filaApto[APTO_2026_COL.tipo] || '').trim()
+    const lugar = resolverLugarDeCita(filaApto, bp)
     return {
       tipo: 'auto',
-      respuesta: 'Tu apto médico ya está programado para el ' + formatearFechaDDMMYYYY(fechaCitaProgramada) + ', en el horario estándar de 8:00 a.m. a 12:30 p.m. El lugar exacto lo encuentras en el correo de convocatoria que te enviamos.',
+      respuesta: 'Tu apto médico ya está programado para el ' + formatearFechaDDMMYYYY(fechaCitaProgramada) +
+        (tipo ? ' (Tipo: ' + tipo + ')' : '') +
+        ', en el horario estándar de 8:00 a.m. a 12:30 p.m.' +
+        (lugar ? ' Centro médico: ' + lugar + '.' : ' El lugar exacto lo encuentras en el correo de convocatoria que te enviamos.'),
     }
   }
 
-  // Filtro 2: ¿qué está vencido? El vencimiento del apto médico se lee de la
+  // Filtro 2: ¿el apto médico está vencido o vence este mes? Se lee de la
   // pestaña "BASE FINAL APTO" (columna H, ver BASE_FINAL_APTO_COL) — ya no
-  // de la columna J de APTO 2026.
+  // de la columna J de APTO 2026. La vigencia del EMO es responsabilidad de
+  // la Rama B (resolverVigenciaOProgramacionEmo), no de acá.
   let filaBaseFinalApto
   try {
     filaBaseFinalApto = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, BASE_FINAL_APTO_GID, BASE_FINAL_APTO_COL.bp, BASE_FINAL_APTO_DATA_START_ROW, bp)
   } catch (err) {
-    Logger.log('resolverCitaReprogramacionAptoMedico: falló la lectura de BASE FINAL APTO: ' + (err && err.message ? err.message : err))
+    Logger.log('resolverCitaYVencimientoApto: falló la lectura de BASE FINAL APTO: ' + (err && err.message ? err.message : err))
     return { tipo: 'escalar', motivo: 'No se pudo leer la base "BASE FINAL APTO" (' + (err && err.message ? err.message : err) + ')' }
   }
   const fechaVencApto = filaBaseFinalApto ? filaBaseFinalApto[BASE_FINAL_APTO_COL.fechaVencimientoApto] : null
@@ -1215,42 +1304,9 @@ function resolverCitaReprogramacionAptoMedico(consultaTexto, bp) {
     return { tipo: 'escalar', motivo: 'Apto médico vencido o vence este mes (vence ' + formatearFechaDDMMYYYY(fechaVencApto) + ')' }
   }
 
-  let filaEmo
-  try {
-    filaEmo = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_VENCIMIENTO_GID, EMO_VENCIMIENTO_COL.bp, EMO_VENCIMIENTO_DATA_START_ROW, bp)
-  } catch (err) {
-    Logger.log('resolverCitaReprogramacionAptoMedico: falló la lectura de vencimiento EMO: ' + (err && err.message ? err.message : err))
-    return { tipo: 'escalar', motivo: 'No se pudo leer la base de vencimiento de EMO (' + (err && err.message ? err.message : err) + ')' }
-  }
-  const fechaVencEmo = filaEmo ? filaEmo[EMO_VENCIMIENTO_COL.fechaVencimiento] : null
-  if (!esFechaValida(fechaVencEmo)) {
-    // Sin dato confiable (BP no encontrado, o celda #N/A del VLOOKUP) — se
-    // deriva en vez de arriesgarse a decirle al tripulante que está vigente.
-    return { tipo: 'escalar', motivo: 'No se encontró una fecha de vencimiento de EMO confiable para el BP ' + bp }
-  }
-
-  // Mismo criterio que esVencidoOEsteMes, pero acá SÍ hace falta distinguir
-  // "ya vencido" (auto, se reprogramará antes de fin de año) de "vence este
-  // mes pero todavía no pasa" (se deriva a Kari, igual de urgente que el
-  // apto vencido/por vencer) — comparar como texto en el timezone de la
-  // hoja, no con aritmética de Date.
-  const tzEmo = obtenerTimeZoneHojaAptoMedico()
-  const hoyEmo = new Date()
-  const emoYaVencido = Utilities.formatDate(fechaVencEmo, tzEmo, 'yyyyMMdd') < Utilities.formatDate(hoyEmo, tzEmo, 'yyyyMMdd')
-  const emoVenceEsteMes = Utilities.formatDate(fechaVencEmo, tzEmo, 'yyyyMM') === Utilities.formatDate(hoyEmo, tzEmo, 'yyyyMM')
-  if (!emoYaVencido && emoVenceEsteMes) {
-    return { tipo: 'escalar', motivo: 'EMO vence este mes (vence ' + formatearFechaDDMMYYYY(fechaVencEmo) + ')' }
-  }
-  if (emoYaVencido) {
-    return {
-      tipo: 'auto',
-      respuesta: 'Tu EMO venció el ' + formatearFechaDDMMYYYY(fechaVencEmo) + '. Se reprogramará antes de terminar el año.',
-    }
-  }
-
   return {
     tipo: 'auto',
-    respuesta: 'Revisamos tu información: tu apto médico vence el ' + formatearFechaDDMMYYYY(fechaVencApto) + ' y tu EMO vence el ' + formatearFechaDDMMYYYY(fechaVencEmo) + '. Ambos están vigentes, así que todavía no corresponde una reprogramación.',
+    respuesta: 'Tu apto médico vence el ' + formatearFechaDDMMYYYY(fechaVencApto) + '. Está vigente, así que todavía no corresponde una reprogramación.',
   }
 }
 
@@ -1285,37 +1341,144 @@ function avisarKariCitaReprogramacion(info) {
 }
 
 // ============================================================================
-// Apto Médico — Rama 2: Entrega / Recojo.
+// Rama B — Vigencia / Programación de EMO.
+//
+// Kari fue clara en que esto es un flujo aparte del apto médico: compara la
+// vigencia del EMO contra el vencimiento del próximo RTI del tripulante
+// (ambos leídos de "BASE FINAL EMO") para decidir CUÁNDO se le va a
+// programar el EMO — nunca inventa la fecha exacta, solo el criterio.
+// ============================================================================
+
+// Único uso de IA de esta rama: detectar si la consulta es específicamente
+// sobre el EMO (no sobre el apto médico en general, eso es la Rama A).
+function esConsultaVigenciaOProgramacionEmo(consultaTexto) {
+  const prompt = [
+    'Un tripulante de LATAM Airlines escribió esta consulta:',
+    '"' + consultaTexto + '"',
+    '',
+    '¿Esta consulta trata específicamente sobre su EMO (Examen Médico Ocupacional): cuándo le toca pasarlo, cuándo se lo van a programar, si está vigente, o cuándo vence? (ejemplos que SÍ cuentan: "¿cuándo me toca pasar mi EMO?", "¿cuándo me programan el EMO?", "¿está vigente mi EMO?", "¿cuándo vence mi EMO?").',
+    '',
+    'Responde NO si la consulta es sobre su apto médico (cita, vencimiento del apto) y no menciona el EMO específicamente.',
+    '',
+    'Responde ÚNICAMENTE "SI" o "NO", nada más.',
+  ].join('\n')
+
+  let salida
+  try {
+    salida = BibliotecaVertexAI.ejecutarPrompt(prompt)
+  } catch (err) {
+    Logger.log('esConsultaVigenciaOProgramacionEmo falló: ' + (err && err.message ? err.message : err))
+    return false
+  }
+  return /^\s*s[ií]/i.test(String(salida || ''))
+}
+
+// Devuelve null si la consulta no es de esta rama, o { tipo: 'auto',
+// respuesta } / { tipo: 'escalar', motivo }. Nunca inventa una fecha: si el
+// RTI no cae ni en el año en curso ni en el siguiente (dato inconsistente, o
+// ya vencido), se deriva en vez de adivinar qué corresponde.
+function resolverVigenciaOProgramacionEmo(consultaTexto, bp) {
+  if (!consultaTexto || !bp) return null
+  if (!esConsultaVigenciaOProgramacionEmo(consultaTexto)) return null
+
+  let filaEmo
+  try {
+    filaEmo = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_VENCIMIENTO_GID, EMO_VENCIMIENTO_COL.bp, EMO_VENCIMIENTO_DATA_START_ROW, bp)
+  } catch (err) {
+    Logger.log('resolverVigenciaOProgramacionEmo: falló la lectura de BASE FINAL EMO: ' + (err && err.message ? err.message : err))
+    return { tipo: 'escalar', motivo: 'No se pudo leer la base "BASE FINAL EMO" (' + (err && err.message ? err.message : err) + ')' }
+  }
+  if (!filaEmo) {
+    return { tipo: 'escalar', motivo: 'No se encontró el BP ' + bp + ' en la base "BASE FINAL EMO"' }
+  }
+
+  const fechaEmision = filaEmo[EMO_VENCIMIENTO_COL.fechaEmisionEmo]
+  if (!esFechaValida(fechaEmision)) {
+    return { tipo: 'escalar', motivo: 'No se encontró una fecha de emisión de EMO confiable para el BP ' + bp }
+  }
+  const fechaVencEmo = sumarUnAnio(fechaEmision)
+
+  const fechaRti = filaEmo[EMO_VENCIMIENTO_COL.rtiVencimiento]
+  if (!esFechaValida(fechaRti)) {
+    return { tipo: 'escalar', motivo: 'No se encontró una fecha de vencimiento de RTI confiable para el BP ' + bp }
+  }
+
+  const tz = obtenerTimeZoneHojaAptoMedico()
+  const anioRti = Number(Utilities.formatDate(fechaRti, tz, 'yyyy'))
+  const anioActual = Number(Utilities.formatDate(new Date(), tz, 'yyyy'))
+
+  if (anioRti === anioActual) {
+    return {
+      tipo: 'auto',
+      respuesta: 'Tu EMO vence el ' + formatearFechaDDMMYYYY(fechaVencEmo) + '. Como tu próximo RTI vence este mismo año (' + formatearFechaDDMMYYYY(fechaRti) + '), se te programará el EMO de forma conjunta con tu RTI para optimizar tu bajada a tierra.',
+    }
+  }
+  if (anioRti === anioActual + 1) {
+    return {
+      tipo: 'auto',
+      respuesta: 'Tu EMO vence el ' + formatearFechaDDMMYYYY(fechaVencEmo) + '. Se te programará dentro del año fiscal, antes de que venza oficialmente.',
+    }
+  }
+  return { tipo: 'escalar', motivo: 'El vencimiento del RTI (' + formatearFechaDDMMYYYY(fechaRti) + ') no cae en el año actual ni en el siguiente para el BP ' + bp + ' — requiere revisión manual' }
+}
+
+// Prueba manual: correr desde el editor (no pasa por el formulario web ni
+// requiere un despliegue nuevo). Cambia BP_DE_PRUEBA por un BP real de tu
+// hoja "BASE FINAL EMO" y revisa el resultado en Ver > Registros.
+function testResolverVigenciaOProgramacionEmo() {
+  const BP_DE_PRUEBA = '2692547' // reemplaza por el BP que quieras probar
+  const consultaTexto = '¿Cuándo me toca pasar mi EMO?'
+
+  Logger.log('¿Es vigencia/programación de EMO?: ' + esConsultaVigenciaOProgramacionEmo(consultaTexto))
+
+  const filaEmo = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_VENCIMIENTO_GID, EMO_VENCIMIENTO_COL.bp, EMO_VENCIMIENTO_DATA_START_ROW, BP_DE_PRUEBA)
+  Logger.log('Fila BASE FINAL EMO encontrada: ' + JSON.stringify(filaEmo))
+
+  const resultado = resolverVigenciaOProgramacionEmo(consultaTexto, BP_DE_PRUEBA)
+  Logger.log('Resultado final: ' + JSON.stringify(resultado))
+}
+
+// ============================================================================
+// Rama C — Entrega / Recojo del apto médico físico.
 //
 // Kari lo resumió así: esta rama arranca siempre con la misma fuente — la
 // columna de gestión ante la DGC ("Status doc", columna P de APTO 2026) —
 // y con la columna "Observaciones" (O) al lado. No hay que preguntarle nada
-// a Kari salvo en el caso "sin gestionar".
+// a Kari salvo en 2 casos puntuales (ver más abajo).
 //
-// Confirmados con el usuario los 5 estados reales de "Status doc" (siempre
+// Confirmados por Kari los 5 estados reales de "Status doc" (siempre
 // empiezan con su número; el nombre que sigue es el destinatario interno —
 // Julio, TC, Anto, etc. — y varía, pero no cambia el significado para el
 // tripulante, así que la lógica identifica solo el número inicial):
-//   1.- Pndte solicitar a [alguien]  -> todavía NO se ha solicitado.
-//   2.- Solicitado a [alguien]       -> ya se solicitó, en espera de recojo.
-//   3.- Notificado a TC              -> ya se le notificó al tripulante.
-//   4.- Recogido                     -> ya lo recogió.
-//   5.- Notificado a Anto            -> mismo significado que el 3, otro destinatario interno.
-// Los 5 tienen respuesta automática fija (ver resolverEntregaRecojoAptoMedico).
+//   1.- Pndte solicitar a [alguien]  \_ mismo mensaje: expediente en
+//   2.- Solicitado a [alguien]       /  trámite/solicitado ante la DGC.
+//   3.- Notificado a TC              -> ya puede recogerlo en Plaza El
+//                                        Olivar (7 días hábiles desde el
+//                                        correo de notificación).
+//   4.- Recogido                     -> ya lo recogió (caso raro, casi nadie
+//                                        pregunta esto — respuesta simple).
+//   5.- Notificado a Anto            -> confirma que su expediente ya se
+//                                        envió a programación, Y ADEMÁS se le
+//                                        avisa por correo a Anto para que lo
+//                                        suba a rol (ver avisoInterno más
+//                                        abajo) — a diferencia de los demás
+//                                        casos "auto", este SÍ dispara un
+//                                        correo interno aunque responda solo.
 //
-// Además, cuando "Status doc" está vacío/guión ("-"), hay 2 sub-casos según
-// la columna "Observaciones" (O) al costado:
-//  - Observado por clínica — "Observaciones" SÍ tiene texto (ej. la clínica
-//    dejó una observación de oftalmología, falta un examen/documento). La
-//    IA NO resuelve el trámite: solo interpreta esa observación con un
-//    prompt (nunca la copia literal, porque el texto libre de la hoja no
-//    siempre tiene sentido tal cual, ni se inventa nada que no esté ahí) y
-//    le explica al tripulante qué le falta, derivándolo DIRECTO a la clínica
-//    (ese intercambio de documentos no pasa por Kari).
+// Cuando "Status doc" está vacío/guión ("-"), hay 2 sub-casos según la
+// columna "Observaciones" (O) al costado:
+//  - Levantar observación / descargo — el tripulante informa que YA ENVIÓ o
+//    YA TIENE los documentos que la clínica le pidió para levantar un "No
+//    Apto" temporal (ej. exámenes complementarios, informe de especialista).
+//    La IA NO puede validar si esos documentos resuelven la observación —
+//    esto SIEMPRE se deriva a Kari, nunca se interpreta ni se responde solo.
+//  - Observado por clínica (el tripulante solo PREGUNTA qué le falta, no
+//    dice que ya lo tiene) — la IA interpreta la observación con un prompt
+//    (nunca la copia literal, ni inventa nada que no esté ahí) y le explica
+//    qué le falta, derivándolo DIRECTO a la clínica (no pasa por Kari).
 //  - Sin gestionar — "Observaciones" TAMBIÉN está vacía: nadie inició el
-//    trámite ante la DGC todavía. Este es el ÚNICO caso de toda la rama que
-//    se deriva a Kari — ella necesita mirarlo a mano para entender por qué
-//    no se ha gestionado.
+//    trámite ante la DGC todavía. Se deriva a Kari — ella necesita mirarlo a
+//    mano para entender por qué no se ha gestionado.
 //
 // Cualquier "Status doc" con un número fuera del 1-5, o sin número al
 // inicio, no se adivina: se deriva, mismo criterio de todo este sistema
@@ -1344,6 +1507,36 @@ function esConsultaEntregaRecojoAptoMedico(consultaTexto) {
   } catch (err) {
     Logger.log('esConsultaEntregaRecojoAptoMedico falló: ' + (err && err.message ? err.message : err))
     return false
+  }
+  return /^\s*s[ií]/i.test(String(salida || ''))
+}
+
+// Detecta el caso "levantar observación / descargo": el tripulante informa
+// que YA ENVIÓ o YA TIENE los documentos que la clínica le pidió para
+// levantar un "No Apto" temporal. La IA nunca valida si esos documentos
+// realmente resuelven la observación — eso siempre se deriva a Kari (ver
+// resolverEntregaRecojoAptoMedico). Distinto de solo PREGUNTAR qué falta,
+// que sí se interpreta y responde (ver generarRespuestaObservacionAptoMedico).
+function esConsultaLevantarObservacionMedica(consultaTexto) {
+  const prompt = [
+    'Un tripulante de LATAM Airlines escribió esta consulta sobre una observación pendiente de su apto médico:',
+    '"' + consultaTexto + '"',
+    '',
+    '¿El tripulante está INFORMANDO que YA ENVIÓ, YA ENTREGÓ o YA TIENE EN SU PODER los documentos/exámenes que la clínica le pidió para levantar un "No Apto" temporal (ej. "ya envié mis exámenes", "ya tengo el informe del especialista", "ya subsané la observación")?',
+    '',
+    'Responde NO si el tripulante solo está PREGUNTANDO qué le falta o qué debe hacer (eso no cuenta acá).',
+    '',
+    'Responde ÚNICAMENTE "SI" o "NO", nada más.',
+  ].join('\n')
+
+  let salida
+  try {
+    salida = BibliotecaVertexAI.ejecutarPrompt(prompt)
+  } catch (err) {
+    Logger.log('esConsultaLevantarObservacionMedica falló: ' + (err && err.message ? err.message : err))
+    // Ante la duda, mejor derivar que arriesgarse a interpretar sola una
+    // subsanación real que la IA no puede validar.
+    return true
   }
   return /^\s*s[ií]/i.test(String(salida || ''))
 }
@@ -1377,8 +1570,11 @@ function generarRespuestaObservacionAptoMedico(observacion) {
   return texto
 }
 
-// Devuelve null si la consulta no es de esta rama, o { tipo: 'auto', respuesta }
-// / { tipo: 'escalar', motivo } — mismo contrato que resolverCitaReprogramacionAptoMedico.
+// Devuelve null si la consulta no es de esta rama, o { tipo: 'auto',
+// respuesta, avisoInterno? } / { tipo: 'escalar', motivo } — mismo contrato
+// que resolverCitaYVencimientoApto. `avisoInterno` (solo en el estatus 5)
+// le indica al dispatcher que mande un correo interno a Anto ADEMÁS de la
+// respuesta automática al tripulante.
 function resolverEntregaRecojoAptoMedico(consultaTexto, bp) {
   if (!consultaTexto || !bp) return null
   if (!esConsultaEntregaRecojoAptoMedico(consultaTexto)) return null
@@ -1402,15 +1598,19 @@ function resolverEntregaRecojoAptoMedico(consultaTexto, bp) {
   const observaciones = observacionesCrudas === '-' ? '' : observacionesCrudas
 
   // "Sin gestionar" — ni status ni observaciones: nadie inició el trámite
-  // ante la DGC todavía. Único caso de esta rama que se deriva a Kari.
+  // ante la DGC todavía. Se deriva a Kari.
   if (!statusDoc && !observaciones) {
     return { tipo: 'escalar', motivo: 'Aún no se ha gestionado la entrega/recojo ante la DGC para el BP ' + bp + ' (columna de gestión vacía)' }
   }
 
-  // "Observado por clínica" — status vacío pero con observación: se
-  // interpreta con IA (nunca se copia literal) y se deriva a la clínica
-  // (nunca a Kari, ese intercambio de documentos no pasa por ella).
+  // Status vacío pero con observación: puede ser "levantar observación"
+  // (el tripulante ya tiene/envió los documentos — SIEMPRE se deriva,
+  // la IA no puede validar si eso resuelve el "No Apto") o "Observado por
+  // clínica" (solo pregunta qué le falta — sí se interpreta y responde).
   if (!statusDoc && observaciones) {
+    if (esConsultaLevantarObservacionMedica(consultaTexto)) {
+      return { tipo: 'escalar', motivo: 'El tripulante indica que ya envió/tiene los documentos para levantar la observación ("' + observaciones + '") — requiere validación manual' }
+    }
     const respuestaObservacion = generarRespuestaObservacionAptoMedico(observaciones)
     if (!respuestaObservacion) {
       return { tipo: 'escalar', motivo: 'Hay una observación registrada pero no se pudo interpretar automáticamente: "' + observaciones + '"' }
@@ -1418,56 +1618,59 @@ function resolverEntregaRecojoAptoMedico(consultaTexto, bp) {
     return { tipo: 'auto', respuesta: respuestaObservacion }
   }
 
-  // Confirmados con el usuario los 5 estados reales de "Status doc" — cada
-  // uno siempre empieza con su número (el nombre de la persona que sigue
-  // puede variar: "a Julio", "a TC", "a Anto", etc., y no cambia el
-  // significado para el tripulante), así que se identifica por el número
-  // inicial en vez de buscar palabras sueltas (eso fue justo el bug: "3.-
-  // Notificado a TC" no calzaba con "recogid" ni "solicit" y se derivaba
-  // por error). Cualquier número fuera de 1-5, o texto sin número al
-  // inicio, no se adivina: se deriva.
+  // Confirmados por Kari los 5 estados reales de "Status doc" — cada uno
+  // siempre empieza con su número (el nombre de la persona que sigue puede
+  // variar: "a Julio", "a TC", "a Anto", etc., y no cambia el significado
+  // para el tripulante), así que se identifica por el número inicial en vez
+  // de buscar palabras sueltas. Cualquier número fuera de 1-5, o texto sin
+  // número al inicio, no se adivina: se deriva.
   const numeroEstado = (statusDoc.match(/^(\d)/) || [])[1]
   switch (numeroEstado) {
     case '1': // "1.- Pndte solicitar a ..." — todavía NO se ha solicitado.
-      return {
-        tipo: 'auto',
-        respuesta: 'Tu apto médico está pendiente de ser solicitado ante la DGC. En cuanto se realice la solicitud, se te notificará.',
-      }
     case '2': // "2.-.Solicitado a ..." — ya se solicitó, en espera.
       return {
         tipo: 'auto',
-        respuesta: 'Tu apto médico ya fue solicitado ante la DGC. Está pendiente el envío de la información para el recojo en la zona de Lima en los próximos días.',
+        respuesta: 'Tu apto médico está en trámite / solicitado ante la DGC.',
       }
-    case '3': // "3.- Notificado a TC" — ya se le avisó al tripulante.
-    case '5': // "5.- Notificado a Anto" — mismo significado, distinto destinatario interno.
+    case '3': // "3.- Notificado a TC" — ya puede ir a recogerlo.
       return {
         tipo: 'auto',
-        respuesta: 'Ya se te notificó sobre tu apto médico. Por favor revisa tu correo para más detalles.',
+        respuesta: 'Ya puedes acercarte a Plaza El Olivar a recoger tu apto médico. Recuerda que tienes 7 días hábiles desde que te llegó el correo de notificación para hacerlo.',
       }
-    case '4': // "4.- Recogido" — se confirma sin citar fecha (para no
-      // arriesgarse a una fecha equivocada si el texto no la trae clara).
+    case '4': // "4.- Recogido" — caso raro, casi nadie pregunta esto; se
+      // confirma sin citar fecha (para no arriesgarse a una fecha
+      // equivocada si el texto no la trae clara).
       return {
         tipo: 'auto',
         respuesta: 'Nuestros registros indican que ya recogiste tu apto médico. Si necesitas una copia o tienes otra duda, escríbenos.',
+      }
+    case '5': // "5.- Notificado a Anto" — enviado a programación: responde
+      // solo, PERO además dispara un aviso interno a Anto para que lo suba
+      // a rol (a diferencia de los demás casos "auto", que no avisan a nadie).
+      return {
+        tipo: 'auto',
+        respuesta: 'Nuestros registros indican que tu expediente fue enviado a programación. Ya se avisó al equipo para coordinar que puedas volar pronto.',
+        avisoInterno: { destinatario: 'anto', motivo: 'Expediente de apto médico enviado a programación (Status doc: "' + statusDoc + '") — falta subir a rol' },
       }
     default:
       return { tipo: 'escalar', motivo: 'Estado de gestión no reconocido con certeza para el BP ' + bp + ': "' + statusDoc + '"' }
   }
 }
 
-// "Escalar a Kari" para la Rama 2 — mismo correo temporal, mismo patrón que
-// avisarKariCitaReprogramacion (nunca lanza).
-function avisarKariEntregaRecojoAptoMedico(info) {
+// "Escalar a Kari" genérico — usado por cualquier motivo de esta matriz que
+// no sea una solicitud de reprogramación (ver avisarKariCitaReprogramacion
+// para ese caso puntual). Mismo correo temporal, nunca lanza.
+function avisarKariRevisionAptoMedico(info) {
   const correo = CONSULTAS_COORDINADOR_EMAIL_TEMPORAL.aptoMedico
   if (!correo || correo.indexOf('REEMPLAZAR') === 0) return
   try {
     MailApp.sendEmail({
       to: correo,
-      subject: 'Apto Médico — entrega/recojo sin gestionar (' + info.bp + ')',
+      subject: 'Apto Médico — requiere tu revisión (' + info.bp + ')',
       body: [
         'Hola Kari,',
         '',
-        'Un tripulante consultó sobre la entrega/recojo de su apto médico y necesita tu revisión:',
+        'Un tripulante consultó sobre su apto médico / EMO y necesita tu revisión:',
         '',
         'Motivo por el que se deriva: ' + info.motivo,
         '',
@@ -1475,11 +1678,42 @@ function avisarKariEntregaRecojoAptoMedico(info) {
         'Correo: ' + info.correo,
         'Consulta: "' + info.consulta + '"',
         '',
-        'Por favor revisa por qué no se ha gestionado ante la DGC y actualiza la hoja.',
+        'Por favor revisa y actualiza la hoja según corresponda.',
       ].join('\n'),
     })
   } catch (err) {
-    Logger.log('avisarKariEntregaRecojoAptoMedico falló: ' + (err && err.message ? err.message : err))
+    Logger.log('avisarKariRevisionAptoMedico falló: ' + (err && err.message ? err.message : err))
+  }
+}
+
+// Aviso interno para Anto (estatus 5 de "Status doc", ver
+// resolverEntregaRecojoAptoMedico) — mientras no exista su correo real, usa
+// el mismo temporal que Kari (ver CONSULTAS_COORDINADOR_EMAIL_TEMPORAL,
+// acordado con el usuario). A diferencia de avisarKariRevisionAptoMedico,
+// esto se dispara AUNQUE la consulta ya se haya respondido sola al
+// tripulante — es un aviso de seguimiento interno, no una derivación. Nunca
+// lanza: un fallo acá no debe romper el envío de la consulta.
+function avisarAntoEnvioAProgramacion(info) {
+  const correo = CONSULTAS_COORDINADOR_EMAIL_TEMPORAL.aptoMedico
+  if (!correo || correo.indexOf('REEMPLAZAR') === 0) return
+  try {
+    MailApp.sendEmail({
+      to: correo,
+      subject: 'Apto Médico — expediente enviado a programación, falta subir a rol (' + info.bp + ')',
+      body: [
+        'Hola Anto,',
+        '',
+        'Un tripulante consultó por el estado de su apto médico y su expediente figura como enviado a programación:',
+        '',
+        'Nombre: ' + info.nombre + ' (BP ' + info.bp + ')',
+        'Correo: ' + info.correo,
+        'Consulta: "' + info.consulta + '"',
+        '',
+        'Por favor confirma y súbelo a rol para que pueda volar.',
+      ].join('\n'),
+    })
+  } catch (err) {
+    Logger.log('avisarAntoEnvioAProgramacion falló: ' + (err && err.message ? err.message : err))
   }
 }
 
@@ -1544,10 +1778,7 @@ function testResolverCitaReprogramacionAptoMedico() {
   const filaApto = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, APTO_2026_GID, APTO_2026_COL.bp, APTO_2026_DATA_START_ROW, BP_DE_PRUEBA)
   Logger.log('Fila APTO 2026 encontrada: ' + JSON.stringify(filaApto))
 
-  const filaEmo = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_VENCIMIENTO_GID, EMO_VENCIMIENTO_COL.bp, EMO_VENCIMIENTO_DATA_START_ROW, BP_DE_PRUEBA)
-  Logger.log('Fila vencimiento EMO encontrada: ' + JSON.stringify(filaEmo))
-
-  const resultado = resolverCitaReprogramacionAptoMedico(consultaTexto, BP_DE_PRUEBA)
+  const resultado = resolverCitaYVencimientoApto(consultaTexto, BP_DE_PRUEBA)
   Logger.log('Resultado final: ' + JSON.stringify(resultado))
 }
 
@@ -1572,14 +1803,13 @@ function construirMapaUltimaFilaPorBP(spreadsheetId, gid, bpColIdx, dataStartRow
   return mapa
 }
 
-// Utilidad para encontrar BPs de ejemplo reales de cada rama, sin tener que
+// Utilidad para encontrar BPs de ejemplo reales de la Rama A, sin tener que
 // leer la hoja APTO 2026 a ojo. Escanea todas las filas desde
 // APTO_2026_DATA_START_ROW y clasifica cada BP según el mismo criterio que
-// resolverCitaReprogramacionAptoMedico (sin llamar a la IA ni tocar nada).
-// Correr desde el editor (Ejecutar > buscarEjemplosPorRamaAptoMedico) y
-// revisar Ver > Registros: te da hasta 3 BPs por categoría, priorizando
-// "escalarVencido" y "escalarSinFilaEnAptoNiEmo" para que puedas probar la
-// derivación a Kari.
+// resolverCitaYVencimientoApto (sin llamar a la IA ni tocar nada). Correr
+// desde el editor (Ejecutar > buscarEjemplosPorRamaAptoMedico) y revisar
+// Ver > Registros: te da hasta 3 BPs por categoría, priorizando
+// "escalarVencido" para que puedas probar la derivación a Kari.
 function buscarEjemplosPorRamaAptoMedico() {
   const ss = SpreadsheetApp.openById(APTO_2026_SHEET_ID)
   const sheet = ss.getSheets().find((s) => s.getSheetId() === APTO_2026_GID)
@@ -1597,8 +1827,6 @@ function buscarEjemplosPorRamaAptoMedico() {
     autoCitaProgramada: [],
     escalarVencido: [],
     escalarSinFechaVencConfiable: [],
-    autoEmoVencido: [],
-    escalarEmoVenceEsteMes: [],
     autoInformativo: [],
   }
 
@@ -1628,34 +1856,98 @@ function buscarEjemplosPorRamaAptoMedico() {
       if (categorias.escalarVencido.length < 3) categorias.escalarVencido.push(bp + ' (vence: ' + formatearFechaDDMMYYYY(fechaVencApto) + ')')
       continue
     }
+    if (categorias.autoInformativo.length < 3) categorias.autoInformativo.push(bp + ' (vence: ' + formatearFechaDDMMYYYY(fechaVencApto) + ')')
+  }
 
-    // Apto vigente: para saber si es "EMO ya vencido" (auto), "EMO vence
-    // este mes" (escalar) o "informativo" hay que mirar también la otra
-    // hoja — se hace solo mientras falten ejemplos de esas 3 categorías,
-    // para no disparar de más lecturas de Sheet en este escaneo.
-    if (categorias.autoEmoVencido.length < 3 || categorias.escalarEmoVenceEsteMes.length < 3 || categorias.autoInformativo.length < 3) {
-      const filaEmo = leerFilaMasRecientePorBP(APTO_2026_SHEET_ID, EMO_VENCIMIENTO_GID, EMO_VENCIMIENTO_COL.bp, EMO_VENCIMIENTO_DATA_START_ROW, bp)
-      const fechaVencEmo = filaEmo ? filaEmo[EMO_VENCIMIENTO_COL.fechaVencimiento] : null
-      if (esFechaValida(fechaVencEmo)) {
-        const tzEmo = obtenerTimeZoneHojaAptoMedico()
-        const hoyEmo = new Date()
-        const emoYaVencido = Utilities.formatDate(fechaVencEmo, tzEmo, 'yyyyMMdd') < Utilities.formatDate(hoyEmo, tzEmo, 'yyyyMMdd')
-        const emoVenceEsteMes = Utilities.formatDate(fechaVencEmo, tzEmo, 'yyyyMM') === Utilities.formatDate(hoyEmo, tzEmo, 'yyyyMM')
-        if (emoYaVencido && categorias.autoEmoVencido.length < 3) categorias.autoEmoVencido.push(bp + ' (EMO venció: ' + formatearFechaDDMMYYYY(fechaVencEmo) + ')')
-        else if (!emoYaVencido && emoVenceEsteMes && categorias.escalarEmoVenceEsteMes.length < 3) categorias.escalarEmoVenceEsteMes.push(bp + ' (EMO vence: ' + formatearFechaDDMMYYYY(fechaVencEmo) + ')')
-        else if (!emoYaVencido && !emoVenceEsteMes && categorias.autoInformativo.length < 3) categorias.autoInformativo.push(bp)
-      }
+  Logger.log('=== Ejemplos Rama A — Cita/Vencimiento de Apto (Apto Médico) ===')
+  Logger.log('AUTO — ya tiene cita programada: ' + JSON.stringify(categorias.autoCitaProgramada))
+  Logger.log('ESCALAR — apto vencido o vence este mes: ' + JSON.stringify(categorias.escalarVencido))
+  Logger.log('ESCALAR — sin fecha de vencimiento de apto confiable: ' + JSON.stringify(categorias.escalarSinFechaVencConfiable))
+  Logger.log('AUTO — apto vigente, informativo: ' + JSON.stringify(categorias.autoInformativo))
+  return categorias
+}
+
+// Igual que buscarEjemplosPorRamaAptoMedico, pero para la Rama B — escanea
+// "BASE FINAL EMO" y clasifica cada BP según el mismo criterio que
+// resolverVigenciaOProgramacionEmo (sin llamar a la IA). Correr desde el
+// editor (Ejecutar > buscarEjemplosParaVigenciaEmo) y revisar Ver > Registros.
+function buscarEjemplosParaVigenciaEmo() {
+  const ss = SpreadsheetApp.openById(APTO_2026_SHEET_ID)
+  const sheet = ss.getSheets().find((s) => s.getSheetId() === EMO_VENCIMIENTO_GID)
+  if (!sheet) throw new Error('No se encontró la pestaña (gid) de BASE FINAL EMO')
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow < EMO_VENCIMIENTO_DATA_START_ROW) throw new Error('La hoja BASE FINAL EMO no tiene filas de datos')
+  const rows = sheet.getRange(EMO_VENCIMIENTO_DATA_START_ROW, 1, lastRow - EMO_VENCIMIENTO_DATA_START_ROW + 1, sheet.getLastColumn()).getValues()
+
+  const tz = obtenerTimeZoneHojaAptoMedico()
+  const anioActual = Number(Utilities.formatDate(new Date(), tz, 'yyyy'))
+
+  const categorias = {
+    autoRtiEsteAnio: [],
+    autoRtiProximoAnio: [],
+    escalarSinDatoConfiable: [],
+    escalarRtiFueraDeRango: [],
+  }
+
+  const vistos = {}
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const bp = String(rows[i][EMO_VENCIMIENTO_COL.bp] || '').trim()
+    if (!bp || vistos[bp]) continue
+    vistos[bp] = true
+
+    const fechaEmision = rows[i][EMO_VENCIMIENTO_COL.fechaEmisionEmo]
+    const fechaRti = rows[i][EMO_VENCIMIENTO_COL.rtiVencimiento]
+    if (!esFechaValida(fechaEmision) || !esFechaValida(fechaRti)) {
+      if (categorias.escalarSinDatoConfiable.length < 3) categorias.escalarSinDatoConfiable.push(bp)
+      continue
+    }
+
+    const anioRti = Number(Utilities.formatDate(fechaRti, tz, 'yyyy'))
+    if (anioRti === anioActual) {
+      if (categorias.autoRtiEsteAnio.length < 3) categorias.autoRtiEsteAnio.push(bp + ' (RTI: ' + formatearFechaDDMMYYYY(fechaRti) + ')')
+    } else if (anioRti === anioActual + 1) {
+      if (categorias.autoRtiProximoAnio.length < 3) categorias.autoRtiProximoAnio.push(bp + ' (RTI: ' + formatearFechaDDMMYYYY(fechaRti) + ')')
+    } else if (categorias.escalarRtiFueraDeRango.length < 3) {
+      categorias.escalarRtiFueraDeRango.push(bp + ' (RTI: ' + formatearFechaDDMMYYYY(fechaRti) + ')')
     }
   }
 
-  Logger.log('=== Ejemplos por rama (Apto Médico) ===')
-  Logger.log('AUTO — ya tiene cita programada: ' + JSON.stringify(categorias.autoCitaProgramada))
-  Logger.log('ESCALAR — apto vencido o vence este mes (septiembre 2026): ' + JSON.stringify(categorias.escalarVencido))
-  Logger.log('ESCALAR — sin fecha de vencimiento de apto confiable: ' + JSON.stringify(categorias.escalarSinFechaVencConfiable))
-  Logger.log('AUTO — apto vigente pero EMO ya vencido: ' + JSON.stringify(categorias.autoEmoVencido))
-  Logger.log('ESCALAR — apto vigente pero EMO vence este mes: ' + JSON.stringify(categorias.escalarEmoVenceEsteMes))
-  Logger.log('AUTO — ambos vigentes (informativo): ' + JSON.stringify(categorias.autoInformativo))
+  Logger.log('=== Ejemplos Rama B — Vigencia/Programación de EMO ===')
+  Logger.log('AUTO — RTI vence este año: ' + JSON.stringify(categorias.autoRtiEsteAnio))
+  Logger.log('AUTO — RTI vence el próximo año: ' + JSON.stringify(categorias.autoRtiProximoAnio))
+  Logger.log('ESCALAR — sin fecha de emisión/RTI confiable: ' + JSON.stringify(categorias.escalarSinDatoConfiable))
+  Logger.log('ESCALAR — RTI fuera del rango contemplado: ' + JSON.stringify(categorias.escalarRtiFueraDeRango))
   return categorias
+}
+
+// ============================================================================
+// Dispatcher — único punto de entrada que usa submitConsultaSoporte para
+// tema "Apto Médico". Prueba las 3 ramas en orden (A: cita/vencimiento de
+// apto, B: vigencia/programación de EMO, C: entrega/recojo); la primera que
+// devuelva algo distinto de null gana. Si NINGUNA aplica, la consulta está
+// fuera del alcance de esta matriz automática — el llamador debe usar el
+// aviso genérico de 24h (avisarCoordinadorConsultaDerivada), no este
+// dispatcher. Devuelve null en ese caso, o { resultado, avisarKari } donde
+// `avisarKari` ya viene resuelto a la función de correo correcta según el
+// motivo de la derivación (reprogramación vs. cualquier otro).
+function resolverConsultaAptoMedicoAutomatica(consultaTexto, bp) {
+  let resultado = resolverCitaYVencimientoApto(consultaTexto, bp)
+  if (resultado) {
+    return { resultado: resultado, avisarKari: resultado.esReprogramacion ? avisarKariCitaReprogramacion : avisarKariRevisionAptoMedico }
+  }
+
+  resultado = resolverVigenciaOProgramacionEmo(consultaTexto, bp)
+  if (resultado) {
+    return { resultado: resultado, avisarKari: avisarKariRevisionAptoMedico }
+  }
+
+  resultado = resolverEntregaRecojoAptoMedico(consultaTexto, bp)
+  if (resultado) {
+    return { resultado: resultado, avisarKari: avisarKariRevisionAptoMedico }
+  }
+
+  return null
 }
 
 // ============================================================================
@@ -1823,28 +2115,36 @@ function submitConsultaSoporte(data) {
 
   // El sistema de objetivos por precedente histórico (generarRespuestaConsultaIA,
   // más abajo) sigue pausado — esta función no lo llama. Lo que SÍ está
-  // activo son la Rama 1 (cita/reprogramación) y la Rama 2 (entrega/recojo)
-  // de Apto Médico, ver más arriba: solo para ese tema, se prueba primero
-  // la Rama 1 y si no aplica (devuelve null) se prueba la Rama 2; cualquier
-  // otra consulta de Apto Médico (o de cualquier otro tema) sigue el flujo
-  // normal de siempre, sin tocar nada. Un fallo acá nunca debe impedir que
-  // la consulta se registre.
+  // activo es la matriz de 3 ramas de Apto Médico + EMO (ver
+  // resolverConsultaAptoMedicoAutomatica más arriba): solo para ese tema, se
+  // prueban en orden hasta que una aplique. Si NINGUNA aplica, la consulta
+  // queda fuera del alcance de esta matriz automática y se deriva igual con
+  // el aviso genérico de siempre (avisarCoordinadorConsultaDerivada, 24h) —
+  // así el tripulante nunca ve solo un "consulta guardada" silencioso.
+  // Cualquier otro tema sigue el flujo normal de siempre, sin tocar nada. Un
+  // fallo acá nunca debe impedir que la consulta se registre.
   let respuestaIA = null
   let derivada = false
   if (data.tema === 'aptoMedico') {
     const consultaTexto = String(data.consulta || '').trim()
     try {
-      let resultado = resolverCitaReprogramacionAptoMedico(consultaTexto, bp)
-      let avisarKari = avisarKariCitaReprogramacion
-      if (!resultado) {
-        resultado = resolverEntregaRecojoAptoMedico(consultaTexto, bp)
-        avisarKari = avisarKariEntregaRecojoAptoMedico
-      }
-      if (resultado && resultado.tipo === 'auto') {
-        respuestaIA = 'Hola ' + nombre + ',\n\n' + resultado.respuesta
-      } else if (resultado && resultado.tipo === 'escalar') {
+      const despacho = resolverConsultaAptoMedicoAutomatica(consultaTexto, bp)
+      if (despacho) {
+        const resultado = despacho.resultado
+        if (resultado.tipo === 'auto') {
+          respuestaIA = 'Hola ' + nombre + ',\n\n' + resultado.respuesta
+        } else if (resultado.tipo === 'escalar') {
+          derivada = true
+          despacho.avisarKari({ nombre: nombre, bp: bp, correo: correo, consulta: consultaTexto, motivo: resultado.motivo })
+        }
+        // El estatus 5 de "Status doc" (Rama C) responde solo AL TRIPULANTE
+        // pero además necesita avisar a Anto — no es una derivación normal.
+        if (resultado.avisoInterno) {
+          avisarAntoEnvioAProgramacion({ nombre: nombre, bp: bp, correo: correo, consulta: consultaTexto })
+        }
+      } else {
         derivada = true
-        avisarKari({ nombre: nombre, bp: bp, correo: correo, consulta: consultaTexto, motivo: resultado.motivo })
+        avisarCoordinadorConsultaDerivada('aptoMedico', temaConfig.label, { nombre: nombre, bp: bp, codigoOperacion: codigoOperacion, consulta: consultaTexto })
       }
     } catch (err) {
       Logger.log('submitConsultaSoporte: falló la resolución automática de Apto Médico: ' + (err && err.message ? err.message : err))
